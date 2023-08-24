@@ -2,6 +2,7 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/decoder/cpu_Opcodes.h>
 #include <RiscvEmu/util/util_Bitfields.h>
+#include <RiscvEmu/util/util_SignExtend.h>
 
 namespace riscv {
 namespace cpu {
@@ -60,6 +61,7 @@ public:
     constexpr auto funct3() const noexcept { return util::ExtractBitfield(m_Val, 12, 3); }
     constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
     constexpr auto imm() const noexcept { return util::ExtractBitfield(m_Val, 20, 12); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
 };
 
 class STypeInstruction : public detail::SBTypeBase {
@@ -69,6 +71,8 @@ public:
     constexpr auto imm() const noexcept {
         return util::ExtractBitfield(m_Val, 7, 5) | (m_Val & (0x7F << 25) >> 20);
     }
+
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
 };
 
 class BTypeInstruction : public detail::SBTypeBase {
@@ -77,12 +81,16 @@ class BTypeInstruction : public detail::SBTypeBase {
     constexpr auto imm() const noexcept {
         return (m_Val & (0xF << 8) >> 7) | (m_Val & (0x3F << 25) >> 20) | (m_Val & (1 << 7) << 4) | (m_Val & (1 << 31) >> 19);
     }
+
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 13, NativeWordBitLen); }
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr auto imm() const noexcept { return m_Val & (0xFFF << 12); }
+    constexpr auto imm() const noexcept { return m_Val & (0xFFFFFFFF << 12); }
+
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 32, NativeWordBitLen); }
 };
 
 class JTypeInstruction : public detail::UJTypeBase {
@@ -91,7 +99,9 @@ class JTypeInstruction : public detail::UJTypeBase {
     constexpr auto imm() const noexcept {
         return (m_Val & (0x3FF << 21) >> 20) | (m_Val & (1 << 20) >> 9) | (m_Val & (0xFF << 12)) | (m_Val & (1 << 31) >> 11);
     }
-}
+
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 21, NativeWordBitLen); }
+};
 
 } // namespace cpu
 } // namespace riscv
