@@ -38,4 +38,40 @@ using NativeWordS = std::conditional_t<cfg::cpu::EnableIsaRV64I, DWordS, WordS>;
 /** Address type, same as NativeWordU. */
 using Address = NativeWordU;
 
+/** Byte Length. */
+constexpr inline auto ByteLen = sizeof(ByteU);
+
+/* Byte Length in Bits. */
+constexpr inline auto ByteBitLen = ByteLen * 8;
+
+/** Half Word Length. */
+constexpr inline auto HWordLen = sizeof(HWordU);
+
+/** Half Word Length in Bits. */
+constexpr inline auto HWordBitLen = HWordLen * 8;
+
+/** Word Length. */
+constexpr inline auto WordLen = sizeof(WordU);
+
+/** Word Length in Bits. */
+constexpr inline auto WordBitLen = WordLen * 8;
+
+/** Double Word Length. */
+constexpr inline auto DWordLen = sizeof(DWordU);
+
+/** Double Word Length in Bits. */
+constexpr inline auto DWordBitLen = DWordLen * 8;
+
+/** Native Word Length. */
+constexpr inline auto NativeWordLen = sizeof(NativeWordU);
+
+/** Native Word Length in Bits. */
+constexpr inline auto NativeWordBitLen = NativeWordLen * 8;
+
+/** Address Length. */
+constexpr inline auto AddressLen = sizeof(Address);
+
+/** Address Length in Bits. */
+constexpr inline auto AddressBitLen = AddressLen * 8;
+
 } // namespace riscv
