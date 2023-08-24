@@ -5,21 +5,14 @@
 namespace riscv {
 namespace util {
 
-template<std::size_t From, std::size_t To, typename T>
-constexpr auto SignExtend(T val) {
-    static constexpr T ExtendMask = util::GenerateMaskLeft<T>(To - From);
-    static constexpr T SignCheck = 1 << (From - 1);
-
-    if (val & SignCheck) {
-        val |= ExtendMask;
+template<typename T>
+constexpr auto SignExtend(T val, int from, int to) {
+    /* Check if value is signed. */
+    if(val & 1 << (from - 1)) {
+        val |= util::GenerateMaskLeft<T>(to - from);
     }
 
     return val;
-}
-
-template<typename From, typename To>
-constexpr auto SignExtendType(From val) {
-    return static_cast<To>(static_cast<std::make_signed_t<From>>(val));
 }
 
 } // namespace util
