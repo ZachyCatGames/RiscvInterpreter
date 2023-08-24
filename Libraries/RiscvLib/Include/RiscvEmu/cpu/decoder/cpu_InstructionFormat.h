@@ -27,6 +27,7 @@ protected:
 namespace detail {
 
 class SBTypeBase : public Instruction {
+public:
     using Instruction::Instruction;
 
     constexpr auto funct3() const noexcept { return util::ExtractBitfield(m_Val, 12, 3); }
@@ -35,6 +36,7 @@ class SBTypeBase : public Instruction {
 };
 
 class UJTypeBase : public Instruction {
+public:
     using Instruction::Instruction;
 
     constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5); }
@@ -76,6 +78,7 @@ public:
 };
 
 class BTypeInstruction : public detail::SBTypeBase {
+public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
@@ -86,6 +89,7 @@ class BTypeInstruction : public detail::SBTypeBase {
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
+public:
     using detail::UJTypeBase::UJTypeBase;
 
     constexpr auto imm() const noexcept { return m_Val & (0xFFFFFFFF << 12); }
@@ -94,6 +98,7 @@ class UTypeInstruction : public detail::UJTypeBase {
 };
 
 class JTypeInstruction : public detail::UJTypeBase {
+public:
     using detail::UJTypeBase::UJTypeBase;
 
     constexpr auto imm() const noexcept {
