@@ -19,14 +19,14 @@ add_compile_options(-fno-exceptions -fno-stack-protector)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Use lld as our linker and libc++ as our std library.
     add_link_options(-fuse-ld=lld -stdlib=libc++)
-    add_compile_options(-stdlib=c++)
+    add_compile_options(-stdlib=libc++)
 
     # Statically link libc++.
     # TODO: Remove when arch finally updates llvm.
     add_link_options(-static -lc++abi)
 
     # Enable full LTO on Release builds.
-    if(CMAKE_BUILD_TYPE STEQUAL "Release")
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
         add_link_options(-flto=full)
     endif()
 endif()
@@ -40,6 +40,10 @@ include(UtilLibrarySources)
 # Create our executable.
 add_library(RiscvLib
     "${PROJECT_SOURCE_DIR}/Sources/Test.cpp"
+
+    # Result library.
+    ${RISCV_RESULT_LIBRARY_HEADERS}
+    ${RISCV_RESULT_LIBRARY_SOURCES}
 
     # Util library.
     ${RISCV_UTIL_LIBRARY_HEADERS}
