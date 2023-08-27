@@ -6,6 +6,14 @@
 namespace riscv {
 namespace mem {
 
+/**
+ * This wraps around another IMmioDev class, ImplT, and performs alignment checks
+ * on all Read/Write functions before calling the appropriate function from ImplT.
+ * 
+ * This removes the need for duplicating alignment checks.
+ * 
+ * @param ImplT  IMmioDev class to wrap around.
+*/
 template<std::derived_from<IMmioDev> ImplT>
 class AlignedMmioDev : public IMmioDev {
 public:
