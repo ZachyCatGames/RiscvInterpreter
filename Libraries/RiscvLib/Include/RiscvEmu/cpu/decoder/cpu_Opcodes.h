@@ -67,10 +67,45 @@ enum class Funct3 {
     SRLI = 0b101,
     ORI = 0b110,
     ANDI = 0b111,
+
+    /* Opcode STORE. */
+    SB = 0b000,
+    SH = 0b001,
+    SW = 0b010,
+
+    /* Opcode OP. */
+    ADD = 0b000,
+    SLL = 0b001,
+    SLT = 0b010,
+    SLTU = 0b011,
+    XOR = 0b100,
+    SRL = 0b101,
+    OR = 0b110,
+    AND = 0b111,
+
+    /* Opcode BRANCH. */
+    BEQ = 0b000,
+    BNE = 0b001,
+    BLT = 0b100,
+    BGE = 0b101,
+    BLTU = 0b110,
+    BGEU = 0b111,
+
+    /* Opcode JALR. */
+    JALR = 0b000,
 }; // enum class Funct3
 
 enum class Funct7 {
+    /* For use when Funct7 isn't used within a Funct3 namespace. */
+    Zero = 0,
 
+    /* OP::ADD. */
+    ADD = 0b0000000,
+    SUB = 0b0100000,
+
+    /* OP::SRL. */
+    SRL = 0b0000000,
+    SRA = 0b0100000,
 };
 
 } // namespace cpu

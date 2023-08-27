@@ -1,4 +1,5 @@
 #pragma once
+#include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
 
 namespace riscv {
@@ -7,8 +8,9 @@ namespace cpu {
 template<typename Derived>
 class DecoderImpl {
 public:
-    Result ParseInstruction(Instruction inst) {
-        /* Parse */
+    constexpr Result ParseInstruction(Instruction inst) {
+        /* Parse starting from opcode. */
+        return this->ParseOpcode(inst);
     }
 private:
     constexpr auto GetDerived() noexcept { return static_cast<Derived*>(this); }
@@ -23,16 +25,32 @@ private:
     constexpr auto CreateInOutReg(auto val) noexcept { return InOutRegObject(GetDerived(), val); }
     constexpr auto CreateImmediate(auto val) noexcept { return ImmediateObject(GetDerived(), val); }
 
+    constexpr Result CallStandardRType(RTypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateInReg(inst.rs2()));
+    }
+
     constexpr Result CallStandardITypeExt(ITypeInstruction inst, auto func) {
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(inst.imm_ext()));
+    }
+
+    constexpr Result CallStandardSTypeExt(STypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateInReg(inst.rs1()), CreateInReg(inst.rs2()), CreateImmediate(inst.imm_ext()));
+    }
+
+    constexpr Result CallStandardBTypeExt(BTypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateInReg(inst.rs1()), CreateInReg(inst.rs2()), CreateImmediate(inst.imm_ext()));
     }
 
     constexpr Result CallStandardUTypeExt(UTypeInstruction inst, auto func) {
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(inst.imm_ext()));
     }
 
+    constexpr Result CallStandardJTypeExt(JTypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(inst.imm_ext()));
+    }
+
 private:
-    Result ParseOpcode(Instruction inst) {
+    constexpr Result ParseOpcode(Instruction inst) {
         switch(inst.opcode()) {
         case Opcode::LOAD:
             return this->ParseLOAD(ITypeInstruction(inst));
@@ -44,7 +62,7 @@ private:
         case Opcode::OP_IMM:
             return this->ParseOP_IMM(ITypeInstruction(inst));
         case Opcode::AUIPC:
-            return this->ParseAUIPC(UTypeInstruction(inst));
+            return this->CallStandardUTypeExt(UTypeInstruction(inst), &Derived::ParseInstAUIPC);
         case Opcode::OP_IMM_32:
             /* TODO */
             break;
@@ -59,7 +77,7 @@ private:
         case Opcode::OP:
             return this->ParseOP(RTypeInstruction(inst));
         case Opcode::LUI:
-            return this->ParseLUI(UTypeInstruction(inst));
+            return this->CallStandardUTypeExt(UTypeInstruction(inst), &Derived::ParseInstLUI);
         case Opcode::OP_32:
             /* TODO */
             break;
@@ -83,7 +101,7 @@ private:
         case Opcode::JALR:
             return this->ParseJALR(ITypeInstruction(inst));
         case Opcode::JAL:
-            return this->ParseJAL(JTypeInstruction(inst));
+            return this->CallStandardJTypeExt(JTypeInstruction(inst), &Derived::ParseInstJAL);
         case Opcode::SYSTEM:
             /* TODO */
             break;
@@ -94,17 +112,17 @@ private:
         return ResultInvalidInstruction();
     }
 
-    Result ParseLOAD(ITypeInstruction inst) {
+    constexpr Result ParseLOAD(ITypeInstruction inst) {
         switch(inst.funct3()) {
-        case 0b000: // LB
+        case Funct3::LB:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLB);
-        case 0b001: // LH
+        case Funct3::LH:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLH);
-        case 0b010: // LW
+        case Funct3::LW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLW);
-        case 0b100: // LBU
+        case Funct3::LBU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLBU);
-        case 0b101: // LHU
+        case Funct3::LHU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLHU);
         default:
             break;
@@ -113,9 +131,9 @@ private:
         return ResultInvalidInstruction();
     }
 
-    Result ParseMISC_MEM(ITypeInstruction inst) {
+    constexpr Result ParseMISC_MEM(ITypeInstruction inst) {
         switch(inst.funct3()) {
-        case 0b000: // FENCE
+        case Funct3::FENCE: // FENCE
             break;
         default:
             break;
@@ -124,7 +142,7 @@ private:
         return ResultInvalidInstruction();
     }
 
-    Result ParseOP_IMM(ITypeInstruction inst) {
+    constexpr Result ParseOP_IMM(ITypeInstruction inst) {
         static constexpr auto shamtMask = cfg::cpu::EnableIsaRV64I ? 0x3F : 0x1F;
 
         switch(inst.funct3()) {
@@ -152,7 +170,7 @@ private:
             if(upper) {
                 /* If exclusively the 10th bit is set, parse as SRAI. */
                 if(upper == (1 << 10)) {
-                    return GetDerived().ParseInstSRAI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1), CreateImmediate(shamt));
+                    return GetDerived().ParseInstSRAI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
                 }
 
                 /* If any other bits are set, this is an invalid/reserved instruction. */
@@ -160,12 +178,109 @@ private:
             }
 
             /* Otherwise parse as SRLI. */
-            return GetDerived().ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1), CreateImmediate(shamt));
+            return GetDerived().ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
         }
         case Funct3::ORI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstORI);
         case Funct3::ANDI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstANDI);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseSTORE(STypeInstruction inst) {
+        switch(inst.funct3()) {
+        case Funct3::SB:
+            return this->CallStandardSTypeExt(inst, &Derived::ParseInstSB);
+        case Funct3::SH:
+            return this->CallStandardSTypeExt(inst, &Derived::ParseInstSH);
+        case Funct3::SW:
+            return this->CallStandardSTypeExt(inst, &Derived::ParseInstSW);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseOP(RTypeInstruction inst) {
+        constexpr auto CallOnFunct7Zero = [&](RTypeInstruction inst, auto func) {
+            if(inst.funct7() == Funct7::Zero)
+                return this->CallStandardRType(inst, func);
+            return ResultInvalidInstruction();
+        };
+
+        auto func7 = inst.funct7();
+        switch(inst.funct3()) {
+        case Funct3::ADD: {
+            switch(func7) {
+            case Funct7::ADD:
+                return this->CallStandardRType(inst, &Derived::ParseInstADD);
+            case Funct7::SUB:
+                return this->CallStandardRType(inst, &Derived::ParseInstSUB);
+            default:
+                break;
+            }
+            break;
+        }
+        case Funct3::SLL:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstSLL);
+        case Funct3::SLT:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstSLT);
+        case Funct3::SLTU:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstSLTU);
+        case Funct3::XOR:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstXOR);
+        case Funct3::SRL: {
+            switch(func7) {
+            case Funct7::SRL:
+                return this->CallStandardRType(inst, &Derived::ParseInstSRL);
+            case Funct7::SRA:
+                return this->CallStandardRType(inst, &Derived::ParseInstSRA);
+            default:
+                break;
+            }
+            break;
+        }
+        case Funct3::OR:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstOR);
+        case Funct3::AND:
+            return CallOnFunct7Zero(inst, &Derived::ParseInstAND);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseBRANCH(BTypeInstruction inst) {
+        switch(inst.funct3()) {
+        case Funct3::BEQ:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBEQ);
+        case Funct3::BNE:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBNE);
+        case Funct3::BLT:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBLT);
+        case Funct3::BGE:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBGE);
+        case Funct3::BLTU:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBLTU);
+        case Funct3::BGEU:
+            return this->CallStandardBTypeExt(inst, &Derived::ParseInstBGEU);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseJALR(ITypeInstruction inst) {
+        switch(inst.funct3()) {
+        case Funct3::JALR:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstJALR);
         default:
             break;
         }
