@@ -10,6 +10,8 @@ public:
     constexpr auto GetValue() const noexcept { return Value; }
 
     constexpr auto IsSuccess() const noexcept { return false; }
+
+    constexpr operator Result() const noexcept { return Result(Value); }
 private:
     static constexpr auto Value = detail::CreateResultValue(ModId, Desc);
 }; // class ErrorBase
