@@ -9,7 +9,7 @@ namespace cpu {
 
 class Instruction {
 public:
-    constexpr explicit Instruction(Word val) noexcept : m_Val(val) {}
+    constexpr explicit Instruction(WordU val) noexcept : m_Val(val) {}
 
     constexpr auto Get() const noexcept {
         return m_Val;
@@ -19,9 +19,9 @@ public:
         return static_cast<Opcode>(m_Val & c_OpcodeMask);
     }
 private:
-    static constexpr Word c_OpcodeMask = 0x3F;
+    static constexpr WordU c_OpcodeMask = 0x3F;
 protected:
-    Word m_Val = 0;
+    WordU m_Val = 0;
 };
 
 namespace detail {
