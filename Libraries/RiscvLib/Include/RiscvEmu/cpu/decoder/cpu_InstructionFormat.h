@@ -7,21 +7,29 @@
 namespace riscv {
 namespace cpu {
 
-class Instruction {
-public:
-    constexpr explicit Instruction(WordU val) noexcept : m_Val(val) {}
+namespace detail {
 
-    constexpr auto Get() const noexcept {
-        return m_Val;
-    }
+class InstructionBase {
+public:
+    constexpr explicit InstructionBase(WordU val) noexcept : m_Val(val) {}
+
+    constexpr auto Get() const noexcept { return m_Val; }
+private:
+    WordU m_Val = 0;
+}; // class InstructionBase
+
+} // namespace detail
+
+class Instruction : public detail::InstructionBase {
+public:
+    constexpr explicit Instruction(const detail::InstructionBase inst) noexcept : detail::InstructionBase(inst) {}
+    constexpr explicit Instruction(WordU val) noexcept : detail::InstructionBase(val) {}
 
     constexpr auto opcode() const noexcept {
-        return static_cast<Opcode>(m_Val & c_OpcodeMask);
+        return static_cast<Opcode>(this->Get() & c_OpcodeMask);
     }
 private:
     static constexpr WordU c_OpcodeMask = 0x3F;
-protected:
-    WordU m_Val = 0;
 };
 
 namespace detail {
@@ -30,16 +38,16 @@ class SBTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
-    constexpr auto rs2() const noexcept { return util::ExtractBitfield(m_Val, 20, 5); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
+    constexpr auto rs2() const noexcept { return util::ExtractBitfield(this->Get(), 20, 5); }
 };
 
 class UJTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5); }
+    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5); }
 };
 
 } // namespace detail
@@ -48,21 +56,21 @@ class RTypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5); }
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
-    constexpr auto rs2() const noexcept { return util::ExtractBitfield(m_Val, 20, 5); }
-    constexpr auto funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(m_Val, 25, 7)); }
+    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
+    constexpr auto rs2() const noexcept { return util::ExtractBitfield(this->Get(), 20, 5); }
+    constexpr auto funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(this->Get(), 25, 7)); }
 };
 
 class ITypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5 ); }
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
-    constexpr auto imm() const noexcept { return util::ExtractBitfield(m_Val, 20, 12); }
+    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5 ); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
+    constexpr auto imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
 };
 
@@ -71,7 +79,7 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return util::ExtractBitfield(m_Val, 7, 5) | (m_Val & (0x7F << 25) >> 20);
+        return util::ExtractBitfield(this->Get(), 7, 5) | (this->Get() & (0x7F << 25) >> 20);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
@@ -82,7 +90,7 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (m_Val & (0xF << 8) >> 7) | (m_Val & (0x3F << 25) >> 20) | (m_Val & (1 << 7) << 4) | (m_Val & (1 << 31) >> 19);
+        return (this->Get() & (0xF << 8) >> 7) | (this->Get() & (0x3F << 25) >> 20) | (this->Get() & (1 << 7) << 4) | (this->Get() & (1 << 31) >> 19);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 13, NativeWordBitLen); }
@@ -92,7 +100,7 @@ class UTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr auto imm() const noexcept { return m_Val & (0xFFFFFFFF << 12); }
+    constexpr auto imm() const noexcept { return this->Get() & (0xFFFFFFFF << 12); }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 32, NativeWordBitLen); }
 };
@@ -102,7 +110,7 @@ public:
     using detail::UJTypeBase::UJTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (m_Val & (0x3FF << 21) >> 20) | (m_Val & (1 << 20) >> 9) | (m_Val & (0xFF << 12)) | (m_Val & (1 << 31) >> 11);
+        return (this->Get() & (0x3FF << 21) >> 20) | (this->Get() & (1 << 20) >> 9) | (this->Get() & (0xFF << 12)) | (this->Get() & (1 << 31) >> 11);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 21, NativeWordBitLen); }
