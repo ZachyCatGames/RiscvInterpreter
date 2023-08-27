@@ -10,6 +10,8 @@ public:
     constexpr auto IsSuccess() const noexcept { return true; }
 
     constexpr operator Result() const noexcept { return Result(result::detail::SuccessValue); }
+
+    constexpr bool Includes(Result res) const noexcept { return res.GetValue() == result::detail::SuccessValue; }
 }; // class ResultSuccess
 
 } // namespace riscv

@@ -8,6 +8,8 @@ public:
     constexpr Result() noexcept : m_Value(0) {}
     constexpr Result(Word val) noexcept : m_Value(val) {}
 
+    constexpr auto GetValue() const noexcept { return m_Value; }
+
     /**
      * Returns whether a Result indicates success.
     */
