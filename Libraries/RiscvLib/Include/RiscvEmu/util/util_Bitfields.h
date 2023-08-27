@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <utility>
 #include <concepts>
-#include <Riscv/util/util_Bitmask.h>
+#include <RiscvEmu/util/util_Bitmask.h>
 
 namespace riscv {
 namespace util {
@@ -13,6 +13,7 @@ class Bitfields {
 public:
     constexpr Bitfields() noexcept : m_Value(0) {}
     explicit constexpr Bitfields(const T& val) noexcept : m_Value(val) {}
+    explicit constexpr Bitfields(T&& val) noexcept : m_Value(std::move(val)) {}
 
     constexpr const T& GetValue() const noexcept {
         return m_Value;
@@ -45,29 +46,28 @@ public:
     constexpr T GetField(std::pair<int, int> pair) const noexcept {
         return this->GetField(std::get<0>(pair), std::get<1>(pair));
     }
-
 private:
     T m_Value;
 };
 
 template<typename T>
-constexpr T ExtractBitfield(const T& val, int offset, int size) noexcept {
-    return Bitfields(val).GetField(offset, size);
+constexpr T ExtractBitfield(T&& val, int offset, int size) noexcept {
+    return Bitfields(std::forward<T>(val)).GetField(offset, size);
 }
 
 template<typename T>
-constexpr T ExtractBitfield(const T& val, std::pair<int, int> pair) noexcept {
-    return Bitfields(val).GetField(pair);
+constexpr T ExtractBitfield(T&& val, std::pair<int, int> pair) noexcept {
+    return Bitfields(std::forward<T>(val)).GetField(pair);
 }
 
 template<typename T>
-constexpr T AssignBitfield(const T& val, int offset, int size, const T& val) noexcept {
-    return Bitfields(val).SetField(offset, size, val).GetValue();
+constexpr T AssignBitfield(T&& target, int offset, int size, const T& val) noexcept {
+    return Bitfields(std::forward<T>(target)).SetField(offset, size, val).GetValue();
 }
 
 template<typename T>
-constexpr T AssignBitfield(const T& val, std::pair<int, int> pair, const T& val) noexcept {
-    return Bitfields(val).SetField(offset, pair, val).GetValue();
+constexpr T AssignBitfield(T&& target, std::pair<int, int> pair, const T& val) noexcept {
+    return Bitfields(std::forward<T>(target)).SetField(pair, val).GetValue();
 }
 
 } // namespace util
