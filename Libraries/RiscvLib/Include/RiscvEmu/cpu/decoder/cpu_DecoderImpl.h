@@ -27,6 +27,10 @@ private:
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(inst.imm_ext()));
     }
 
+    constexpr Result CallStandardUTypeExt(UTypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(inst.imm_ext()));
+    }
+
 private:
     Result ParseOpcode(Instruction inst) {
         switch(inst.opcode()) {
@@ -102,6 +106,66 @@ private:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLBU);
         case 0b101: // LHU
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLHU);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    Result ParseMISC_MEM(ITypeInstruction inst) {
+        switch(inst.funct3()) {
+        case 0b000: // FENCE
+            break;
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    Result ParseOP_IMM(ITypeInstruction inst) {
+        static constexpr auto shamtMask = cfg::cpu::EnableIsaRV64I ? 0x3F : 0x1F;
+
+        switch(inst.funct3()) {
+        case Funct3::ADDI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstADDI);
+        case Funct3::SLLI: {
+            /* SLLI requires that all upper bits are 0. */
+            if(inst.imm() > NativeWordBitLen - 1) {
+                break;
+            }
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstSLLI);
+        }
+        case Funct3::SLTI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstSLTI);
+        case Funct3::SLTIU:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstSLTIU);
+        case Funct3::XORI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstXORI);
+        case Funct3::SRLI: {
+            auto imm = inst.imm();
+            auto shamt = imm & shamtMask;
+
+            /* Check if any upper bits in the immediate are set. */
+            auto upper = imm & ~shamtMask;
+            if(upper) {
+                /* If exclusively the 10th bit is set, parse as SRAI. */
+                if(upper == (1 << 10)) {
+                    return GetDerived().ParseInstSRAI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1), CreateImmediate(shamt));
+                }
+
+                /* If any other bits are set, this is an invalid/reserved instruction. */
+                break;
+            }
+
+            /* Otherwise parse as SRLI. */
+            return GetDerived().ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1), CreateImmediate(shamt));
+        }
+        case Funct3::ORI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstORI);
+        case Funct3::ANDI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstANDI);
         default:
             break;
         }

@@ -45,6 +45,32 @@ enum class Opcode {
     RESERVED_64   = 0b0111111,
     RESERVED_48_2 = 0b1011111,
     RESERVED_80   = 0b1111111,
+}; // enum class Opcode
+
+enum class Funct3 {
+    /* Opcode LOAD. */
+    LB = 0b000,
+    LH = 0b001,
+    LW = 0b010,
+    LBU = 0b100,
+    LHU = 0b101,
+
+    /* Opcode MISC_MEM. */
+    FENCE = 0b000,
+
+    /* Opcode OP_IMM. */
+    ADDI = 0b000,
+    SLLI = 0b001,
+    SLTI = 0b010,
+    SLTIU = 0b011,
+    XORI = 0b100,
+    SRLI = 0b101,
+    ORI = 0b110,
+    ANDI = 0b111,
+}; // enum class Funct3
+
+enum class Funct7 {
+
 };
 
 } // namespace cpu

@@ -15,7 +15,7 @@ public:
         return m_Val;
     }
 
-    constexpr Opcode opcode() const noexcept {
+    constexpr auto opcode() const noexcept {
         return static_cast<Opcode>(m_Val & c_OpcodeMask);
     }
 private:
@@ -30,7 +30,7 @@ class SBTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto funct3() const noexcept { return util::ExtractBitfield(m_Val, 12, 3); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
     constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
     constexpr auto rs2() const noexcept { return util::ExtractBitfield(m_Val, 20, 5); }
 };
@@ -49,10 +49,10 @@ public:
     using Instruction::Instruction;
 
     constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5); }
-    constexpr auto funct3() const noexcept { return util::ExtractBitfield(m_Val, 12, 3); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
     constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
     constexpr auto rs2() const noexcept { return util::ExtractBitfield(m_Val, 20, 5); }
-    constexpr auto funct7() const noexcept { return util::ExtractBitfield(m_Val, 25, 7); }
+    constexpr auto funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(m_Val, 25, 7)); }
 };
 
 class ITypeInstruction : public Instruction {
@@ -60,7 +60,7 @@ public:
     using Instruction::Instruction;
 
     constexpr auto rd() const noexcept { return util::ExtractBitfield(m_Val, 7, 5 ); }
-    constexpr auto funct3() const noexcept { return util::ExtractBitfield(m_Val, 12, 3); }
+    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(m_Val, 12, 3)); }
     constexpr auto rs1() const noexcept { return util::ExtractBitfield(m_Val, 15, 5); }
     constexpr auto imm() const noexcept { return util::ExtractBitfield(m_Val, 20, 12); }
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
