@@ -51,22 +51,22 @@ private:
 };
 
 template<typename T>
-constexpr T ExtractBitfield(T&& val, int offset, int size) noexcept {
+constexpr auto ExtractBitfield(T&& val, int offset, int size) noexcept -> std::remove_cvref_t<T> {
     return Bitfields(std::forward<T>(val)).GetField(offset, size);
 }
 
 template<typename T>
-constexpr T ExtractBitfield(T&& val, std::pair<int, int> pair) noexcept {
+constexpr auto ExtractBitfield(T&& val, std::pair<int, int> pair) noexcept -> std::remove_cvref_t<T> {
     return Bitfields(std::forward<T>(val)).GetField(pair);
 }
 
 template<typename T>
-constexpr T AssignBitfield(T&& target, int offset, int size, const T& val) noexcept {
+constexpr auto AssignBitfield(T&& target, int offset, int size, const T& val) noexcept -> std::remove_cvref_t<T> {
     return Bitfields(std::forward<T>(target)).SetField(offset, size, val).GetValue();
 }
 
 template<typename T>
-constexpr T AssignBitfield(T&& target, std::pair<int, int> pair, const T& val) noexcept {
+constexpr auto AssignBitfield(T&& target, std::pair<int, int> pair, const T& val) noexcept -> std::remove_cvref_t<T> {
     return Bitfields(std::forward<T>(target)).SetField(pair, val).GetValue();
 }
 
