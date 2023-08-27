@@ -5,17 +5,17 @@ namespace riscv {
 namespace result {
 namespace detail {
 
-constexpr inline WordU SuccessValue = 0;
+constexpr inline Word SuccessValue = 0;
 
-constexpr WordU CreateResultValue(WordU modId, WordU desc) noexcept {
+constexpr Word CreateResultValue(Word modId, Word desc) noexcept {
     return modId << 24 | (desc & 0xFFFFFF);
 }
 
-constexpr WordU GetModuleIdFromValue(WordU val) noexcept {
+constexpr Word GetModuleIdFromValue(Word val) noexcept {
     return val >> 24;
 }
 
-constexpr WordU GetDescriptionFromValue(WordU val) noexcept {
+constexpr Word GetDescriptionFromValue(Word val) noexcept {
     return val & 0xFFFFFF;
 }
 

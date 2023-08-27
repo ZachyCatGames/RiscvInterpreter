@@ -15,6 +15,8 @@ public:
 
     Result ExecuteAtPc();
 
+    Result Reset();
+
     ProcessorRegisters* GetRegisterContext() const noexcept;
 private:
     ProcessorRegisters m_Registers;

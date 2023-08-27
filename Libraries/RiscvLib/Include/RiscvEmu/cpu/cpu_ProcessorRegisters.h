@@ -7,7 +7,7 @@ namespace cpu {
 struct ProcessorRegisters {
     static constexpr auto GprCount = cfg::cpu::EnableIsaRV32E ? 16 : 32;
 
-    NativeWordU x[GprCount];
+    NativeWord x[GprCount];
 
     Address pc;
 };

@@ -6,7 +6,7 @@ namespace cpu {
 
 namespace detail {
 
-constexpr inline WordU ModuleId = 1;
+constexpr inline Word ModuleId = 1;
 
 } // namespace detail
 

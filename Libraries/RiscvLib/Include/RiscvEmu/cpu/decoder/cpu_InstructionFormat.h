@@ -11,11 +11,11 @@ namespace detail {
 
 class InstructionBase {
 public:
-    constexpr explicit InstructionBase(WordU val) noexcept : m_Val(val) {}
+    constexpr explicit InstructionBase(Word val) noexcept : m_Val(val) {}
 
     constexpr auto Get() const noexcept { return m_Val; }
 private:
-    WordU m_Val = 0;
+    Word m_Val = 0;
 }; // class InstructionBase
 
 } // namespace detail
@@ -23,13 +23,13 @@ private:
 class Instruction : public detail::InstructionBase {
 public:
     constexpr explicit Instruction(const detail::InstructionBase inst) noexcept : detail::InstructionBase(inst) {}
-    constexpr explicit Instruction(WordU val) noexcept : detail::InstructionBase(val) {}
+    constexpr explicit Instruction(Word val) noexcept : detail::InstructionBase(val) {}
 
     constexpr auto opcode() const noexcept {
         return static_cast<Opcode>(this->Get() & c_OpcodeMask);
     }
 private:
-    static constexpr WordU c_OpcodeMask = 0x3F;
+    static constexpr Word c_OpcodeMask = 0x3F;
 };
 
 namespace detail {
