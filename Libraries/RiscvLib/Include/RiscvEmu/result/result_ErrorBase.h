@@ -13,7 +13,7 @@ public:
 
     constexpr operator Result() const noexcept { return Result(Value); }
 
-    constexpr bool Includes(Result res) const noexcept { res.GetValue() == Value; }
+    constexpr bool Includes(Result res) const noexcept { return res.GetValue() == Value; }
 private:
     static constexpr auto Value = detail::CreateResultValue(ModId, Desc);
 }; // class ErrorBase
