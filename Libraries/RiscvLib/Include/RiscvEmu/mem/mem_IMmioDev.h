@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/result.h>
 
 namespace riscv {
 namespace mem {
@@ -15,6 +16,11 @@ namespace mem {
 */
 class IMmioDev {
 public:
+    virtual ~IMmioDev() = default;
+
+    /** Retrieve the size of a device's address space. */
+    virtual NativeWord GetMappedSize() = 0;
+
     /** Read a single byte. */
     virtual Result ReadByte(Byte* pOut, Address addr) = 0;
 
