@@ -40,8 +40,6 @@ public:
     */
     Result Initialize(const RegionInfo* pRegions, std::size_t regionCount);
 
-    Result RemoveRegion(const RegionInfo& region) { return this->RemoveRegion(region.GetStart()); }
-
     /** Add an MMIO device. */
     Result AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address addr);
 
