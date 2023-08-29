@@ -23,16 +23,21 @@ private:
 
 class IoRegion : public RegionBase {
 public:
-    constexpr IoRegion(const RegionInfo& info) :
-        RegionBase(info.start, info.length) {}
+    explicit constexpr IoRegion(const RegionBase& info) noexcept :
+        RegionBase(info) {}
+
+    constexpr void Initialize(const RegionBase& info) noexcept {
+        RegionBase::Initialize(info);
+        m_Devices.clear();
+    }
 
     constexpr auto& GetDevList() noexcept { return m_Devices; }
     constexpr const auto& GetDevList() const noexcept { return m_Devices; }
 
-    constexpr IMmioDev* FindDevice(Address addr) {
+    constexpr IoDev* FindDevice(Address addr) {
         for(auto& dev : m_Devices) {
             if(dev.Includes(addr)) {
-                return dev.GetDevice();
+                return &dev;
             }
         }
         return nullptr;
