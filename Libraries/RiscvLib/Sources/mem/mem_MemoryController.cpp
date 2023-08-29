@@ -11,7 +11,7 @@ Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t regi
         if (m_MemRegion.Includes(curRegion.GetStart()) ||
             m_MemRegion.Includes(curRegion.GetEnd() - 1) ||
             this->FindIoRegion(curRegion.GetStart()) != nullptr ||
-            this->FindIoRegion(curRegion.GetEnd() - 1)) {
+            this->FindIoRegion(curRegion.GetEnd() - 1) != nullptr) {
             return ResultRegionAlreadyExists();
         }
 
@@ -55,18 +55,59 @@ Result MemoryController::AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address add
 }
 
 Result MemoryController::ReadByte(Byte* pOut, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadByte, &IMmioDev::ReadByte>(pOut, addr);
+}
+
+Result MemoryController::ReadHWord(HWord* pOut, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadHWord, &IMmioDev::ReadHWord>(pOut, addr);
+}
+
+Result MemoryController::ReadWord(Word* pOut, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadWord, &IMmioDev::ReadWord>(pOut, addr);
+}
+
+Result MemoryController::ReadDWord(DWord* pOut, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadDWord, &IMmioDev::ReadDWord>(pOut, addr);
+}
+
+Result MemoryController::WriteByte(Byte in, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteByte, &IMmioDev::WriteByte>(in, addr);
+}
+
+Result MemoryController::WriteHWord(HWord in, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteHWord, &IMmioDev::WriteHWord>(in, addr);
+}
+
+Result MemoryController::WriteWord(Word in, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteWord, &IMmioDev::WriteWord>(in, addr);
+}
+
+Result MemoryController::WriteDWord(DWord in, Address addr) {
+    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteDWord, &IMmioDev::WriteDWord>(in, addr);
+}
+
+template<auto MemRead, auto IoRead, typename T>
+Result MemoryController::ReadWriteImpl(T pOut, Address addr) {
     /* First let's check if this address is in main memory. */
     if(m_MemRegion.Includes(addr)) {
-        return m_MemRegion.ReadByte(pOut, addr);
+        return (m_MemRegion.*MemRead)(pOut, addr);
     }
-
-    /* Next if that fails let's try reading from an IO device. */
-    detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(*pOut));
+    /* Next if that fails let's try reading/writing from/to an IO device. */
+    detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(std::remove_pointer_t<T>));
     if(pDev) {
-        return pDev->GetDevice()->ReadByte(pOut, addr);
+        return (*pDev->GetDevice().*IoRead)(pOut, addr);
     }
-
     return ResultReadAccessFault();
+}
+
+template<typename T>
+T* MemoryController::FindRegionImpl(std::vector<T>& regionList, Address addr) {
+    for(auto& region : regionList) {
+        if(region.Includes(addr)) {
+            return &region;
+        }
+    }
+    return nullptr;
 }
 
 detail::IoRegion* MemoryController::FindIoRegion(Address addr) {
@@ -88,7 +129,7 @@ detail::IoDev* MemoryController::FindIoDevice(Address addr, NativeWord len) {
     }
 
     /* Finally let's make sure our access doesn't go out of bounds. */
-    if(relAddr + len > pDev->GetEnd()) {
+    if(!pDev->Includes(relAddr + len)) {
         return nullptr;
     }
 

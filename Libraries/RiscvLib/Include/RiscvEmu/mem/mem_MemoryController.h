@@ -62,16 +62,11 @@ private:
     detail::MemRegion m_MemRegion;
     std::vector<detail::IoRegion> m_IoRegions;
 private:
-    template<typename T>
-    T* FindRegionImpl(std::vector<T>& regionList, Address addr) {
-        for(auto& region : regionList) {
-            if(region.Includes(addr)) {
-                return &region;
-            }
-        }
+    template<auto MemRead, auto IoRead, typename T>
+    Result ReadWriteImpl(T pOut, Address addr);
 
-        return nullptr;
-    }
+    template<typename T>
+    T* FindRegionImpl(std::vector<T>& regionList, Address addr);
 
     detail::IoRegion* FindIoRegion(Address addr);
     detail::IoDev* FindIoDevice(Address addr, NativeWord len);
