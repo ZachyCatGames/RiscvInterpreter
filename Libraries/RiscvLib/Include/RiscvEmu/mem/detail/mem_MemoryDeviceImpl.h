@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/result.h>
 #include <bit>
 
 namespace riscv {
