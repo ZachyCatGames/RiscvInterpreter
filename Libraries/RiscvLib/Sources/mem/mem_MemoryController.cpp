@@ -32,11 +32,6 @@ Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t regi
     return ResultSuccess();
 }
 
-Result MemoryController::RemoveRegion(Address regionAddr) {
-    /* Try removing an IO region. */
-    return this->RemoveRegionImpl(m_IoRegions, regionAddr);
-}
-
 Result MemoryController::AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address addr) {
     /* Find the IO region we'll be placing this device in. */
     detail::IoRegion* pRegion = this->FindIoRegion(addr);

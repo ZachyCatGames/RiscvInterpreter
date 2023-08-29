@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable additional compilier warnings.
-add_compile_options(-Wall -Wextra)
+add_compile_options(-Wall -Wextra -Wconversion)
 
 # Disable C++ exceptions and stack protector.
 add_compile_options(-fno-exceptions -fno-stack-protector)
@@ -35,11 +35,17 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
 # Include library modules.
+include(MemLibrarySources)
+include(ResultLibrarySources)
 include(UtilLibrarySources)
 
 # Create our executable.
 add_library(RiscvLib
     "${PROJECT_SOURCE_DIR}/Sources/Test.cpp"
+
+    # Memory library.
+    ${RISCV_MEM_LIBRARY_HEADERS}
+    ${RISCV_MEM_LIBRARY_SOURCES}
 
     # Result library.
     ${RISCV_RESULT_LIBRARY_HEADERS}

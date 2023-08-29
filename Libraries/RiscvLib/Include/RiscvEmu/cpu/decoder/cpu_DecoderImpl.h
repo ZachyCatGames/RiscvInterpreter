@@ -143,7 +143,7 @@ private:
     }
 
     constexpr Result ParseOP_IMM(ITypeInstruction inst) {
-        static constexpr auto shamtMask = cfg::cpu::EnableIsaRV64I ? 0x3F : 0x1F;
+        static constexpr auto shamtMask = cfg::cpu::EnableIsaRV64I ? 0x3Fu : 0x1Fu;
 
         switch(inst.funct3()) {
         case Funct3::ADDI:

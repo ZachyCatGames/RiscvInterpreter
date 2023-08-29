@@ -79,7 +79,7 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return util::ExtractBitfield(this->Get(), 7, 5) | (this->Get() & (0x7F << 25) >> 20);
+        return util::ExtractBitfield(this->Get(), 7u, 5u) | (this->Get() & (0x7Fu << 25u) >> 20u);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
@@ -90,17 +90,17 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (this->Get() & (0xF << 8) >> 7) | (this->Get() & (0x3F << 25) >> 20) | (this->Get() & (1 << 7) << 4) | (this->Get() & (1 << 31) >> 19);
+        return (this->Get() & (0xFu << 8u) >> 7u) | (this->Get() & (0x3Fu << 25u) >> 20u) | (this->Get() & (1u << 7u) << 4u) | (this->Get() & (1u << 31u) >> 19u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 13, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 13u, NativeWordBitLen); }
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr auto imm() const noexcept { return this->Get() & (0xFFFFFFFF << 12); }
+    constexpr auto imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 32, NativeWordBitLen); }
 };
@@ -110,7 +110,7 @@ public:
     using detail::UJTypeBase::UJTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (this->Get() & (0x3FF << 21) >> 20) | (this->Get() & (1 << 20) >> 9) | (this->Get() & (0xFF << 12)) | (this->Get() & (1 << 31) >> 11);
+        return (this->Get() & (0x3FFu << 21u) >> 20u) | (this->Get() & (1u << 20u) >> 9u) | (this->Get() & (0xFFu << 12u)) | (this->Get() & (1u << 31u) >> 11u);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 21, NativeWordBitLen); }
