@@ -3,12 +3,12 @@
 namespace riscv {
 namespace cpu {
 
-enum PrivilageLevel {
-    PrivilageLevel_User = 0,
-    PrivilageLevel_Supervisor = 1,
-    PrivilageLevel_Hypervisor = 2,
-    PrivilageLevel_Machine = 3
-};
+enum class PrivilageLevel {
+    User = 0,
+    Supervisor = 1,
+    Hypervisor = 2,
+    Machine = 3
+}; // enum class PrivilageLevel
 
 } // namespace cpu
 } // namespace riscv
