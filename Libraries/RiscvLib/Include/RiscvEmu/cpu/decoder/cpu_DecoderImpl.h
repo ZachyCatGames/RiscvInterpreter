@@ -18,7 +18,7 @@ private:
 
     /* Derived must provide *Impl functions. */
     constexpr auto CreateInReg(auto val) noexcept { return GetDerived()->CreateInRegImpl(val); }
-    constexpr auto CreateOutReg(auto val) noexcept { return GetDerived()->CreateInRegImpl(val); }
+    constexpr auto CreateOutReg(auto val) noexcept { return GetDerived()->CreateOutRegImpl(val); }
     constexpr auto CreateImmediate(auto val) noexcept { return GetDerived()->CreateImmediateImpl(val); }
 
     constexpr Result CallStandardRType(RTypeInstruction inst, auto func) {
@@ -139,8 +139,6 @@ private:
     }
 
     constexpr Result ParseOP_IMM(ITypeInstruction inst) {
-        static constexpr auto shamtMask = cfg::cpu::EnableIsaRV64I ? 0x3Fu : 0x1Fu;
-
         switch(inst.funct3()) {
         case Funct3::ADDI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstADDI);
@@ -159,14 +157,14 @@ private:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstXORI);
         case Funct3::SRLI: {
             auto imm = inst.imm();
-            auto shamt = imm & shamtMask;
+            auto shamt = imm & ShiftAmtMask;
 
             /* Check if any upper bits in the immediate are set. */
-            auto upper = imm & ~shamtMask;
+            auto upper = imm & ~ShiftAmtMask;
             if(upper) {
                 /* If exclusively the 10th bit is set, parse as SRAI. */
                 if(upper == (1 << 10)) {
-                    return GetDerived().ParseInstSRAI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
+                    return GetDerived()->ParseInstSRAI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
                 }
 
                 /* If any other bits are set, this is an invalid/reserved instruction. */
@@ -174,7 +172,7 @@ private:
             }
 
             /* Otherwise parse as SRLI. */
-            return GetDerived().ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
+            return GetDerived()->ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
         }
         case Funct3::ORI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstORI);
@@ -203,7 +201,7 @@ private:
     }
 
     constexpr Result ParseOP(RTypeInstruction inst) {
-        constexpr auto CallOnFunct7Zero = [&](RTypeInstruction inst, auto func) {
+        auto CallOnFunct7Zero = [&](RTypeInstruction inst, auto func) constexpr -> Result {
             if(inst.funct7() == Funct7::Zero)
                 return this->CallStandardRType(inst, func);
             return ResultInvalidInstruction();

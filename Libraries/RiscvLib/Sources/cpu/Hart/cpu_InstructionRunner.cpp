@@ -11,6 +11,7 @@ namespace cpu {
 
 class Hart::InstructionRunner : public DecoderImpl<Hart::InstructionRunner> {
 private:
+    friend class DecoderImpl<Hart::InstructionRunner>;
     class InRegObject {
     public:
         constexpr InRegObject(NativeWord value) :
@@ -283,6 +284,10 @@ private:
 private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
+
+Result Hart::ExecuteInstruction(Instruction inst) {
+    return InstructionRunner().ParseInstruction(inst);
+}
 
 } // namespace cpu
 } // namespace riscv
