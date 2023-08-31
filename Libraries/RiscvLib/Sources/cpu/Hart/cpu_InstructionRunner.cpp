@@ -1,6 +1,7 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
 #include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
+#include <RiscvEmu/cpu/decoder/cpu_Values.h>
 #include <concepts>
 #include <bit>
 
@@ -145,7 +146,7 @@ private:
         return ResultSuccess();
     }
     Result ParseInstSRAI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        rd.Set(rs1.Get<NativeWordS>() << imm.Get<NativeWordS>());
+        rd.Set(rs1.Get<NativeWordS>() << imm.Get<Word>());
         return ResultSuccess();
     }
     Result ParseInstORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
@@ -168,6 +169,50 @@ private:
     }
     Result ParseInstSW(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         return m_pParent->MemoryWriteWord(rs2.Get<Word>(), rs1.Get<Address>() + imm.Get<Address>());
+    }
+
+    /*
+     * Opcode OP.
+     */
+    Result ParseInstADD(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() + rs2.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSUB(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() - rs2.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() << (rs2.Get<Word>() & ShiftAmtMask));
+        return ResultSuccess();
+    }
+    Result ParseInstSLT(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWordS>() < rs2.Get<NativeWordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLTU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() < rs2.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstXOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() ^ rs2.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSRL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() >> (rs2.Get<Word>() & ShiftAmtMask));
+        return ResultSuccess();
+    }
+    Result ParseInstSRA(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWordS>() >> (rs2.Get<Word>() & ShiftAmtMask));
+        return ResultSuccess();
+    }
+    Result ParseInstOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() | rs2.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstAND(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<NativeWord>() & rs2.Get<NativeWord>());
+        return ResultSuccess();
     }
 private:
     Hart* const m_pParent = 0;
