@@ -15,15 +15,10 @@ public:
 private:
     constexpr auto GetDerived() noexcept { return static_cast<Derived*>(this); }
 
-    using InRegObject = Derived::InRegObject;
-    using OutRegObject = Derived::OutRegObject;
-    using InOutRegObject = Derived::InOutRegObject;
-    using ImmediateObject = Derived::ImmediateObject;
-
-    constexpr auto CreateInReg(auto val) noexcept { return InRegObject(GetDerived(), val); }
-    constexpr auto CreateOutReg(auto val) noexcept { return OutRegObject(GetDerived(), val); }
-    constexpr auto CreateInOutReg(auto val) noexcept { return InOutRegObject(GetDerived(), val); }
-    constexpr auto CreateImmediate(auto val) noexcept { return ImmediateObject(GetDerived(), val); }
+    /* Derived must provide *Impl functions. */
+    constexpr auto CreateInReg(auto val) noexcept { return GetDerived()->CreateInRegImpl(val); }
+    constexpr auto CreateOutReg(auto val) noexcept { return GetDerived()->CreateInRegImpl(val); }
+    constexpr auto CreateImmediate(auto val) noexcept { return GetDerived()->CreateImmediateImpl(val); }
 
     constexpr Result CallStandardRType(RTypeInstruction inst, auto func) {
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateInReg(inst.rs2()));
