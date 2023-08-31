@@ -1,0 +1,111 @@
+#include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
+#include <concepts>
+#include <bit>
+
+namespace riscv {
+namespace cpu {
+
+
+class Hart::InstructionRunner : public DecoderImpl<Hart::InstructionRunner> {
+private:
+    class InRegObject {
+    public:
+        constexpr InRegObject(NativeWord value) :
+            m_RegValue(value) {}
+
+        template<std::integral T>
+        constexpr auto Get() const noexcept {
+            if constexpr (std::signed_integral<T>) {
+                return static_cast<T>(static_cast<NativeWordS>(m_RegValue));
+            }
+            return static_cast<T>(m_RegValue);
+        }
+    private:
+        NativeWord m_RegValue;
+    }; // class InRegObject
+
+    class OutRegObject {
+    public:
+        constexpr OutRegObject(NativeWord* pTarget) :
+            m_pTarget(pTarget) {}
+
+        template<std::integral T>
+        constexpr void Set(const T& value) noexcept {
+            if constexpr (std::signed_integral<T>) {
+                *m_pTarget = static_cast<NativeWord>(static_cast<NativeWordS>(value));
+            }
+            *m_pTarget = static_cast<NativeWord>(value);
+        }
+    private:
+        NativeWord* const m_pTarget;
+    }; // class OutRegObject
+
+    class ImmediateObject {
+    public:
+        constexpr ImmediateObject(NativeWord value) :
+            m_Value(value) {}
+
+        template<std::integral T>
+        constexpr auto Get() const noexcept {
+            if constexpr (std::signed_integral<T>) {
+                return static_cast<T>(static_cast<NativeWordS>(m_Value));
+            }
+            return static_cast<T>(m_Value);
+        }
+    private:
+        NativeWord m_Value;
+    }; // class ImmediateObject
+
+    constexpr auto CreateInRegImpl(auto id) noexcept {
+        return InRegObject(m_pParent->m_GPR[id]);
+    }
+
+    constexpr auto CreateOutRegImpl(auto id) noexcept {
+        return OutRegObject(&m_pParent->m_GPR[id]);
+    }
+
+    constexpr auto CreateImmediateImpl(auto val) noexcept {
+        return ImmediateObject(val);
+    }
+
+    /*
+     * Opcode LOAD.
+     */
+    template<bool Signed, typename T>
+    Result InstLoadImpl(auto func, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        T out = 0;
+        Result res = (*m_pParent.*func)(&out, rs1.Get<Address>() + imm.Get<Address>());
+        if(res.IsSuccess()) {
+            if constexpr(Signed) {
+                rd.Set(util::SignExtend(out, sizeof(T) * 8, NativeWordBitLen));
+            }
+            else {
+                rd.Set(out);
+            }
+        }
+        return res;
+    }
+    Result ParseInstLB(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<true, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
+    }
+    Result ParseInstLH(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<true, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
+    }
+    Result ParseInstLW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<true, Word>(&Hart::MemoryReadWord, rd, rs1, imm);
+    }
+    Result ParseInstLBU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<false, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
+    }
+    Result ParseInstLHU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<false, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
+    }
+
+private:
+    Hart* const m_pParent = 0;
+}; // class Hart::InstructionRunner
+
+} // namespace cpu
+} // namespace riscv

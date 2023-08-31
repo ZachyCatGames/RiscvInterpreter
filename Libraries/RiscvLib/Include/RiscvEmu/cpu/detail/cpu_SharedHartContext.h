@@ -11,7 +11,7 @@ public:
     constexpr auto GetMemoryController() noexcept {
         return &m_MemCtlr;
     }
-    constexpr const auto GetMemoryController() const noexcept {
+    constexpr auto GetMemoryController() const noexcept {
         return &m_MemCtlr;
     }
 private:
