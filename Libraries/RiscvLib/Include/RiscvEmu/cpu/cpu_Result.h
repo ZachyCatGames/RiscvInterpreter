@@ -12,5 +12,7 @@ constexpr inline Word ModuleId = 1;
 
 class ResultInvalidInstruction : public result::ErrorBase<detail::ModuleId, 1> {};
 
+class ResultNotImplemented : public result::ErrorBase<detail::ModuleId, 2> {};
+
 } // namespace cpu
 } // namespace riscv
