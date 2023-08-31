@@ -156,6 +156,19 @@ private:
         rd.Set(rs1.Get<NativeWord>() & imm.Get<NativeWord>());
         return ResultSuccess();
     }
+
+    /*
+     * Opcode STORE.
+     */
+    Result ParseInstSB(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return m_pParent->MemoryWriteByte(rs2.Get<Byte>(), rs1.Get<Address>() + imm.Get<Address>());
+    }
+    Result ParseInstSH(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return m_pParent->MemoryWriteHWord(rs2.Get<HWord>(), rs1.Get<Address>() + imm.Get<Address>());
+    }
+    Result ParseInstSW(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return m_pParent->MemoryWriteWord(rs2.Get<Word>(), rs1.Get<Address>() + imm.Get<Address>());
+    }
 private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
