@@ -1,6 +1,7 @@
 #pragma once
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/decoder/cpu_Values.h>
 
 namespace riscv {
 namespace cpu {
@@ -128,8 +129,8 @@ private:
 
     constexpr Result ParseMISC_MEM(ITypeInstruction inst) {
         switch(inst.funct3()) {
-        case Funct3::FENCE: // FENCE
-            break;
+        case Funct3::FENCE:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstFENCE);
         default:
             break;
         }
