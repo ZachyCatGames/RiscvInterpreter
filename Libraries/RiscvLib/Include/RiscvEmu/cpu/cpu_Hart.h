@@ -35,6 +35,11 @@ private:
     class InstructionRunner;
 
 private:
+    Result SignalBranch(Address offset) {
+        m_PC += offset;
+        return ResultSuccess();
+    }
+private:
     using MemCtlT = mem::MemoryController;
 
     template<typename T>

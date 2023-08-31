@@ -214,6 +214,25 @@ private:
         rd.Set(rs1.Get<NativeWord>() & rs2.Get<NativeWord>());
         return ResultSuccess();
     }
+
+    /*
+     * Opcode BRANCH.
+     */
+    Result InstBranchImpl(bool cond, ImmediateObject imm) {
+        if(bool) {
+            return m_pParent->SignalBranch(imm.Get<Address>());
+        }
+        return ResultSuccess();
+    }
+    Result ParseInstBEQ(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWord>() == rs2.Get<NativeWord>(), imm);
+    }
+    Result ParseInstBNE(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWord>() != rs2.Get<NativeWord>(), imm);
+    }
+    Result ParseInstBLT(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWordS>() < rs2.Get<NativeWordS>(), imm);
+    }
 private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
