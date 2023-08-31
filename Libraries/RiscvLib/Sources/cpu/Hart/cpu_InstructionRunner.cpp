@@ -50,7 +50,7 @@ private:
         template<std::integral T>
         constexpr auto Get() const noexcept {
             if constexpr (std::signed_integral<T>) {
-                return static_cast<T>(static_cast<NativeWordS>(m_Value));
+                return static_cast<T>(static_cast<WordS>(m_Value));
             }
             return static_cast<T>(m_Value);
         }
@@ -103,6 +103,59 @@ private:
         return this->InstLoadImpl<false, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
     }
 
+    /*
+     * Opcode MISC_MEM.
+     */
+    Result ParseInstFENCE(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        /* 
+         * We're always going to be executing instructions in-order,
+         * so FENCE doesn't need to be implemented.
+         */
+        (void)rd;
+        (void)rs1;
+        (void)imm;
+        return ResultSuccess();
+    }
+
+    /*
+     * Opcode OP_IMM.
+     */
+    Result ParseInstADDI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() + imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() << imm.Get<Word>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLTI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWordS>() < imm.Get<NativeWordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLTIU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() < imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstXORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() ^ imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSRLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() << imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstSRAI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWordS>() << imm.Get<NativeWordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() | imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
+    Result ParseInstANDI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<NativeWord>() & imm.Get<NativeWord>());
+        return ResultSuccess();
+    }
 private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
