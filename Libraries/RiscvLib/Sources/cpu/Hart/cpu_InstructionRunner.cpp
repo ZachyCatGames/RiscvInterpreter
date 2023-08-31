@@ -159,6 +159,14 @@ private:
     }
 
     /*
+     * Opcode AUIPC.
+     */
+    Result ParseInstAUIPC(OutRegObject rd, ImmediateObject imm) {
+        rd.Set(m_pParent->m_PC + imm.Get<Address>());
+        return ResultSuccess();
+    }
+
+    /*
      * Opcode STORE.
      */
     Result ParseInstSB(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
@@ -216,6 +224,14 @@ private:
     }
 
     /*
+     * Opcode LUI.
+     */
+    Result ParseInstLUI(OutRegObject rd, ImmediateObject imm) {
+        rd.Set(imm.Get<Word>());
+        return ResultSuccess();
+    }
+
+    /*
      * Opcode BRANCH.
      */
     Result InstBranchImpl(bool cond, ImmediateObject imm) {
@@ -248,10 +264,21 @@ private:
      */
     Result ParseInstJALR(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         /* Save current PC to rd. */
-        rd.Set(m_pParent->m_PC);
+        rd.Set(m_pParent->m_PC + 4);
 
         /* Signal jump. */
         return m_pParent->SignalJump((rs1.Get<Address>() + imm.Get<Address>()) & ~static_cast<Address>(1u));
+    }
+
+    /*
+     * Opcode JAL.
+     */
+    Result ParseInstJAL(OutRegObject rd, ImmediateObject imm) {
+        /* Save current PC to rd. */
+        rd.Set(m_pParent->m_PC + 4);
+
+        /* Signal branch. */
+        return m_pParent->SignalBranch(imm.Get<Address>());
     }
 private:
     Hart* const m_pParent = 0;
