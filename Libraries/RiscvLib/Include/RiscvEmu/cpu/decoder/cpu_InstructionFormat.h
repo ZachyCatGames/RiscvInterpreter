@@ -71,7 +71,7 @@ public:
     constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
     constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
     constexpr auto imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
 };
 
 class STypeInstruction : public detail::SBTypeBase {
@@ -82,7 +82,7 @@ public:
         return util::ExtractBitfield(this->Get(), 7u, 5u) | (this->Get() & (0x7Fu << 25u) >> 20u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 12, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
 };
 
 class BTypeInstruction : public detail::SBTypeBase {
@@ -93,7 +93,7 @@ public:
         return (this->Get() & (0xFu << 8u) >> 7u) | (this->Get() & (0x3Fu << 25u) >> 20u) | (this->Get() & (1u << 7u) << 4u) | (this->Get() & (1u << 31u) >> 19u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 13u, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 13u, NativeWordBitLen); }
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
@@ -102,7 +102,7 @@ public:
 
     constexpr auto imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 32, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 32, NativeWordBitLen); }
 };
 
 class JTypeInstruction : public detail::UJTypeBase {
@@ -113,7 +113,7 @@ public:
         return (this->Get() & (0x3FFu << 21u) >> 20u) | (this->Get() & (1u << 20u) >> 9u) | (this->Get() & (0xFFu << 12u)) | (this->Get() & (1u << 31u) >> 11u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(this->imm(), 21, NativeWordBitLen); }
+    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 21, NativeWordBitLen); }
 };
 
 } // namespace cpu
