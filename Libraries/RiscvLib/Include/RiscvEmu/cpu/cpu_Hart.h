@@ -39,6 +39,11 @@ private:
         m_PC += offset;
         return ResultSuccess();
     }
+
+    Result SignalJump(Address addr) {
+        m_PC = addr;
+        return ResultSuccess();
+    }
 private:
     using MemCtlT = mem::MemoryController;
 

@@ -219,7 +219,7 @@ private:
      * Opcode BRANCH.
      */
     Result InstBranchImpl(bool cond, ImmediateObject imm) {
-        if(bool) {
+        if(cond) {
             return m_pParent->SignalBranch(imm.Get<Address>());
         }
         return ResultSuccess();
@@ -232,6 +232,26 @@ private:
     }
     Result ParseInstBLT(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         return InstBranchImpl(rs1.Get<NativeWordS>() < rs2.Get<NativeWordS>(), imm);
+    }
+    Result ParseInstBGE(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWordS>() >= rs2.Get<NativeWordS>(), imm);
+    }
+    Result ParseInstBLTU(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWord>() < rs2.Get<NativeWord>(), imm);
+    }
+    Result ParseInstBGEU(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return InstBranchImpl(rs1.Get<NativeWord>() >= rs2.Get<NativeWord>(), imm);
+    }
+
+    /*
+     * Opcode JALR.
+     */
+    Result ParseInstJALR(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        /* Save current PC to rd. */
+        rd.Set(m_pParent->m_PC);
+
+        /* Signal jump. */
+        return m_pParent->SignalJump((rs1.Get<Address>() + imm.Get<Address>()) & ~static_cast<Address>(1u));
     }
 private:
     Hart* const m_pParent = 0;
