@@ -98,6 +98,23 @@ private:
         return this->MemoryWriteImpl(&MemCtlT::WriteDWord, in, addr);
     }
 
+    Result FetchInstruction(Instruction* pOut, Address addr) {
+        Word inst = 0;
+        Result res;
+
+        /* If running in machine mode perform a direct physical memory write. */
+        if(m_CurPrivLevel == PrivilageLevel::Machine) {
+            res = m_pSharedCtx->GetMemoryController()->ReadWord(&inst, m_PC);
+            *pOut = Instruction(inst);
+            return res;
+        }
+
+        /* Otherwise obtain a physical address from the MMU. */
+        /* TODO: Supervisor. */
+        /* TODO: MMU. */
+        return ResultNotImplemented();
+    }
+
 private:
     static constexpr auto c_NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
     NativeWord m_PC;
