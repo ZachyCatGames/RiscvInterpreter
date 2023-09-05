@@ -48,5 +48,14 @@ constexpr Word EncodeUTypeInstruction(Opcode op, int rd, Word imm) noexcept {
             (static_cast<Word>(imm) & ~0xFFF);
 }
 
+constexpr Word EncodeJTypeInstruction(Opcode op, int rd, Word imm) noexcept {
+    return  (static_cast<Word>(op)  & 0x7Fu) |
+            (static_cast<Word>(rd)  & 0x3Fu) << 7 |
+            (static_cast<Word>(imm) & 0x08u << 12) |
+            (static_cast<Word>(imm) & 1u << 11) << 9 |
+            (static_cast<Word>(imm) & 0x3FFu << 1) << 20 |
+            (static_cast<Word>(imm) & 1u << 20) << 11
+}
+
 } // namespace cpu
 } // namespace riscv

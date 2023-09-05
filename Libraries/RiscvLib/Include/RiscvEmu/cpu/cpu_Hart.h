@@ -104,7 +104,7 @@ private:
 
         /* If running in machine mode perform a direct physical memory write. */
         if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            res = m_pSharedCtx->GetMemoryController()->ReadWord(&inst, m_PC);
+            res = m_pSharedCtx->GetMemoryController()->ReadWord(&inst, addr);
             *pOut = Instruction(inst);
             return res;
         }
