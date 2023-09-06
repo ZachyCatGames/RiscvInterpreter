@@ -1,9 +1,9 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
-#include <RiscvEmu/cpu/detail/cpu_SharedHartContext.h>
 #include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
+#include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
 
 namespace riscv {
@@ -58,72 +58,21 @@ private:
     using MemCtlT = mem::MemoryController;
 
     template<typename T>
-    Result MemoryReadImpl(auto func, T* pOut, Address addr) {
-        /* If running in Machine mode perform a direct physical memory read. */
-        if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            return (*m_pSharedCtx->GetMemController().*func)(pOut, addr);
-        }
-
-        /* Otherwise obtain a physical address from the MMU. */
-        /* TODO: Supervisor. */
-        /* TODO: MMU. */
-        return ResultNotImplemented();
-    }
+    Result MemoryReadImpl(auto func, T* pOut, Address addr);
 
     template<typename T>
-    Result MemoryWriteImpl(auto func, T in, Address addr) {
-        /* If running in machine mode perform a direct physical memory write. */
-        if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            return (*m_pSharedCtx->GetMemController().*func)(in, addr);
-        }
+    Result MemoryWriteImpl(auto func, T in, Address addr);
 
-        /* Otherwise obtain a physical address from the MMU. */
-        /* TODO: Supervisor. */
-        /* TODO: MMU. */
-        return ResultNotImplemented();
-    }
+    Result MemoryReadByte(Byte* pOut, Address addr);
+    Result MemoryReadHWord(HWord* pOut, Address addr);
+    Result MemoryReadWord(Word* pOut, Address addr);
+    Result MemoryReadDWord(DWord* pOut, Address addr);
+    Result MemoryWriteByte(Byte in, Address addr);
+    Result MemoryWriteHWord(HWord in, Address addr);
+    Result MemoryWriteWord(Word in, Address addr);
+    Result MemoryWriteDWord(DWord in, Address addr);
 
-    Result MemoryReadByte(Byte* pOut, Address addr) { 
-        return this->MemoryReadImpl(&MemCtlT::ReadByte, pOut, addr); 
-    }
-    Result MemoryReadHWord(HWord* pOut, Address addr) {
-        return this->MemoryReadImpl(&MemCtlT::ReadHWord, pOut, addr);
-    }
-    Result MemoryReadWord(Word* pOut, Address addr) {
-        return this->MemoryReadImpl(&MemCtlT::ReadWord, pOut, addr);
-    }
-    Result MemoryReadDWord(DWord* pOut, Address addr) {
-        return this->MemoryReadImpl(&MemCtlT::ReadDWord, pOut, addr);
-    }
-    Result MemoryWriteByte(Byte in, Address addr) {
-        return this->MemoryWriteImpl(&MemCtlT::WriteByte, in, addr);
-    }
-    Result MemoryWriteHWord(HWord in, Address addr) {
-        return this->MemoryWriteImpl(&MemCtlT::WriteHWord, in, addr);
-    }
-    Result MemoryWriteWord(Word in, Address addr) {
-        return this->MemoryWriteImpl(&MemCtlT::WriteWord, in, addr);
-    }
-    Result MemoryWriteDWord(DWord in, Address addr) {
-        return this->MemoryWriteImpl(&MemCtlT::WriteDWord, in, addr);
-    }
-
-    Result FetchInstruction(Instruction* pOut, Address addr) {
-        Word inst = 0;
-        Result res;
-
-        /* If running in machine mode perform a direct physical memory write. */
-        if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            res = m_pSharedCtx->GetMemController()->ReadWord(&inst, addr);
-            *pOut = Instruction(inst);
-            return res;
-        }
-
-        /* Otherwise obtain a physical address from the MMU. */
-        /* TODO: Supervisor. */
-        /* TODO: MMU. */
-        return ResultNotImplemented();
-    }
+    Result FetchInstruction(Instruction* pOut, Address addr);
 
 private:
     static constexpr auto c_NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
