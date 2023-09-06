@@ -11,7 +11,17 @@ namespace cpu {
 
 class Hart {
 public:
-    Hart(detail::SharedHartContext* pSharedCtx) :
+    class SharedContext {
+    public:
+        constexpr SharedContext(mem::MemoryController* pMemCtlr) noexcept :
+            m_pMemCtlr(pMemCtlr) {}
+        
+        constexpr auto GetMemController() const noexcept { return m_pMemCtlr; }
+    private:
+        mem::MemoryController* const m_pMemCtlr;
+    }; // SharedContext
+public:
+    Hart(SharedContext* pSharedCtx) :
         m_pSharedCtx(pSharedCtx) {}
 
     Result ExecuteInstruction(Instruction inst);
@@ -51,7 +61,7 @@ private:
     Result MemoryReadImpl(auto func, T* pOut, Address addr) {
         /* If running in Machine mode perform a direct physical memory read. */
         if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            return (*m_pSharedCtx->GetMemoryController().*func)(pOut, addr);
+            return (*m_pSharedCtx->GetMemController().*func)(pOut, addr);
         }
 
         /* Otherwise obtain a physical address from the MMU. */
@@ -64,7 +74,7 @@ private:
     Result MemoryWriteImpl(auto func, T in, Address addr) {
         /* If running in machine mode perform a direct physical memory write. */
         if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            return (*m_pSharedCtx->GetMemoryController().*func)(in, addr);
+            return (*m_pSharedCtx->GetMemController().*func)(in, addr);
         }
 
         /* Otherwise obtain a physical address from the MMU. */
@@ -104,7 +114,7 @@ private:
 
         /* If running in machine mode perform a direct physical memory write. */
         if(m_CurPrivLevel == PrivilageLevel::Machine) {
-            res = m_pSharedCtx->GetMemoryController()->ReadWord(&inst, addr);
+            res = m_pSharedCtx->GetMemController()->ReadWord(&inst, addr);
             *pOut = Instruction(inst);
             return res;
         }
@@ -122,7 +132,7 @@ private:
 
     PrivilageLevel m_CurPrivLevel;
 
-    detail::SharedHartContext* const m_pSharedCtx;
+    SharedContext* const m_pSharedCtx;
 }; // class Hart
 
 } // namespace cpu
