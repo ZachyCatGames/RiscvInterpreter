@@ -1,4 +1,5 @@
 #pragma once
+#include <RiscvEmu/riscv_Peripheral.h>
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/result.h>
 
@@ -10,7 +11,7 @@ namespace hw {
  *
  * See hw::DeviceScheduler.
 */
-class IDevice {
+class IDevice : Peripheral {
 public:
     constexpr IDevice(DWordS updateFreq) noexcept :
         m_UpdateFreq(updateFreq) {}
