@@ -1,9 +1,7 @@
 #pragma once
-#include <cstdint>
-#include <cstddef>
-#include <utility>
-#include <concepts>
 #include <RiscvEmu/util/util_Bitmask.h>
+#include <concepts>
+#include <utility>
 
 namespace riscv {
 namespace util {

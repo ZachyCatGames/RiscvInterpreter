@@ -1,8 +1,8 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
 #include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
+#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
 

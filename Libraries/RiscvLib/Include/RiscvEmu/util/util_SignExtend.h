@@ -1,6 +1,5 @@
 #pragma once
 #include <RiscvEmu/util/util_Bitmask.h>
-#include <type_traits>
 
 namespace riscv {
 namespace util {

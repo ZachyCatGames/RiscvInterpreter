@@ -1,12 +1,11 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_IMmioDev.h>
+#include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_Result.h>
 #include <RiscvEmu/mem/detail/mem_MemRegion.h>
 #include <RiscvEmu/mem/detail/mem_IoRegion.h>
 #include <vector>
-#include <variant>
 
 namespace riscv {
 namespace mem {

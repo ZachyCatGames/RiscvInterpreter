@@ -1,8 +1,8 @@
 #pragma once
-#include <RiscvEmu/mem/detail/mem_RegionBase.h>
-#include <RiscvEmu/mem/detail/mem_MemoryDeviceImpl.h>
 #include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_Result.h>
+#include <RiscvEmu/mem/detail/mem_RegionBase.h>
+#include <RiscvEmu/mem/detail/mem_MemoryDeviceImpl.h>
 #include <memory>
 
 namespace riscv {

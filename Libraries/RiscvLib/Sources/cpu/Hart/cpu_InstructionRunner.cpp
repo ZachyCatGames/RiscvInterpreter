@@ -2,8 +2,8 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
 #include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
 #include <RiscvEmu/cpu/decoder/cpu_Values.h>
-#include <concepts>
 #include <bit>
+#include <concepts>
 
 namespace riscv {
 namespace cpu {

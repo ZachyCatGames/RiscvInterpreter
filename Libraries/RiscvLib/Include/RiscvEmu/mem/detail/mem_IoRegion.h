@@ -1,9 +1,9 @@
 #pragma once
-#include <RiscvEmu/mem/detail/mem_RegionBase.h>
 #include <RiscvEmu/mem/mem_IMmioDev.h>
 #include <RiscvEmu/mem/mem_RegionInfo.h>
-#include <vector>
+#include <RiscvEmu/mem/detail/mem_RegionBase.h>
 #include <memory>
+#include <vector>
 
 namespace riscv {
 namespace mem {
