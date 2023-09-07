@@ -32,7 +32,7 @@ Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t regi
     return ResultSuccess();
 }
 
-Result MemoryController::AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address addr) {
+Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
     /* Find the IO region we'll be placing this device in. */
     detail::IoRegion* pRegion = this->FindIoRegion(addr);
     if(!pRegion) {
@@ -41,7 +41,7 @@ Result MemoryController::AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address add
 
     /* Make sure this new device doesn't overlap with an existing one. */
     auto relAddr = addr - pRegion->GetStart();
-    auto len = dev->GetMappedSize();
+    auto len = pDev->GetMappedSize();
     for(const auto& dev : pRegion->GetDevList()) {
         if(dev.Includes(relAddr) || dev.Includes(relAddr + len)) {
             return ResultDeviceAlreadyExists();
@@ -49,7 +49,7 @@ Result MemoryController::AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address add
     }
 
     /* Add the new device. */
-    pRegion->GetDevList().emplace_back(relAddr, len, std::move(dev));
+    pRegion->GetDevList().emplace_back(relAddr, len, pDev);
 
     return ResultSuccess();
 }

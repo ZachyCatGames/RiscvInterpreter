@@ -40,7 +40,7 @@ public:
     Result Initialize(const RegionInfo* pRegions, std::size_t regionCount);
 
     /** Add an MMIO device. */
-    Result AddMmioDev(std::unique_ptr<IMmioDev>&& dev, Address addr);
+    Result AddMmioDev(IMmioDev* dev, Address addr);
 
     Result ReadByte(Byte* pOut, Address addr);
 

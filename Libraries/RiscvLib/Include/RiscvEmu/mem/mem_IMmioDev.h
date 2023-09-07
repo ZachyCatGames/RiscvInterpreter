@@ -1,7 +1,7 @@
 #pragma once
 #include <RiscvEmu/result.h>
+#include <RiscvEmu/riscv_Peripheral.h>
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/hw/hw_IDevice.h>
 
 namespace riscv {
 namespace mem {
@@ -15,7 +15,7 @@ namespace mem {
  * Implementations should return ResultBadMisalignedAddress if they doesn't support
  * misaligned addresses when a misaligned address is given to them.
 */
-class IMmioDev : public hw::IDevice {
+class IMmioDev : public Peripheral {
 public:
     virtual ~IMmioDev() = default;
 

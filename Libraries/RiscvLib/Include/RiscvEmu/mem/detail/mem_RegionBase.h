@@ -17,17 +17,10 @@ public:
         return addr >= this->GetStart() && addr <= this->GetEnd();
     }
 protected:
-    constexpr RegionBase(Address addr, NativeWord len) :
+    constexpr RegionBase() noexcept = default;
+    constexpr RegionBase(Address addr, NativeWord len) noexcept :
         m_Address(addr),
         m_Length(len) {}
-
-    constexpr RegionBase(const RegionBase& other) noexcept = default;
-
-    constexpr RegionBase& operator=(const RegionBase& rhs) noexcept {
-        this->m_Address = rhs.m_Address;
-        this->m_Length = rhs.m_Length;
-        return *this;
-    }
 
     constexpr void Initialize(Address addr, NativeWord len) noexcept {
         m_Address = addr;

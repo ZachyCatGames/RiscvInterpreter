@@ -11,14 +11,14 @@ namespace detail {
 
 class IoDev : public RegionBase {
 public:
-    constexpr IoDev(Address addr, NativeWord len, std::unique_ptr<IMmioDev>&& pDev) :
+    constexpr IoDev(Address addr, NativeWord len, IMmioDev* pDev) :
         RegionBase(addr, len),
-        pDev(std::move(pDev)) {}
+        pDev(pDev) {}
 
-    constexpr IMmioDev* GetDevice() noexcept { return pDev.get(); }
-    constexpr const IMmioDev* GetDevice() const noexcept { return pDev.get(); }
+    constexpr IMmioDev* GetDevice() noexcept { return pDev; }
+    constexpr const IMmioDev* GetDevice() const noexcept { return pDev; }
 private:
-    std::unique_ptr<IMmioDev> pDev;
+    IMmioDev* pDev;
 }; // class IoDev
 
 class IoRegion : public RegionBase {

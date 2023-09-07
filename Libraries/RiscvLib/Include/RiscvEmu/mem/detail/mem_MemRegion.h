@@ -11,6 +11,7 @@ namespace detail {
 
 class MemRegion : public RegionBase, private MemoryDeviceImpl<std::unique_ptr<Byte[]>> {
 public:
+    MemRegion() noexcept = default;
     constexpr MemRegion(const RegionBase& info) :
         RegionBase(info),
         MemoryDeviceImpl(std::make_unique<Byte[]>(info.GetLength())) {}
