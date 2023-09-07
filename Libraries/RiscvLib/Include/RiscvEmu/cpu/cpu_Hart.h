@@ -21,8 +21,7 @@ public:
         mem::MemoryController* const m_pMemCtlr;
     }; // SharedContext
 public:
-    Hart(SharedContext* pSharedCtx) :
-        m_pSharedCtx(pSharedCtx) {}
+    Result Initialize(SharedContext* pSharedCtx);
 
     Result ExecuteInstruction(Instruction inst);
 
@@ -81,7 +80,7 @@ private:
 
     PrivilageLevel m_CurPrivLevel;
 
-    SharedContext* const m_pSharedCtx;
+    SharedContext* m_pSharedCtx;
 }; // class Hart
 
 } // namespace cpu
