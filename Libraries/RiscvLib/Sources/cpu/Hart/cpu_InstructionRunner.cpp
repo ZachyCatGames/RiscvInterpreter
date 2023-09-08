@@ -10,6 +10,10 @@ namespace cpu {
 
 
 class Hart::InstructionRunner : public DecoderImpl<Hart::InstructionRunner> {
+public:
+    constexpr InstructionRunner(Hart* pParent) :
+        m_pParent(pParent) {}
+
 private:
     friend class DecoderImpl<Hart::InstructionRunner>;
     class InRegObject {
@@ -286,7 +290,7 @@ private:
 }; // class Hart::InstructionRunner
 
 Result Hart::ExecuteInstruction(Instruction inst) {
-    return InstructionRunner().ParseInstruction(inst);
+    return InstructionRunner(this).ParseInstruction(inst);
 }
 
 } // namespace cpu
