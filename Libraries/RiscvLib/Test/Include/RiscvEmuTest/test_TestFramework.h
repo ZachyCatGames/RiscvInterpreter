@@ -12,7 +12,7 @@ namespace detail {
 
 class TestFrameworkBase {
 public:
-    static void LogResetFailed(std::string_view name);
+    static void LogResetFailed(std::string_view name, Result res);
     static void LogTestResult(std::string_view name, Result res);
 }; // class TestFrameworkBase
 
@@ -38,7 +38,7 @@ private:
         /* Run reset function. */
         Result res = m_ResetFunc(pSys);
         if(res.IsFailure()) {
-            this->LogResetFailed(test.GetName());
+            this->LogResetFailed(test.GetName(), res);
             return res;
         }
 

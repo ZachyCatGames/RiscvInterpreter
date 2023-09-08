@@ -59,10 +59,10 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x44 },
+            { 4, 0x11 },
             { 4, HartTestSystem::MemoryAddress },
             0,
-            { HartTestSystem::MemoryAddress, 0x11223344 }
+            { HartTestSystem::MemoryAddress, 0x11 }
         },
 
         /* Test LB with a positive offset. */
@@ -71,10 +71,10 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x44 },
+            { 4, 0x11 },
             { 4, HartTestSystem::MemoryAddress },
             0x100,
-            { HartTestSystem::MemoryAddress + 0x100, 0x11223344 }
+            { HartTestSystem::MemoryAddress + 0x100, 0x11 }
         },
 
         /* Test LB with a negative offset. */
@@ -83,10 +83,10 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x44 },
+            { 4, 0x11 },
             { 4, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
-            { HartTestSystem::MemoryAddress, 0x11223344 }
+            { HartTestSystem::MemoryAddress, 0x11 }
         },
 
         /* Test LB with a signed value. */
