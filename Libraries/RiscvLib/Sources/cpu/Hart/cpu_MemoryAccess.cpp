@@ -5,9 +5,15 @@ namespace cpu {
 
 template<typename T>
 Result Hart::MemoryReadImpl(auto func, T* pOut, Address addr) {
+    Result res;
+
     /* If running in Machine mode perform a direct physical memory read. */
     if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        return (*m_SharedCtx.GetMemController().*func)(pOut, addr);
+        res = (*m_SharedCtx.GetMemController().*func)(pOut, addr);
+
+        /* TODO: Throw exception on failure. */
+
+        return res;
     }
 
     /* Otherwise obtain a physical address from the MMU. */
@@ -18,9 +24,15 @@ Result Hart::MemoryReadImpl(auto func, T* pOut, Address addr) {
 
 template<typename T>
 Result Hart::MemoryWriteImpl(auto func, T in, Address addr) {
+    Result res;
+
     /* If running in machine mode perform a direct physical memory write. */
     if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        return (*m_SharedCtx.GetMemController().*func)(in, addr);
+        res = (*m_SharedCtx.GetMemController().*func)(in, addr);
+
+        /* TODO: Throw exception on failure. */
+
+        return res;
     }
 
     /* Otherwise obtain a physical address from the MMU. */
