@@ -4,8 +4,8 @@
 namespace riscv {
 namespace cpu {
 
-Result Hart::Initialize(SharedContext* pSharedCtx) {
-    m_pSharedCtx = pSharedCtx;
+Result Hart::Initialize(SharedContext sharedCtx) {
+    m_SharedCtx = sharedCtx;
 
     return ResultSuccess();
 }

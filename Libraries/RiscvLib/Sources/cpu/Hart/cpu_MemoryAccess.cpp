@@ -7,7 +7,7 @@ template<typename T>
 Result Hart::MemoryReadImpl(auto func, T* pOut, Address addr) {
     /* If running in Machine mode perform a direct physical memory read. */
     if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        return (*m_pSharedCtx->GetMemController().*func)(pOut, addr);
+        return (*m_SharedCtx.GetMemController().*func)(pOut, addr);
     }
 
     /* Otherwise obtain a physical address from the MMU. */
@@ -20,7 +20,7 @@ template<typename T>
 Result Hart::MemoryWriteImpl(auto func, T in, Address addr) {
     /* If running in machine mode perform a direct physical memory write. */
     if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        return (*m_pSharedCtx->GetMemController().*func)(in, addr);
+        return (*m_SharedCtx.GetMemController().*func)(in, addr);
     }
 
     /* Otherwise obtain a physical address from the MMU. */
@@ -60,7 +60,7 @@ Result Hart::FetchInstruction(Instruction* pOut, Address addr) {
 
     /* If running in machine mode perform a direct physical memory write. */
     if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        res = m_pSharedCtx->GetMemController()->ReadWord(&inst, addr);
+        res = m_SharedCtx.GetMemController()->ReadWord(&inst, addr);
         *pOut = Instruction(inst);
         return res;
     }

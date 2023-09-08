@@ -13,15 +13,16 @@ class Hart {
 public:
     class SharedContext {
     public:
+        constexpr SharedContext() noexcept = default;
         constexpr SharedContext(mem::MemoryController* pMemCtlr) noexcept :
             m_pMemCtlr(pMemCtlr) {}
         
         constexpr auto GetMemController() const noexcept { return m_pMemCtlr; }
     private:
-        mem::MemoryController* const m_pMemCtlr;
+        mem::MemoryController* m_pMemCtlr;
     }; // SharedContext
 public:
-    Result Initialize(SharedContext* pSharedCtx);
+    Result Initialize(SharedContext pSharedCtx);
 
     Result ExecuteInstruction(Instruction inst);
 
@@ -62,6 +63,7 @@ private:
     template<typename T>
     Result MemoryWriteImpl(auto func, T in, Address addr);
 
+public:
     Result MemoryReadByte(Byte* pOut, Address addr);
     Result MemoryReadHWord(HWord* pOut, Address addr);
     Result MemoryReadWord(Word* pOut, Address addr);
@@ -80,7 +82,7 @@ private:
 
     PrivilageLevel m_CurPrivLevel;
 
-    SharedContext* m_pSharedCtx;
+    SharedContext m_SharedCtx;
 }; // class Hart
 
 } // namespace cpu
