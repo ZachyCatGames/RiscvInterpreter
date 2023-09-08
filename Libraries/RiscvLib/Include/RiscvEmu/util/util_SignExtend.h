@@ -7,7 +7,7 @@ namespace util {
 template<typename T>
 constexpr auto SignExtend(T val, int from, int to) {
     /* Check if value is signed. */
-    if(val & 1 << (from - 1)) {
+    if(from < to && val & 1 << (from - 1)) {
         val |= util::GenerateMaskLeft<T>(to - from);
     }
 
