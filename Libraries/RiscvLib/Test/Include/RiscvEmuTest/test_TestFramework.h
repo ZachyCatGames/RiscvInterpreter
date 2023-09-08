@@ -54,7 +54,7 @@ private:
         }
 
         /* Run next test. */
-        if constexpr(sizeof...(TestsT) < I) {
+        if constexpr(sizeof...(TestsT) > I + 1) {
             return this->RunAllImpl<I + 1>(pSys);
         }
 
