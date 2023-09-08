@@ -66,6 +66,8 @@ static constexpr TestFramework g_TestRunner(
 
 } // namespace
 
+extern const std::string_view ProgramName = "TestOpcodeLOAD";
+
 Result Main([[maybe_unused]] Args args) {
     HartTestSystem sys;
 

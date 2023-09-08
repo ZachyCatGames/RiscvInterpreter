@@ -8,21 +8,19 @@
 namespace riscv {
 namespace test {
 
-Result Main(Args args) __attribute__((weak));
+extern const std::string_view ProgramName;
+
+extern Result Main(Args args);
 
 } // namespace test
 } // namespace riscv
 
 int main(int argc, const char* argv[]) {
-    riscv::test::Args args(argc, argv);
-
-    /* Make sure the test defines Main. */
-    if(!riscv::test::Main) {
-        std::cerr << "Program " << args[0] << " does not define Main!" << std::endl;
-        return -1;
-    }
+    /* Announce that's we've started. */
+    std::cerr << "Program " << riscv::test::ProgramName << " has started..." << std::endl;
 
     /* Run main. */
+    riscv::test::Args args(argc, argv);
     riscv::Result res = riscv::test::Main(args);
-    std::cerr << "Program " << args[0] << " finished with Result = " << res.GetValue() << std::endl;
+    std::cerr << "Program " << riscv::test::ProgramName << " finished with Result = " << res.GetValue() << std::endl;
 }
