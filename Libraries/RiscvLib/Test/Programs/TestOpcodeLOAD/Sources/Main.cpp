@@ -59,8 +59,8 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x11 },
-            { 4, HartTestSystem::MemoryAddress },
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -71,8 +71,8 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x11 },
-            { 4, HartTestSystem::MemoryAddress },
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x11 }
         },
@@ -83,8 +83,8 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, 0x11 },
-            { 4, HartTestSystem::MemoryAddress + 0x100 },
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -95,10 +95,58 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
-            { 4, -1 },
-            { 4, HartTestSystem::MemoryAddress },
+            { 1, -69 },
+            { 31, HartTestSystem::MemoryAddress },
             0,
-            { HartTestSystem::MemoryAddress, -1 }
+            { HartTestSystem::MemoryAddress, -69 }
+        },
+
+        /* Test LH with an offset of 0. */
+        LoadInstTest{
+            "UnsignedNoOffsetLH",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LH,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, 0x1122 }
+        },
+
+        /* Test LH with a positive offset. */
+        LoadInstTest{
+            "UnsignedPosOffsetLH",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LH,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress },
+            0x100,
+            { HartTestSystem::MemoryAddress + 0x100, 0x1122 }
+        },
+
+        /* Test LH with a negative offset. */
+        LoadInstTest{
+            "UnsignedNegOffsetLH",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LH,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            static_cast<Word>(-0x100),
+            { HartTestSystem::MemoryAddress, 0x1122 }
+        },
+
+        /* Test LH with a signed value. */
+        LoadInstTest{
+            "SignedNoOffsetLH",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LH,
+            { 1, -69 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, -69 }
         },
 
         /* Test LW with an offset of 0. */
@@ -107,8 +155,8 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
-            { 4, 0x11223344 },
-            { 4, HartTestSystem::MemoryAddress },
+            { 1, 0x11223344 },
+            { 31, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x11223344 }
         },
@@ -119,8 +167,8 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
-            { 4, 0x11223344 },
-            { 4, HartTestSystem::MemoryAddress },
+            { 1, 0x11223344 },
+            { 31, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x11223344 }
         },
@@ -131,11 +179,119 @@ static constexpr TestFramework g_TestRunner(
             ResultSuccess(),
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
-            { 4, 0x11223344 },
-            { 4, HartTestSystem::MemoryAddress + 0x100 },
+            { 1, 0x11223344 },
+            { 31, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x11223344 }
-        }
+        },
+
+        /* Test LW with a signed value. */
+        LoadInstTest{
+            "SignedNoOffsetLW",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LW,
+            { 1, -69 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, -69 }
+        },
+
+        /* Test LBU with an offset of 0. */
+        LoadInstTest{
+            "UnsignedNoOffsetLBU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LBU,
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, 0x11 }
+        },
+
+        /* Test LBU with a positive offset. */
+        LoadInstTest{
+            "UnsignedPosOffsetLBU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LBU,
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress },
+            0x100,
+            { HartTestSystem::MemoryAddress + 0x100, 0x11 }
+        },
+
+        /* Test LBU with a negative offset. */
+        LoadInstTest{
+            "UnsignedNegOffsetLBU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LBU,
+            { 1, 0x11 },
+            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            static_cast<Word>(-0x100),
+            { HartTestSystem::MemoryAddress, 0x11 }
+        },
+
+        /* Test LBU with a signed value. */
+        LoadInstTest{
+            "SignedNoOffsetLBU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LBU,
+            { 1, 0x80 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, 0x80 }
+        },
+
+        /* Test LHU with an offset of 0. */
+        LoadInstTest{
+            "UnsignedNoOffsetLHU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LHU,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, 0x1122 }
+        },
+
+        /* Test LHU with a positive offset. */
+        LoadInstTest{
+            "UnsignedPosOffsetLHU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LHU,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress },
+            0x100,
+            { HartTestSystem::MemoryAddress + 0x100, 0x1122 }
+        },
+
+        /* Test LHU with a negative offset. */
+        LoadInstTest{
+            "UnsignedNegOffsetLHU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LHU,
+            { 1, 0x1122 },
+            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            static_cast<Word>(-0x100),
+            { HartTestSystem::MemoryAddress, 0x1122 }
+        },
+
+        /* Test LHU with a signed value. */
+        LoadInstTest{
+            "SignedNoOffsetLHU",
+            ResultSuccess(),
+            cpu::Opcode::LOAD,
+            cpu::Funct3::LHU,
+            { 1, 0x8000 },
+            { 31, HartTestSystem::MemoryAddress },
+            0,
+            { HartTestSystem::MemoryAddress, 0x8000 }
+        },
     }
 
 );
