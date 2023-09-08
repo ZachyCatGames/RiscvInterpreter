@@ -39,6 +39,7 @@ include(CpuLibrarySources)
 include(HwLibrarySources)
 include(MemLibrarySources)
 include(ResultLibrarySources)
+include(TestLibrarySources)
 include(UtilLibrarySources)
 
 # Create our executable.
@@ -61,6 +62,10 @@ add_library(RiscvLib
     ${RISCV_RESULT_LIBRARY_HEADERS}
     ${RISCV_RESULT_LIBRARY_SOURCES}
 
+    # Test library.
+    ${RISCV_TEST_LIBRARY_HEADERS}
+    ${RISCV_TEST_LIBRARY_SOURCES}
+
     # Util library.
     ${RISCV_UTIL_LIBRARY_HEADERS}
     ${RISCV_UTIL_LIBRARY_SOURCES}
@@ -69,4 +74,5 @@ add_library(RiscvLib
 # Add our Include directory the list of include directories.
 target_include_directories(RiscvLib PUBLIC "${PROJECT_SOURCE_DIR}/Include")
 
-#add_subdirectory(Test)
+# Include tests.
+add_subdirectory(Test)
