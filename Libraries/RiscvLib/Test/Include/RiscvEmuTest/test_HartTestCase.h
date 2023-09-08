@@ -15,6 +15,7 @@ class HartCustomTest : public TestCaseBase<HartCustomTest, HartTestSystem> {
 public:
     using FuncType = Result(*)(HartTestSystem* pSys);
     constexpr HartCustomTest(FuncType test) noexcept :
+        TestCaseBase<HartCustomTest, HartTestSystem>("test"),
         m_Test(test) {}
 private:
     friend class TestCaseBase<HartCustomTest, HartTestSystem>;
@@ -46,7 +47,8 @@ private:
         return static_cast<const Derived*>(this)->Check(pSys);
     }
 protected:
-    constexpr HartSingleInstTestBase(cpu::Instruction inst, Result expectedRes) noexcept :
+    constexpr HartSingleInstTestBase(cpu::Instruction inst, std::string_view name, Result expectedRes) noexcept :
+        TestCaseBase<HartSingleInstTestBase<Derived>, HartTestSystem>(name),
         m_Inst(inst),
         m_ExpectedResult(expectedRes) {}
 
@@ -61,8 +63,8 @@ private:
 
 class HartSimpleRTypeTest : public HartSingleInstTestBase<HartSimpleRTypeTest> {
 public:
-    constexpr HartSimpleRTypeTest(Result expectedRes, cpu::Opcode op, cpu::Funct3 f3, cpu::Funct7 f7, RegPairT rd, RegPairT rs1, RegPairT rs2) noexcept :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeRTypeInstruction(op, f3, f7, GetPairId(rd), GetPairId(rs1), GetPairId(rs2))), expectedRes),
+    constexpr HartSimpleRTypeTest(std::string_view name, Result expectedRes, cpu::Opcode op, cpu::Funct3 f3, cpu::Funct7 f7, RegPairT rd, RegPairT rs1, RegPairT rs2) noexcept :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeRTypeInstruction(op, f3, f7, GetPairId(rd), GetPairId(rs1), GetPairId(rs2))), name, expectedRes),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_InitialRs2(rs2) {}
@@ -87,8 +89,8 @@ private:
 
 class HartSimpleITypeTest : public HartSingleInstTestBase<HartSimpleITypeTest> {
 public:
-    constexpr HartSimpleITypeTest(Result expectedRes, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm) noexcept :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), expectedRes),
+    constexpr HartSimpleITypeTest(std::string_view name, Result expectedRes, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm) noexcept :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name, expectedRes),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1) {}
 private:
