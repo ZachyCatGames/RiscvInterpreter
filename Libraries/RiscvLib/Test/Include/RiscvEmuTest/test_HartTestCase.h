@@ -5,26 +5,19 @@
 #include <RiscvEmu/cpu/decoder/cpu_Opcodes.h>
 #include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_Result.ext.h>
+#include <RiscvEmuTest/test_TestCaseBase.h>
 #include <utility>
 
 namespace riscv {
 namespace test {
 
-template<typename Derived>
-class HartTestCaseBase {
-public:
-    constexpr Result Run(HartTestSystem* pSys) const {
-        return static_cast<const Derived*>(this)->RunImpl(pSys);
-    }
-}; // class HartTestCaseBase
-
-class HartCustomTest : public HartTestCaseBase<HartCustomTest> {
+class HartCustomTest : public TestCaseBase<HartCustomTest, HartTestSystem> {
 public:
     using FuncType = Result(*)(HartTestSystem* pSys);
     constexpr HartCustomTest(FuncType test) noexcept :
         m_Test(test) {}
 private:
-    friend class HartTestCaseBase<HartCustomTest>;
+    friend class TestCaseBase<HartCustomTest, HartTestSystem>;
     Result TestImpl(HartTestSystem* pSys) const {
         return m_Test(pSys);
     }
@@ -33,9 +26,9 @@ private:
 }; // class HartCustomTest
 
 template<typename Derived>
-class HartSingleInstTestBase : public HartTestCaseBase<HartSingleInstTestBase<Derived>> {
+class HartSingleInstTestBase : public TestCaseBase<HartSingleInstTestBase<Derived>, HartTestSystem> {
 private:
-    friend class HartTestCaseBase<HartSingleInstTestBase<Derived>>;
+    friend class TestCaseBase<HartSingleInstTestBase<Derived>, HartTestSystem>;
     Result RunImpl(HartTestSystem* pSys) const {
         /* Perform specific initialization. */
         Result res = static_cast<const Derived*>(this)->Initialize(pSys);
