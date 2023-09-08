@@ -85,7 +85,7 @@ private:
         Result res = (*m_pParent.*func)(&out, rs1.Get<Address>() + imm.Get<Address>());
         if(res.IsSuccess()) {
             if constexpr(Signed) {
-                rd.Set(util::SignExtend(out, sizeof(T) * 8, NativeWordBitLen));
+                rd.Set(util::SignExtend(static_cast<NativeWord>(out), sizeof(T) * 8, NativeWordBitLen));
             }
             else {
                 rd.Set(out);
