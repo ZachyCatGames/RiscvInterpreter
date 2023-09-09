@@ -36,20 +36,6 @@ public:
 
     void ClearGPRs() noexcept;
 
-    bool AssertGPR(int index, NativeWord value) const noexcept {
-        return m_Hart.ReadGPR(index) == value;
-    }
-
-    bool AssertPhysMemByte(Address addr, Byte val);
-    bool AssertPhysMemHWord(Address addr, HWord val);
-    bool AssertPhysMemWord(Address addr, Word val);
-    bool AssertPhysMemDWord(Address addr, Word val);
-
-    bool AssertVirtMemByte(Address addr, Byte val);
-    bool AssertVirtMemHWord(Address addr, HWord val);
-    bool AssertVirtMemWord(Address addr, Word val);
-    bool AssertVirtMemDWord(Address addr, Word val);
-
     /* Access physical memory. */
     Result MemReadByte(Byte* pOut, Address addr)   { return m_MemCtlr.ReadByte(pOut, addr); }
     Result MemReadHWord(HWord* pOut, Address addr) { return m_MemCtlr.ReadHWord(pOut, addr); }
@@ -70,6 +56,8 @@ public:
     Result HartWriteHWord(HWord in, Address addr)   { return m_Hart.MemoryWriteHWord(in, addr); }
     Result HartWriteWord(Word in, Address addr)     { return m_Hart.MemoryWriteWord(in, addr); }
     Result HartWriteDWord(DWord in, Address addr)   { return m_Hart.MemoryWriteDWord(in, addr); }
+
+    Result ClearMem();
 
     static Result DefaultReset(HartTestSystem* pSys);
 

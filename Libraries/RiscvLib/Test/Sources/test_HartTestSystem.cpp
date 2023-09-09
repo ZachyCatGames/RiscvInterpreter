@@ -30,5 +30,30 @@ Result HartTestSystem::DefaultReset(HartTestSystem* pSys) {
     return pSys->GetHart()->Reset();
 }
 
+void HartTestSystem::ClearGPRs() noexcept {
+    /* Write zero to each GPR. */
+    for(int i = 0; i < cpu::Hart::NumGPR; i++) {
+        this->WriteGPR(i, 0);
+    }
+}
+
+Result HartTestSystem::ClearMem() {
+    /* Memory size must be aligned to 8 bytes. */
+    static_assert(MemoryAddress + MemorySize % 8);
+
+    /* Write zero to entirety of ram. */
+    Address curAddr = MemoryAddress;
+    while(curAddr < MemoryAddress + MemorySize) {
+        Result res = this->MemWriteDWord(0, curAddr);
+        if(res.IsFailure()) {
+            return res;
+        }
+
+        curAddr += 8;
+    }
+
+    return ResultSuccess();
+}
+
 } // namespace test
 } // namespace riscv
