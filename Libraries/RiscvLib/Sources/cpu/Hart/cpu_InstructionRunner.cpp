@@ -147,11 +147,11 @@ private:
         return ResultSuccess();
     }
     Result ParseInstSRLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        rd.Set(rs1.Get<NativeWord>() << imm.Get<NativeWord>());
+        rd.Set(rs1.Get<NativeWord>() >> imm.Get<NativeWord>());
         return ResultSuccess();
     }
     Result ParseInstSRAI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        rd.Set(rs1.Get<NativeWordS>() << imm.Get<Word>());
+        rd.Set(rs1.Get<NativeWordS>() >> imm.Get<Word>());
         return ResultSuccess();
     }
     Result ParseInstORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
