@@ -26,5 +26,9 @@ Result HartTestSystem::Initialize() {
     return ResultSuccess();
 }
 
+Result HartTestSystem::DefaultReset(HartTestSystem* pSys) {
+    return pSys->GetHart()->Reset();
+}
+
 } // namespace test
 } // namespace riscv

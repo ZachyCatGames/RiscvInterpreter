@@ -71,6 +71,8 @@ public:
     Result HartWriteWord(Word in, Address addr)     { return m_Hart.MemoryWriteWord(in, addr); }
     Result HartWriteDWord(DWord in, Address addr)   { return m_Hart.MemoryWriteDWord(in, addr); }
 
+    static Result DefaultReset(HartTestSystem* pSys);
+
 private:
     cpu::Hart m_Hart;
     mem::MemoryController m_MemCtlr;

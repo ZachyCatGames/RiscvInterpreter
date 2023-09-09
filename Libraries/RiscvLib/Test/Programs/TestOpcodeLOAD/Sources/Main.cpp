@@ -1,8 +1,6 @@
 #include <RiscvEmuTest/test_Common.h>
 #include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
-#include <RiscvEmu/cpu/cpu_Hart.h>
-#include <RiscvEmu/cpu/cpu_EncodeInstruction.h>
 
 namespace riscv {
 namespace test {
@@ -12,8 +10,8 @@ namespace {
 class LoadInstTest : public HartSingleInstTestBase<LoadInstTest> {
 public:
     using AddrPairT = std::pair<Address, NativeWord>;
-    constexpr LoadInstTest(std::string_view name, Result expectedRes, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name, expectedRes),
+    constexpr LoadInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_MemVal(memVal) {}
@@ -43,20 +41,13 @@ private:
     AddrPairT m_MemVal;
 }; // class LoadInstTest
 
-static HartTestSystem g_System;
-
-static Result Reset(HartTestSystem* pSys) {
-    return pSys->GetHart()->Reset();
-}
-
-static constexpr TestFramework g_TestRunner(
-    &Reset,
+constexpr TestFramework g_TestRunner(
+    &HartTestSystem::DefaultReset,
 
     std::tuple {
         /* Test LB with an offset of 0. */
         LoadInstTest{
-            "UnsignedNoOffsetLB",
-            ResultSuccess(),
+            "LB_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
@@ -67,8 +58,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LB with a positive offset. */
         LoadInstTest{
-            "UnsignedPosOffsetLB",
-            ResultSuccess(),
+            "LB_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
@@ -79,8 +69,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LB with a negative offset. */
         LoadInstTest{
-            "UnsignedNegOffsetLB",
-            ResultSuccess(),
+            "LB_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
@@ -91,8 +80,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LB with a signed value. */
         LoadInstTest{
-            "SignedNoOffsetLB",
-            ResultSuccess(),
+            "LB_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, -69 },
@@ -103,8 +91,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LH with an offset of 0. */
         LoadInstTest{
-            "UnsignedNoOffsetLH",
-            ResultSuccess(),
+            "LH_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
@@ -115,8 +102,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LH with a positive offset. */
         LoadInstTest{
-            "UnsignedPosOffsetLH",
-            ResultSuccess(),
+            "LH_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
@@ -127,8 +113,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LH with a negative offset. */
         LoadInstTest{
-            "UnsignedNegOffsetLH",
-            ResultSuccess(),
+            "LH_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
@@ -139,8 +124,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LH with a signed value. */
         LoadInstTest{
-            "SignedNoOffsetLH",
-            ResultSuccess(),
+            "LH_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, -69 },
@@ -151,8 +135,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LW with an offset of 0. */
         LoadInstTest{
-            "UnsignedNoOffsetLW",
-            ResultSuccess(),
+            "LW_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
@@ -163,8 +146,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LW with a positive offset. */
         LoadInstTest{
-            "UnsignedPosOffsetLW",
-            ResultSuccess(),
+            "LW_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
@@ -175,8 +157,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LW with a negative offset. */
         LoadInstTest{
-            "UnsignedNegOffsetLW",
-            ResultSuccess(),
+            "LW_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
@@ -187,8 +168,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LW with a signed value. */
         LoadInstTest{
-            "SignedNoOffsetLW",
-            ResultSuccess(),
+            "LW_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, -69 },
@@ -199,8 +179,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LBU with an offset of 0. */
         LoadInstTest{
-            "UnsignedNoOffsetLBU",
-            ResultSuccess(),
+            "LBU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
@@ -211,8 +190,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LBU with a positive offset. */
         LoadInstTest{
-            "UnsignedPosOffsetLBU",
-            ResultSuccess(),
+            "LBU_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
@@ -223,8 +201,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LBU with a negative offset. */
         LoadInstTest{
-            "UnsignedNegOffsetLBU",
-            ResultSuccess(),
+            "LBU_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
@@ -235,8 +212,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LBU with a signed value. */
         LoadInstTest{
-            "SignedNoOffsetLBU",
-            ResultSuccess(),
+            "LBU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x80 },
@@ -247,8 +223,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LHU with an offset of 0. */
         LoadInstTest{
-            "UnsignedNoOffsetLHU",
-            ResultSuccess(),
+            "LHU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
@@ -259,8 +234,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LHU with a positive offset. */
         LoadInstTest{
-            "UnsignedPosOffsetLHU",
-            ResultSuccess(),
+            "LHU_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
@@ -271,8 +245,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LHU with a negative offset. */
         LoadInstTest{
-            "UnsignedNegOffsetLHU",
-            ResultSuccess(),
+            "LHU_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
@@ -283,8 +256,7 @@ static constexpr TestFramework g_TestRunner(
 
         /* Test LHU with a signed value. */
         LoadInstTest{
-            "SignedNoOffsetLHU",
-            ResultSuccess(),
+            "LHU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x8000 },
@@ -293,15 +265,14 @@ static constexpr TestFramework g_TestRunner(
             { HartTestSystem::MemoryAddress, 0x8000 }
         },
     }
-
 );
 
 } // namespace
 
 extern const std::string_view ProgramName = "TestOpcodeLOAD";
 
-Result Main([[maybe_unused]] Args args) {
-    HartTestSystem sys;
+extern Result Main([[maybe_unused]] Args args) {
+    static HartTestSystem sys;
 
     sys.Initialize();
     g_TestRunner.RunAll(&sys);
