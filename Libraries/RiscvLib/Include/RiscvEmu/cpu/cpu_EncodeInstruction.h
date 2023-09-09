@@ -28,7 +28,7 @@ constexpr Word EncodeSTypeInstruction(Opcode op, Funct3 f3, int rs1, int rs2, Wo
             (static_cast<Word>(f3)  & 0x07u)  << 12 |
             (static_cast<Word>(rs1) & 0x3Fu)  << 15 |
             (static_cast<Word>(rs2) & 0x3Fu)  << 20 |
-            (static_cast<Word>(imm) & 0xFF0)  << 20; // 25 - 5
+            (static_cast<Word>(imm) & 0xFE0)  << 20; // 25 - 5
 }
 
 constexpr Word EncodeBTypeInstruction(Opcode op, Funct3 f3, int rs1, int rs2, Word imm) noexcept {
