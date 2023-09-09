@@ -40,16 +40,15 @@ Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
     }
 
     /* Make sure this new device doesn't overlap with an existing one. */
-    auto relAddr = addr - pRegion->GetStart();
     auto len = pDev->GetMappedSize();
     for(const auto& dev : pRegion->GetDevList()) {
-        if(dev.Includes(relAddr) || dev.Includes(relAddr + len)) {
+        if(dev.Includes(addr) || dev.Includes(addr + len)) {
             return ResultDeviceAlreadyExists();
         }
     }
 
     /* Add the new device. */
-    pRegion->GetDevList().emplace_back(relAddr, len, pDev);
+    pRegion->GetDevList().emplace_back(addr, len, pDev);
 
     return ResultSuccess();
 }
@@ -90,12 +89,12 @@ template<auto MemRead, auto IoRead, typename T>
 Result MemoryController::ReadWriteImpl(T pOut, Address addr) {
     /* First let's check if this address is in main memory. */
     if(m_MemRegion.Includes(addr)) {
-        return (m_MemRegion.*MemRead)(pOut, addr);
+        return (m_MemRegion.*MemRead)(pOut, addr - m_MemRegion.GetStart());
     }
     /* Next if that fails let's try reading/writing from/to an IO device. */
     detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(std::remove_pointer_t<T>));
     if(pDev) {
-        return (*pDev->GetDevice().*IoRead)(pOut, addr);
+        return (*pDev->GetDevice().*IoRead)(pOut, addr - pDev->GetStart());
     }
     return ResultReadAccessFault();
 }
