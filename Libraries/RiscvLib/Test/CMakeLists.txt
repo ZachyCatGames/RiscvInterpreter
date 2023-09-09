@@ -22,3 +22,4 @@ target_link_libraries(RiscvEmuTestLib PUBLIC RiscvLib)
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/TestOpcodeLOAD")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/TestOpcodeOP_IMM")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/TestOpcodeSTORE")
