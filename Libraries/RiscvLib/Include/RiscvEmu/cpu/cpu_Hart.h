@@ -28,13 +28,13 @@ public:
 
     void WritePC(NativeWord addr) noexcept { m_PC = addr; }
     void WriteGPR(int index, NativeWord value) noexcept {
-        assert(index < c_NumGPR && index >= 0);
+        assert(index < NumGPR && index >= 0);
         m_GPR[index] = value;
     }
 
     NativeWord ReadPC() const noexcept { return m_PC; }
     NativeWord ReadGPR(int index) const noexcept {
-        assert(index < c_NumGPR && index >= 0);
+        assert(index < NumGPR && index >= 0);
         return m_GPR[index];
     }
 
@@ -75,10 +75,11 @@ public:
 
     Result FetchInstruction(Instruction* pOut, Address addr);
 
+public:
+    static constexpr auto NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
 private:
-    static constexpr auto c_NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
     NativeWord m_PC;
-    NativeWord m_GPR[c_NumGPR];
+    NativeWord m_GPR[NumGPR];
 
     PrivilageLevel m_CurPrivLevel;
 
