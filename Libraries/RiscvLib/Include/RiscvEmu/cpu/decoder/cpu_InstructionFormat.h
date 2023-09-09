@@ -79,7 +79,7 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return util::ExtractBitfield(this->Get(), 7u, 5u) | (this->Get() & (0x7Fu << 25u) >> 20u);
+        return util::ExtractBitfield(this->Get(), 7u, 5u) | ((this->Get() & 0x7Fu << 25u) >> 20u);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
