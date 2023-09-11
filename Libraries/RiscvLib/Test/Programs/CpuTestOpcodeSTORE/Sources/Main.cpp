@@ -69,7 +69,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0,
             { HartTestSystem::MemoryAddress, 0xDD }
         },
@@ -80,7 +80,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0xDD }
         },
@@ -91,7 +91,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
             { 1, HartTestSystem::MemoryAddress + 0x100 },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0xDD }
         },
@@ -102,7 +102,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0,
             { HartTestSystem::MemoryAddress, 0xCCDD }
         },
@@ -113,7 +113,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0xCCDD }
         },
@@ -124,7 +124,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
             { 1, HartTestSystem::MemoryAddress + 0x100 },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0xCCDD }
         },
@@ -135,7 +135,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0,
             { HartTestSystem::MemoryAddress, 0xAABBCCDD }
         },
@@ -146,7 +146,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
             { 1, HartTestSystem::MemoryAddress },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0xAABBCCDD }
         },
@@ -157,7 +157,7 @@ constexpr TestFramework g_TestRunner{
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
             { 1, HartTestSystem::MemoryAddress + 0x100 },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0xAABBCCDD }
         },
@@ -167,15 +167,14 @@ constexpr TestFramework g_TestRunner{
 
 } // namespace
 
-extern const std::string_view ProgramName = "TestOpcodeSTORE";
+extern constexpr std::string_view ProgramName = "TestOpcodeSTORE";
 
 Result Main([[maybe_unused]] Args args) {
     HartTestSystem sys;
 
     sys.Initialize();
-    g_TestRunner.RunAll(&sys);
 
-    return ResultSuccess();
+    return g_TestRunner.RunAll(&sys);
 }
 
 } // namespace test

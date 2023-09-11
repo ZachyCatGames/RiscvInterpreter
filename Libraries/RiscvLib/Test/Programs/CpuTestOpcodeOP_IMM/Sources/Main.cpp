@@ -17,7 +17,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
             { 1, 0x100 },
-            { 31, 0x100 },
+            { 15, 0x100 },
             0
         },
 
@@ -27,7 +27,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
             { 1, 120 },
-            { 31, 50 },
+            { 15, 50 },
             70
         },
 
@@ -37,8 +37,58 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
             { 1, 30 },
-            { 31, 50 },
+            { 15, 50 },
             static_cast<Word>(-20)
+        },
+
+        /* Test ADDI with overflow. */
+        HartSimpleITypeTest{
+            "ADDI_Overflow",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::ADDI,
+            { 1, 0 },
+            { 15, std::numeric_limits<NativeWord>::max() },
+            1
+        },
+
+        /* Test ADDI with underflow. */
+        HartSimpleITypeTest{
+            "ADDI_Underflow",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::ADDI,
+            { 1, std::numeric_limits<NativeWord>::max() },
+            { 15, 0 },
+            static_cast<NativeWord>(-1)
+        },
+
+        /* Test SLLI with a immediate of zero. */
+        HartSimpleITypeTest{
+            "SLLI_ZeroImm",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::SLLI,
+            { 1, 50000 },
+            { 15, 50000 },
+            0
+        },
+
+        /* Test SLLI with a positive rs1. */
+        HartSimpleITypeTest{
+            "SLLI_PosRs1",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::SLLI,
+            { 1, 50000 << 8 },
+            { 15, 50000 },
+            8
+        },
+
+        /* Test SLLI with a negative rs1. */
+        HartSimpleITypeTest{
+            "SLLI_NegRs1",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::SLLI,
+            { 1, -50000 << 8 },
+            { 15, -50000 },
+            8
         },
 
         /* Test SLTI with imm == rs1, both positive. */
@@ -47,7 +97,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 0 },
-            { 31, 20 },
+            { 15, 20 },
             20
         },
 
@@ -57,7 +107,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 0 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             static_cast<Word>(-20)
         },
 
@@ -67,7 +117,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 1 },
-            { 31, 20 },
+            { 15, 20 },
             40
         },
 
@@ -77,7 +127,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 1 },
-            { 31, static_cast<NativeWord>(-40) },
+            { 15, -40 },
             static_cast<Word>(-20)
         },
 
@@ -87,7 +137,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 1 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             20
         },
 
@@ -97,7 +147,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 0 },
-            { 31, 40 },
+            { 15, 40 },
             20
         },
 
@@ -107,7 +157,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 0 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             static_cast<Word>(-40)
         },
 
@@ -117,11 +167,9 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
             { 1, 0 },
-            { 31, 20 },
+            { 15, 20 },
             static_cast<Word>(-20)
         },
-
-
 
         /* Test SLTIU with imm == rs1, both positive. */
         HartSimpleITypeTest{
@@ -129,7 +177,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 0 },
-            { 31, 20 },
+            { 15, 20 },
             20
         },
 
@@ -139,7 +187,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 0 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             static_cast<Word>(-20)
         },
 
@@ -149,7 +197,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 1 },
-            { 31, 20 },
+            { 15, 20 },
             40
         },
 
@@ -159,7 +207,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 1 },
-            { 31, static_cast<NativeWord>(-40) },
+            { 15, -40 },
             static_cast<Word>(-20)
         },
 
@@ -169,7 +217,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 0 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             20
         },
 
@@ -179,7 +227,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 0 },
-            { 31, 40 },
+            { 15, 40 },
             20
         },
 
@@ -189,7 +237,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 0 },
-            { 31, static_cast<NativeWord>(-20) },
+            { 15, -20 },
             static_cast<Word>(-40)
         },
 
@@ -199,7 +247,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
             { 1, 1 },
-            { 31, 20 },
+            { 15, 20 },
             static_cast<Word>(-20)
         },
 
@@ -209,7 +257,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
             { 1, 0xAABBCCDD },
-            { 31, 0xAABBCCDD },
+            { 15, 0xAABBCCDD },
             0
         },
 
@@ -219,7 +267,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
             { 1, 0xAA ^ 0x77 },
-            { 31, 0xAA },
+            { 15, 0xAA },
             0x77,
         },
 
@@ -229,7 +277,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
             { 1, 0xAABB ^ -5 },
-            { 31, 0xAABB },
+            { 15, 0xAABB },
             static_cast<Word>(-5)
         },
 
@@ -239,7 +287,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, 50000 },
-            { 31, 50000 },
+            { 15, 50000 },
             0
         },
 
@@ -249,7 +297,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, 50000 >> 8 },
-            { 31, 50000 },
+            { 15, 50000 },
             8
         },
 
@@ -259,7 +307,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, static_cast<NativeWord>(-50000) >> 8 },
-            { 31, -50000 },
+            { 15, -50000 },
             8
         },
 
@@ -269,7 +317,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, -50000 },
-            { 31, -50000 },
+            { 15, -50000 },
             (1 << 10u)
         },
 
@@ -279,7 +327,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, 50000 >> 8 },
-            { 31, 50000 },
+            { 15, 50000 },
             8 | (1 << 10u)
         },
 
@@ -289,7 +337,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
             { 1, -50000 >> 8 },
-            { 31, -50000 },
+            { 15, -50000 },
             8 | (1 << 10u)
         },
 
@@ -299,7 +347,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
             { 1, 50000 },
-            { 31, 50000 },
+            { 15, 50000 },
             0
         },
 
@@ -309,7 +357,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
             { 1, 50000 | 0x99 },
-            { 31, 50000 },
+            { 15, 50000 },
             0x99
         },
 
@@ -319,7 +367,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
             { 1, 50000 | -20 },
-            { 31, 50000 },
+            { 15, 50000 },
             static_cast<Word>(-20)
         },
 
@@ -329,7 +377,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,
             { 1, 50000 & 0 },
-            { 31, 50000 },
+            { 15, 50000 },
             0
         },
 
@@ -339,7 +387,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,
             { 1, 50000 & 0x99 },
-            { 31, 50000 },
+            { 15, 50000 },
             0x99
         },
 
@@ -349,7 +397,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,
             { 1, 50000 & -20 },
-            { 31, 50000 },
+            { 15, 50000 },
             static_cast<Word>(-20)
         },
     }
@@ -363,9 +411,8 @@ extern Result Main([[maybe_unused]] Args args) {
     static HartTestSystem sys;
 
     sys.Initialize();
-    g_TestRunner.RunAll(&sys);
 
-    return ResultSuccess();
+    return g_TestRunner.RunAll(&sys);
 }
 
 } // namespace test

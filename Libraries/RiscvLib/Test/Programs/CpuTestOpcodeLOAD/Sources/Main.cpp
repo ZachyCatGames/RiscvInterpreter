@@ -53,7 +53,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -64,7 +64,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x11 }
         },
@@ -75,7 +75,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -86,7 +86,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
             { 1, -69 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, -69 }
         },
@@ -97,7 +97,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x1122 }
         },
@@ -108,7 +108,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x1122 }
         },
@@ -119,7 +119,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x1122 }
         },
@@ -130,7 +130,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
             { 1, -69 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, -69 }
         },
@@ -141,7 +141,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x11223344 }
         },
@@ -152,7 +152,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x11223344 }
         },
@@ -163,7 +163,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, 0x11223344 },
-            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x11223344 }
         },
@@ -174,7 +174,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
             { 1, -69 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, -69 }
         },
@@ -185,7 +185,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -196,7 +196,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x11 }
         },
@@ -207,7 +207,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x11 },
-            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x11 }
         },
@@ -218,7 +218,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
             { 1, 0x80 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x80 }
         },
@@ -229,7 +229,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x1122 }
         },
@@ -240,7 +240,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0x100,
             { HartTestSystem::MemoryAddress + 0x100, 0x1122 }
         },
@@ -251,7 +251,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x1122 },
-            { 31, HartTestSystem::MemoryAddress + 0x100 },
+            { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
             { HartTestSystem::MemoryAddress, 0x1122 }
         },
@@ -262,7 +262,7 @@ constexpr TestFramework g_TestRunner(
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
             { 1, 0x8000 },
-            { 31, HartTestSystem::MemoryAddress },
+            { 15, HartTestSystem::MemoryAddress },
             0,
             { HartTestSystem::MemoryAddress, 0x8000 }
         },
@@ -271,15 +271,14 @@ constexpr TestFramework g_TestRunner(
 
 } // namespace
 
-extern const std::string_view ProgramName = "TestOpcodeLOAD";
+extern constexpr std::string_view ProgramName = "TestOpcodeLOAD";
 
 extern Result Main([[maybe_unused]] Args args) {
     static HartTestSystem sys;
 
     sys.Initialize();
-    g_TestRunner.RunAll(&sys);
 
-    return ResultSuccess();
+    return g_TestRunner.RunAll(&sys);
 }
 
 } // namespace test
