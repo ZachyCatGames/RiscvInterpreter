@@ -1,7 +1,6 @@
 #pragma once
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
 #include <iostream>
 #include <span>
 

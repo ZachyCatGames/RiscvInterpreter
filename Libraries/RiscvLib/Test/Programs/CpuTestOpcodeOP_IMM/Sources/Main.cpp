@@ -1,6 +1,8 @@
 #include <RiscvEmuTest/test_Common.h>
+#include <RiscvEmuTest/test_HartTestCase.h>
 #include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <limits>
 
 namespace riscv {
 namespace test {
