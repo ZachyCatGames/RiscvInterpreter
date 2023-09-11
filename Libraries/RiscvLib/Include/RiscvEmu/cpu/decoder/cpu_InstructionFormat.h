@@ -29,7 +29,7 @@ public:
         return static_cast<Opcode>(this->Get() & c_OpcodeMask);
     }
 private:
-    static constexpr Word c_OpcodeMask = 0x3F;
+    static constexpr Word c_OpcodeMask = 0x7F;
 };
 
 namespace detail {
@@ -90,7 +90,7 @@ public:
     using detail::SBTypeBase::SBTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (this->Get() & (0xFu << 8u) >> 7u) | (this->Get() & (0x3Fu << 25u) >> 20u) | (this->Get() & (1u << 7u) << 4u) | (this->Get() & (1u << 31u) >> 19u);
+        return ((this->Get() & (0xFu << 8u)) >> 7u) | ((this->Get() & (0x3Fu << 25u)) >> 20u) | ((this->Get() & (1u << 7u)) << 4u) | ((this->Get() & (1u << 31u)) >> 19u);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 13u, NativeWordBitLen); }

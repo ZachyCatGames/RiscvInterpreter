@@ -46,6 +46,8 @@ private:
 
 private:
     Result SignalBranch(Address offset) {
+        /* TODO: Check alignment, throw exception if misaligned. */
+
         m_PC += offset;
         return ResultSuccess();
     }

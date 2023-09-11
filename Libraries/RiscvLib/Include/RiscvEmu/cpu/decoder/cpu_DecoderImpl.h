@@ -47,6 +47,7 @@ private:
 
 private:
     constexpr Result ParseOpcode(Instruction inst) {
+        auto t = inst.opcode();
         switch(inst.opcode()) {
         case Opcode::LOAD:
             return this->ParseLOAD(ITypeInstruction(inst));
