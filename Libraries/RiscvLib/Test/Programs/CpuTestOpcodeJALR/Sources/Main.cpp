@@ -84,7 +84,7 @@ constexpr TestFramework g_TestRunner{
             0xF00
         },
 
-        /* Test JALR with overflow. */
+        /* Test JALR with overflow on PC. */
         TestInstJALR{
             "JALR_Overflow",
             cpu::Opcode::JALR,
@@ -96,7 +96,7 @@ constexpr TestFramework g_TestRunner{
             0
         },
 
-        /* Test JALR with underflow. */
+        /* Test JALR with underflow on PC. */
         TestInstJALR{
             "JALR_Underflow",
             cpu::Opcode::JALR,
@@ -106,6 +106,18 @@ constexpr TestFramework g_TestRunner{
             static_cast<Word>(-4),
             0x2000,
             static_cast<NativeWord>(-4)
+        },
+
+        /* Test JALR with overflow on rd. */
+        TestInstJALR{
+            "JALR_OverflowRd",
+            cpu::Opcode::JALR,
+            cpu::Funct3::JALR,
+            { 1, 0 },
+            { 15, std::numeric_limits<NativeWord>::max() - 3 },
+            static_cast<Word>(-0x100),
+            std::numeric_limits<NativeWord>::max() - 3,
+            std::numeric_limits<NativeWord>::max() - 3 - 0x100
         }
     }
 };
