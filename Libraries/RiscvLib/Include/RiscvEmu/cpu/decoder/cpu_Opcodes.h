@@ -4,6 +4,9 @@ namespace riscv {
 namespace cpu {
 
 enum class Opcode {
+    /* Lowest possible opcode. */
+    Min = 0b0000000,
+
     /* Official in-use opcodes. */
     LOAD = 0b0000011,
     LOAD_FP = 0b0000111,
@@ -45,9 +48,15 @@ enum class Opcode {
     RESERVED_64   = 0b0111111,
     RESERVED_48_2 = 0b1011111,
     RESERVED_80   = 0b1111111,
+
+    /* Highest possible opcode. */
+    Max = 0b1111111
 }; // enum class Opcode
 
 enum class Funct3 {
+    /* Lowest possible Funct3 value. */
+    Min = 0b000,
+
     /* Opcode LOAD. */
     LB = 0b000,
     LH = 0b001,
@@ -93,9 +102,15 @@ enum class Funct3 {
 
     /* Opcode JALR. */
     JALR = 0b000,
+
+    /* Highest possible Funct3 value. */
+    Max = 0b111
 }; // enum class Funct3
 
 enum class Funct7 {
+    /* Lowest possible Funct7 value. */
+    Min = 0b0000000,
+
     /* For use when Funct7 isn't used within a Funct3 namespace. */
     Zero = 0,
 
@@ -106,6 +121,9 @@ enum class Funct7 {
     /* OP::SRL. */
     SRL = 0b0000000,
     SRA = 0b0100000,
+
+    /* Highest possible Funct7 value. */
+    Max = 0b1111111
 };
 
 } // namespace cpu

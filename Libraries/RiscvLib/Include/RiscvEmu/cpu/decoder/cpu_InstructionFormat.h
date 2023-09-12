@@ -7,6 +7,9 @@
 namespace riscv {
 namespace cpu {
 
+constexpr inline auto InstMinRegister = 0;
+constexpr inline auto InstMaxRegister = 31;
+
 namespace detail {
 
 class InstructionBase {
