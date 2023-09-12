@@ -9,15 +9,15 @@ namespace test {
 
 namespace {
 
-class AuipcInstTest : public HartSingleInstTestBase<AuipcInstTest> {
+class TestInstAUIPC : public HartSingleInstTestBase<TestInstAUIPC> {
 public:
-    constexpr AuipcInstTest(std::string_view name, cpu::Opcode op, RegPairT rd, Word imm, NativeWord initialPC) :
+    constexpr TestInstAUIPC(std::string_view name, cpu::Opcode op, RegPairT rd, Word imm, NativeWord initialPC) :
         HartSingleInstTestBase(cpu::Instruction(cpu::EncodeUTypeInstruction(op, GetPairId(rd), imm)), name),
         m_ExpectedRd(rd),
         m_Offset(imm),
         m_InitialPC(initialPC) {}
 private:
-    friend class HartSingleInstTestBase<AuipcInstTest>;
+    friend class HartSingleInstTestBase<TestInstAUIPC>;
     Result Initialize(HartTestSystem* pSys) const {
         /* Write PC. */
         pSys->WritePC(m_InitialPC);
@@ -33,14 +33,14 @@ private:
     RegPairT m_ExpectedRd;
     Word m_Offset;
     NativeWord m_InitialPC;
-}; // class AuipcInstTest
+}; // class TestInstAUIPC
 
 constexpr TestFramework g_TestRunner{
     &HartTestSystem::DefaultReset,
 
     std::tuple{
         /* Test AUIPC with an immediate of zero. */
-        AuipcInstTest{
+        TestInstAUIPC{
             "AUIPC_ZeroImm",
             cpu::Opcode::AUIPC,
             { 1, 0x1000 },
@@ -49,7 +49,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test AUIPC with a positive immediate. */
-        AuipcInstTest{
+        TestInstAUIPC{
             "AUIPC_PosImm",
             cpu::Opcode::AUIPC,
             { 1, 0x1000 + (1 << 15) },
@@ -58,7 +58,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test AUIPC with a negative immediate. */
-        AuipcInstTest{
+        TestInstAUIPC{
             "AUIPC_NegImm",
             cpu::Opcode::AUIPC,
             { 1, 0x20000 - 0x10000 },
@@ -67,7 +67,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test AUIPC with overflow. */
-        AuipcInstTest{
+        TestInstAUIPC{
             "AUIPC_Overflow",
             cpu::Opcode::AUIPC,
             { 1, std::numeric_limits<NativeWord>::max() + 0x10000 },
@@ -76,7 +76,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test AUIPC with underflow. */
-        AuipcInstTest{
+        TestInstAUIPC{
             "AUIPC_Underflow",
             cpu::Opcode::AUIPC,
             { 1, 0 - 0x10000 },

@@ -10,16 +10,16 @@ namespace test {
 
 namespace {
 
-class LoadInstTest : public HartSingleInstTestBase<LoadInstTest> {
+class TestInstLOAD : public HartSingleInstTestBase<TestInstLOAD> {
 public:
     using AddrPairT = std::pair<Address, NativeWord>;
-    constexpr LoadInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
+    constexpr TestInstLOAD(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
         HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_MemVal(memVal) {}
 private:
-    friend class HartSingleInstTestBase<LoadInstTest>;
+    friend class HartSingleInstTestBase<TestInstLOAD>;
     Result Initialize(HartTestSystem* pSys) const {
         /* Write our memVal to memory. */
         Result res = pSys->MemWriteDWord(static_cast<DWord>(std::get<1>(m_MemVal)), std::get<0>(m_MemVal));
@@ -41,14 +41,14 @@ private:
     RegPairT m_ExpectedRd;
     RegPairT m_InitialRs1;
     AddrPairT m_MemVal;
-}; // class LoadInstTest
+}; // class TestInstLOAD
 
 constexpr TestFramework g_TestRunner(
     &HartTestSystem::DefaultReset,
 
     std::tuple {
         /* Test LB with an offset of 0. */
-        LoadInstTest{
+        TestInstLOAD{
             "LB_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
@@ -59,7 +59,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LB with a positive offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LB_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
@@ -70,7 +70,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LB with a negative offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LB_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
@@ -81,7 +81,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LB with a signed value. */
-        LoadInstTest{
+        TestInstLOAD{
             "LB_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LB,
@@ -92,7 +92,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LH with an offset of 0. */
-        LoadInstTest{
+        TestInstLOAD{
             "LH_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
@@ -103,7 +103,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LH with a positive offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LH_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
@@ -114,7 +114,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LH with a negative offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LH_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
@@ -125,7 +125,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LH with a signed value. */
-        LoadInstTest{
+        TestInstLOAD{
             "LH_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LH,
@@ -136,7 +136,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LW with an offset of 0. */
-        LoadInstTest{
+        TestInstLOAD{
             "LW_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
@@ -147,7 +147,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LW with a positive offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LW_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
@@ -158,7 +158,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LW with a negative offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LW_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
@@ -169,7 +169,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LW with a signed value. */
-        LoadInstTest{
+        TestInstLOAD{
             "LW_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LW,
@@ -180,7 +180,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LBU with an offset of 0. */
-        LoadInstTest{
+        TestInstLOAD{
             "LBU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
@@ -191,7 +191,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LBU with a positive offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LBU_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
@@ -202,7 +202,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LBU with a negative offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LBU_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
@@ -213,7 +213,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LBU with a signed value. */
-        LoadInstTest{
+        TestInstLOAD{
             "LBU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LBU,
@@ -224,7 +224,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LHU with an offset of 0. */
-        LoadInstTest{
+        TestInstLOAD{
             "LHU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
@@ -235,7 +235,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LHU with a positive offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LHU_PosImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
@@ -246,7 +246,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LHU with a negative offset. */
-        LoadInstTest{
+        TestInstLOAD{
             "LHU_NegImmPosMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,
@@ -257,7 +257,7 @@ constexpr TestFramework g_TestRunner(
         },
 
         /* Test LHU with a signed value. */
-        LoadInstTest{
+        TestInstLOAD{
             "LHU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
             cpu::Funct3::LHU,

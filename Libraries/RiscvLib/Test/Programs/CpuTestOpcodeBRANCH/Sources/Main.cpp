@@ -10,9 +10,9 @@ namespace test {
 
 namespace {
 
-class BranchInstTest : public HartSingleInstTestBase<BranchInstTest> {
+class TestInstBRANCH : public HartSingleInstTestBase<TestInstBRANCH> {
 public:
-    constexpr BranchInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rs1, RegPairT rs2, NativeWord initialPC, Word imm, bool branchExpected) :
+    constexpr TestInstBRANCH(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rs1, RegPairT rs2, NativeWord initialPC, Word imm, bool branchExpected) :
         HartSingleInstTestBase(cpu::Instruction(cpu::EncodeBTypeInstruction(op, f3, GetPairId(rs1), GetPairId(rs2), imm)), name),
         m_InitialRs1(rs1),
         m_InitialRs2(rs2),
@@ -20,7 +20,7 @@ public:
         m_BranchOffset(imm),
         m_BranchExpected(branchExpected) {}
 private:
-    friend class HartSingleInstTestBase<BranchInstTest>;
+    friend class HartSingleInstTestBase<TestInstBRANCH>;
     Result Initialize(HartTestSystem* pSys) const {
         /* Write PC. */
         pSys->WritePC(m_InitialPC);
@@ -53,7 +53,7 @@ private:
     NativeWord m_InitialPC;
     Word m_BranchOffset;
     bool m_BranchExpected;
-}; // class BranchInstTest
+}; // class TestInstBRANCH
 
 constexpr TestFramework g_TestRunner {
     &HartTestSystem::DefaultReset,
@@ -61,7 +61,7 @@ constexpr TestFramework g_TestRunner {
 
     std::tuple {
         /* Test BEQ with non-equal values. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BEQ_NonEq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BEQ,
@@ -73,7 +73,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BEQ with equal values. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BEQ_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BEQ,
@@ -85,7 +85,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BNE with non-equal values. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BNE_NonEq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BNE,
@@ -97,7 +97,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BNE with equal values. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BNE_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BNE,
@@ -109,7 +109,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with equal rs1 and rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -121,7 +121,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with rs1 greater than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_PosRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -133,7 +133,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with rs1 less than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_PosRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -145,7 +145,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with rs1 greater than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_NegRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -157,7 +157,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with rs1 less than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_NegRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -169,7 +169,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with positive rs1 and negative rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -181,7 +181,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLT with negative rs1 and positive rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLT_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLT,
@@ -193,7 +193,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with equal rs1 and rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -205,7 +205,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with rs1 greater than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_PosRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -217,7 +217,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with rs1 less than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_PosRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -229,7 +229,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with rs1 greater than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_NegRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -241,7 +241,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with rs1 less than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_NegRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -253,7 +253,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with positive rs1 and negative rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -265,7 +265,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGE with negative rs1 and positive rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGE_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGE,
@@ -281,7 +281,7 @@ constexpr TestFramework g_TestRunner {
 
 
         /* Test BLTU with equal rs1 and rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -293,7 +293,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with rs1 greater than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_PosRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -305,7 +305,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with rs1 less than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_PosRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -317,7 +317,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with rs1 greater than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_NegRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -329,7 +329,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with rs1 less than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_NegRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -341,7 +341,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with positive rs1 and negative rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -353,7 +353,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BLTU with negative rs1 and positive rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BLTU_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BLTU,
@@ -365,7 +365,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with equal rs1 and rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_Eq",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -377,7 +377,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with rs1 greater than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_PosRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -389,7 +389,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with rs1 less than rs2, both positive. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_PosRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -401,7 +401,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with rs1 greater than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_NegRs1Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -413,7 +413,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with rs1 less than rs2, both negative. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_NegRs2Greater",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -425,7 +425,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with positive rs1 and negative rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,
@@ -437,7 +437,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test BGEU with negative rs1 and positive rs2. */
-        BranchInstTest{
+        TestInstBRANCH{
             "BGEU_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
             cpu::Funct3::BGEU,

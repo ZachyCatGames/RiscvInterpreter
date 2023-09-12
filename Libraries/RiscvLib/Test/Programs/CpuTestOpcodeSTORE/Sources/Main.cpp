@@ -10,16 +10,16 @@ namespace test {
 
 namespace {
 
-class StoreInstTest : public HartSingleInstTestBase<StoreInstTest> {
+class TestInstSTORE : public HartSingleInstTestBase<TestInstSTORE> {
 public:
     using AddrPairT = std::pair<Address, NativeWord>;
-    constexpr StoreInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rs1, RegPairT rs2, Word imm, AddrPairT memExpect) :
+    constexpr TestInstSTORE(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rs1, RegPairT rs2, Word imm, AddrPairT memExpect) :
         HartSingleInstTestBase(cpu::Instruction(cpu::EncodeSTypeInstruction(op, f3, GetPairId(rs1), GetPairId(rs2), imm)), name),
         m_ExpectedMemVal(memExpect),
         m_InitialRs1(rs1),
         m_InitialRs2(rs2) {}
 private:
-    friend class HartSingleInstTestBase<StoreInstTest>;
+    friend class HartSingleInstTestBase<TestInstSTORE>;
     Result Initialize(HartTestSystem* pSys) const {
         /* Write rs1 & rs2. */
         pSys->WriteGPR(m_InitialRs1);
@@ -47,7 +47,7 @@ private:
     AddrPairT m_ExpectedMemVal;
     RegPairT m_InitialRs1;
     RegPairT m_InitialRs2;
-}; // class StoreInstTest
+}; // class TestInstSTORE
 
 Result CustomReset(HartTestSystem* pSys) {
     /* Call default reset. */
@@ -65,7 +65,7 @@ constexpr TestFramework g_TestRunner{
 
     std::tuple{
         /* Test SB with no offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SB_ZeroImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
@@ -76,7 +76,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SB with a positive offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SB_PosImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
@@ -87,7 +87,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SB with a negative offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SB_NegImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SB,
@@ -98,7 +98,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SH with no offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SH_ZeroImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
@@ -109,7 +109,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SH with a positive offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SH_PosImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
@@ -120,7 +120,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SH with a negative offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SH_NegImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SH,
@@ -131,7 +131,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SW with no offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SW_ZeroImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
@@ -142,7 +142,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SW with a positive offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SW_PosImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
@@ -153,7 +153,7 @@ constexpr TestFramework g_TestRunner{
         },
 
         /* Test SW with a negative offset. */
-        StoreInstTest{
+        TestInstSTORE{
             "SW_NegImm",
             cpu::Opcode::STORE,
             cpu::Funct3::SW,
