@@ -110,7 +110,7 @@ public:
     using detail::UJTypeBase::UJTypeBase;
 
     constexpr auto imm() const noexcept {
-        return (this->Get() & (0x3FFu << 21u) >> 20u) | (this->Get() & (1u << 20u) >> 9u) | (this->Get() & (0xFFu << 12u)) | (this->Get() & (1u << 31u) >> 11u);
+        return ((this->Get() & (0x3FFu << 21u)) >> 20u) | ((this->Get() & (1u << 20u)) >> 9u) | (this->Get() & (0xFFu << 12u)) | ((this->Get() & (1u << 31u)) >> 11u);
     }
 
     constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 21, NativeWordBitLen); }
