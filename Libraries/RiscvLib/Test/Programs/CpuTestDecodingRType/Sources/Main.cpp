@@ -67,7 +67,7 @@ constexpr int TestFieldFunct7() noexcept {
 }
 
 constexpr int TestFieldRd() noexcept {
-    for(Word i = 0; i < 31; i++) {
+    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
@@ -86,7 +86,7 @@ constexpr int TestFieldRd() noexcept {
 }
 
 constexpr int TestFieldRs1() noexcept {
-    for(Word i = 0; i < 31; i++) {
+    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
@@ -105,7 +105,7 @@ constexpr int TestFieldRs1() noexcept {
 }
 
 constexpr int TestFieldRs2() noexcept {
-    for(Word i = 0; i < 31; i++) {
+    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
@@ -132,7 +132,7 @@ static_assert(TestFieldRd()     == -1);
 static_assert(TestFieldRs1()    == -1);
 static_assert(TestFieldRs2()    == -1);
 
-extern constexpr std::string_view ProgramName = "CpuTestRTypeDecoding";
+extern constexpr std::string_view ProgramName = "CpuTestDecodingRType";
 
 Result Main([[maybe_unused]] Args args) {
     return ResultSuccess();
