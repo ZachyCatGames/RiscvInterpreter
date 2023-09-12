@@ -29,3 +29,5 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeLUI")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeSTORE")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestRTypeDecoding")
+
