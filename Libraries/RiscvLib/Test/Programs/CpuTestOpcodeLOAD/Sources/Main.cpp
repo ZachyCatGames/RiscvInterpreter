@@ -18,7 +18,6 @@ public:
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_MemVal(memVal) {}
-
 private:
     friend class HartSingleInstTestBase<LoadInstTest>;
     Result Initialize(HartTestSystem* pSys) const {

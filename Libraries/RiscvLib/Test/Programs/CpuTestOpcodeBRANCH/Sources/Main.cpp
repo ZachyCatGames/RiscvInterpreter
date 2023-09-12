@@ -22,7 +22,7 @@ public:
 private:
     friend class HartSingleInstTestBase<BranchInstTest>;
     Result Initialize(HartTestSystem* pSys) const {
-        /* Initialize PC. */
+        /* Write PC. */
         pSys->WritePC(m_InitialPC);
 
         /* Write rs1 & rs2. */
