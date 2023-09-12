@@ -20,6 +20,7 @@ add_library(RiscvEmuTestLib
 target_include_directories(RiscvEmuTestLib PUBLIC ${RISCV_TEST_COMMON_HEADER_DIR})
 target_link_libraries(RiscvEmuTestLib PUBLIC RiscvLib)
 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeBRANCH")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeLOAD")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM")
