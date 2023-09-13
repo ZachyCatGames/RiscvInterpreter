@@ -232,7 +232,7 @@ private:
      * Opcode LUI.
      */
     Result ParseInstLUI(OutRegObject rd, ImmediateObject imm) {
-        rd.Set(imm.Get<Word>());
+        rd.Set(imm.Get<NativeWord>());
         return ResultSuccess();
     }
 
