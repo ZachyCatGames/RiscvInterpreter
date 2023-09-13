@@ -60,7 +60,7 @@ constexpr TestFramework g_TestRunner {
             cpu::Funct3::ADDI,
             { 1, std::numeric_limits<NativeWord>::max() },
             { 15, 0 },
-            static_cast<NativeWord>(-1)
+            static_cast<Word>(-1)
         },
 
         /* Test SLLI with a immediate of zero. */
