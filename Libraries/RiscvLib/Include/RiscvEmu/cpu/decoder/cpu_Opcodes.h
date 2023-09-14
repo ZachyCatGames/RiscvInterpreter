@@ -67,7 +67,8 @@ enum class Funct3 {
     LWU = 0b110,
 
     /* Opcode MISC_MEM. */
-    FENCE = 0b000,
+    FENCE  = 0b000,
+    FENCEI = 0b001,
 
     /* Opcode OP_IMM. */
     ADDI = 0b000,

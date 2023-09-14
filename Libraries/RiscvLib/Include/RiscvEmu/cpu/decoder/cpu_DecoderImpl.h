@@ -138,6 +138,8 @@ private:
         switch(inst.funct3()) {
         case Funct3::FENCE:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstFENCE);
+        case Funct3::FENCEI:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstFENCEI);
         default:
             break;
         }

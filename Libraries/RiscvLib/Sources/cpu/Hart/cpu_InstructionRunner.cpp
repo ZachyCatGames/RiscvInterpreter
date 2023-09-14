@@ -106,7 +106,7 @@ private:
     Result ParseInstLD(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->InstLoadImpl<true, DWord>(&Hart::MemoryReadDWord, rd, rs1, imm);
     }
-#endif  // RISCV_CFG_CPU_ENABLE_RV64
+#endif // RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstLBU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->InstLoadImpl<false, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
     }
@@ -122,14 +122,18 @@ private:
     /*
      * Opcode MISC_MEM.
      */
-    Result ParseInstFENCE(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+    Result ParseInstFENCE([[maybe_unused]] OutRegObject rd, [[maybe_unused]] InRegObject rs1, [[maybe_unused]] ImmediateObject imm) {
         /* 
          * We're always going to be executing instructions in-order,
          * so FENCE doesn't need to be implemented.
          */
-        (void)rd;
-        (void)rs1;
-        (void)imm;
+        return ResultSuccess();
+    }
+    Result ParseInstFENCEI([[maybe_unused]] OutRegObject rd, [[maybe_unused]] InRegObject rs1, [[maybe_unused]] ImmediateObject imm) {
+        /*
+         * FENCE.I is used to sync instruction fetches and instructions writes.
+         * We don't do any funky out of order stuff and don't need to implement this.
+         */
         return ResultSuccess();
     }
 
