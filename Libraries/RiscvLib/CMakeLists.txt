@@ -18,8 +18,8 @@ add_compile_options(-fno-exceptions -fno-stack-protector)
 # Check if we're using clang to add additional options.
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # Use lld as our linker and libc++ as our std library.
-    add_link_options(-fuse-ld=lld -stdlib=libc++)
-    add_compile_options(-stdlib=libc++)
+    add_link_options(-fuse-ld=lld -stdlib=libc++ -fexperimental-library)
+    add_compile_options(-stdlib=libc++ -fexperimental-library)
 
     # Enable full LTO on Release builds.
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
