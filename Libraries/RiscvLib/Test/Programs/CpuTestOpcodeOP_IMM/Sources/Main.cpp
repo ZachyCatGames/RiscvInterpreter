@@ -43,6 +43,16 @@ constexpr TestFramework g_TestRunner {
             static_cast<Word>(-20)
         },
 
+        /* Test ADDI with negative rs1 and immediate. */
+        HartSimpleITypeTest{
+            "ADDI_NegRs1NegImm",
+            cpu::Opcode::OP_IMM,
+            cpu::Funct3::ADDI,
+            { 1, -50 },
+            { 15, -30 },
+            static_cast<Word>(-20)
+        },
+
         /* Test ADDI with overflow. */
         HartSimpleITypeTest{
             "ADDI_Overflow",

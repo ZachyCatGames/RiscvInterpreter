@@ -1,1 +1,2 @@
+Programs/CpuTestOpcodeOP_IMM_32-For64/CpuTestOpcodeOP_IMM_32-For64
 Programs/CpuTestOpcodeOP_IMM-For64/CpuTestOpcodeOP_IMM-For64
