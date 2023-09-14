@@ -2,6 +2,7 @@
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/riscv_Types.h>
 #include <bit>
+#include <utility>
 
 namespace riscv {
 namespace mem {
