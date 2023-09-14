@@ -83,7 +83,7 @@ int RunProgram(std::string_view programPath, std::string_view logPath, bool supp
 
     /* Wait for process to exit. */
     int status = 0;
-    waitpid(pid, &status, WEXITED);
+    waitpid(pid, &status, 0);
 
     return WEXITSTATUS(status);
 }

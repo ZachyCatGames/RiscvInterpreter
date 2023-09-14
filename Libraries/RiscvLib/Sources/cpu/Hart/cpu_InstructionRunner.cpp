@@ -171,6 +171,7 @@ private:
         return ResultSuccess();
     }
 
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
     /*
      * Opcode OP_IMM_32.
      */
@@ -190,6 +191,7 @@ private:
         rd.Set(rs1.Get<WordS>() >> imm.Get<Word>());
         return ResultSuccess();
     }
+#endif
 
     /*
      * Opcode STORE.

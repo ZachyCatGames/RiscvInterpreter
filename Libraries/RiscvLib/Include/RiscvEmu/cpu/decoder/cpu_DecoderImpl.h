@@ -186,6 +186,7 @@ private:
 
     constexpr Result ParseOP_IMM_32(ITypeInstruction inst) {
         switch(inst.funct3()) {
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
         case Funct3::ADDIW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstADDIW);
         case Funct3::SLLIW:
@@ -209,6 +210,7 @@ private:
             /* Otherwise parse as SRLI. */
             return GetDerived()->ParseInstSRLIW(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
         }
+#endif
         default:
             break;
         }

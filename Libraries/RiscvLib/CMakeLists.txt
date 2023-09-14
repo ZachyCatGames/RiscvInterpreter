@@ -68,6 +68,14 @@ add_library(RiscvLib
     ${RISCV_UTIL_LIBRARY_SOURCES}
 )
 
+# Enable RV64.
+set(RISCV_CFG_CPU_ENABLE_RV64 true)
+
+# Check if RV64 is enabled.
+if (RISCV_CFG_CPU_ENABLE_RV64)
+    target_compile_definitions(RiscvLib PUBLIC RISCV_CFG_CPU_ENABLE_RV64=${RISCV_CFG_CPU_ENABLE_RV64})
+endif()
+
 # Add our Include directory the list of include directories.
 target_include_directories(RiscvLib PUBLIC "${PROJECT_SOURCE_DIR}/Include")
 
