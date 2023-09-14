@@ -77,6 +77,11 @@ enum class Funct3 {
     ORI = 0b110,
     ANDI = 0b111,
 
+    /* Opcode OP_IMM_32. */
+    ADDIW = 0b000,
+    SLLIW = 0b001,
+    SRLIW = 0b101,
+
     /* Opcode STORE. */
     SB = 0b000,
     SH = 0b001,

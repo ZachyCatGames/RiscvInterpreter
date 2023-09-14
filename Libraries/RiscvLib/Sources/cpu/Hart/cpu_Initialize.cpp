@@ -1,4 +1,3 @@
-#pragma once
 #include <RiscvEmu/cpu/cpu_Hart.h>
 
 namespace riscv {

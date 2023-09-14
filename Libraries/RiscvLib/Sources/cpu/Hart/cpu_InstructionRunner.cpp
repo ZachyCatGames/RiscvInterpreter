@@ -147,7 +147,7 @@ private:
         return ResultSuccess();
     }
     Result ParseInstSRLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        rd.Set(rs1.Get<NativeWord>() >> imm.Get<NativeWord>());
+        rd.Set(rs1.Get<NativeWord>() >> imm.Get<Word>());
         return ResultSuccess();
     }
     Result ParseInstSRAI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
@@ -168,6 +168,26 @@ private:
      */
     Result ParseInstAUIPC(OutRegObject rd, ImmediateObject imm) {
         rd.Set(m_pParent->m_PC + imm.Get<Address>());
+        return ResultSuccess();
+    }
+
+    /*
+     * Opcode OP_IMM_32.
+     */
+    Result ParseInstADDIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<WordS>() + imm.Get<WordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLLIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(static_cast<WordS>(rs1.Get<Word>() << imm.Get<Word>()));
+        return ResultSuccess();
+    }
+    Result ParseInstSRLIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(static_cast<WordS>(rs1.Get<Word>() >> imm.Get<Word>()));
+        return ResultSuccess();
+    }
+    Result ParseInstSRAIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        rd.Set(rs1.Get<WordS>() >> imm.Get<Word>());
         return ResultSuccess();
     }
 

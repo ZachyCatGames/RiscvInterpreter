@@ -47,7 +47,6 @@ private:
 
 private:
     constexpr Result ParseOpcode(Instruction inst) {
-        auto t = inst.opcode();
         switch(inst.opcode()) {
         case Opcode::LOAD:
             return this->ParseLOAD(ITypeInstruction(inst));
@@ -61,8 +60,7 @@ private:
         case Opcode::AUIPC:
             return this->CallStandardUTypeExt(UTypeInstruction(inst), &Derived::ParseInstAUIPC);
         case Opcode::OP_IMM_32:
-            /* TODO */
-            break;
+            return this->ParseOP_IMM_32(ITypeInstruction(inst));
         case Opcode::STORE:
             return this->ParseSTORE(STypeInstruction(inst));
         case Opcode::STORE_FP:
@@ -179,6 +177,38 @@ private:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstORI);
         case Funct3::ANDI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstANDI);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseOP_IMM_32(ITypeInstruction inst) {
+        switch(inst.funct3()) {
+        case Funct3::ADDIW:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstADDIW);
+        case Funct3::SLLIW:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstSLLIW);
+        case Funct3::SRLIW: {
+            auto imm = inst.imm();
+            auto shamt = imm & ShiftAmtMaskFor32;
+
+            /* Check if any upper bits in the immediate are set. */
+            auto upper = imm & ~ShiftAmtMaskFor32;
+            if(upper) {
+                /* If exclusively the 10th bit is set, parse as SRAI. */
+                if(upper == (1 << 10)) {
+                    return GetDerived()->ParseInstSRAIW(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
+                }
+
+                /* If any other bits are set, this is an invalid/reserved instruction. */
+                break;
+            }
+
+            /* Otherwise parse as SRLI. */
+            return GetDerived()->ParseInstSRLIW(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
+        }
         default:
             break;
         }
