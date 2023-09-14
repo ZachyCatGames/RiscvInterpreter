@@ -283,6 +283,41 @@ private:
         return ResultInvalidInstruction();
     }
 
+    constexpr Result ParseOP_32(RTypeInstruction inst) {
+        switch(inst.funct3()) {
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+        case Funct3::ADDW: {
+            switch(inst.funct7()) {
+            case Funct7::ADDW:
+                return this->CallStandardRType(inst, &Derived::ParseInstADDW);
+            case Funct7::SUBW:
+                return this->CallStandardRType(inst, &Derived::ParseInstSUBW);
+            default:
+                break;
+            }
+            break;
+        }
+        case Funct3::SLLW:
+            return this->CallStandardRType(inst, &Derived::ParseInstSLLW);
+        case Funct3::SRLW: {
+            switch(inst.funct7()) {
+            case Funct7::SRLW:
+                return this->CallStandardRType(inst, &Derived::ParseInstSRLW);
+            case Funct7::SRAW:
+                return this->CallStandardRType(inst, &Derived::ParseInstSRAW);
+            default:
+                break;
+            }
+            break;
+        }
+#endif
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
     constexpr Result ParseBRANCH(BTypeInstruction inst) {
         switch(inst.funct3()) {
         case Funct3::BEQ:

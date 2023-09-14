@@ -97,6 +97,11 @@ enum class Funct3 {
     OR = 0b110,
     AND = 0b111,
 
+    /* Opcode OP_32. */
+    ADDW = 0b000,
+    SLLW = 0b001,
+    SRLW = 0b101,
+
     /* Opcode BRANCH. */
     BEQ = 0b000,
     BNE = 0b001,
@@ -126,6 +131,14 @@ enum class Funct7 {
     /* OP::SRL. */
     SRL = 0b0000000,
     SRA = 0b0100000,
+
+    /* OP_32::ADDW. */
+    ADDW = 0b0000000,
+    SUBW = 0b0100000,
+
+    /* OP_32::SRLW. */
+    SRLW = 0b0000000,
+    SRAW = 0b0100000,
 
     /* Highest possible Funct7 value. */
     Max = 0b1111111

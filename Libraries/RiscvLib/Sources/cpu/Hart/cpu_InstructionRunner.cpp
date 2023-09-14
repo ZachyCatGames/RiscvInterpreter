@@ -250,6 +250,32 @@ private:
         return ResultSuccess();
     }
 
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+    /*
+     * Opcode OP_32.
+     */
+    Result ParseInstADDW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<WordS>() + rs2.Get<WordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstSUBW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<WordS>() - rs2.Get<WordS>());
+        return ResultSuccess();
+    }
+    Result ParseInstSLLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(static_cast<WordS>(rs1.Get<Word>() << (rs2.Get<Word>() & ShiftAmtMaskFor32)));
+        return ResultSuccess();
+    }
+    Result ParseInstSRLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(static_cast<WordS>(rs1.Get<Word>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32)));
+        return ResultSuccess();
+    }
+    Result ParseInstSRAW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        rd.Set(rs1.Get<WordS>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32));
+        return ResultSuccess();
+    }
+#endif
+
     /*
      * Opcode LUI.
      */
