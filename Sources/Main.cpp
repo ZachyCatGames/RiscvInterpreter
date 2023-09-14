@@ -1,10 +1,11 @@
-#include <Test.h>
-#include <RiscvEmu/util/util_Alignment.h>
-#include <RiscvEmu/result.h>
-#include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
-#include <RiscvEmu/mem/mem_AlignedMmioDev.h>
+#include <RiscvEmu/riscv_System.h>
+#include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/hw/hw_Scheduler.h>
 #include <RiscvEmu/mem/mem_MemoryDevice.h>
 
-int main() {
 
+int main(int argc, const char* argv[]) {
+    riscv::System sys;
+
+    sys.AddPeripheral(std::make_unique<riscv::mem::MemoryDevice>(0x1000));
 }
