@@ -23,4 +23,6 @@ int main(int argc, const char* argv[]) {
     riscv::test::Args args(argc, argv);
     riscv::Result res = riscv::test::Main(args);
     std::cerr << "Program " << riscv::test::ProgramName << " finished with Result = " << res.GetValue() << std::endl;
+
+    return res.GetValue();
 }

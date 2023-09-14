@@ -20,6 +20,8 @@ add_library(RiscvEmuTestLib
 target_include_directories(RiscvEmuTestLib PUBLIC ${RISCV_TEST_COMMON_HEADER_DIR})
 target_link_libraries(RiscvEmuTestLib PUBLIC RiscvLib)
 
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/RunTestPrograms")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestDecodingBType")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestDecodingIType")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestDecodingJType")
