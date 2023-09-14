@@ -48,7 +48,7 @@ private:
             this->LogTestResult(test.GetName(), res);
         }
 
-        return ResultSuccess();
+        return res;
     }
 
     template<std::size_t I>
@@ -60,12 +60,14 @@ private:
         TestResults results{};
         if constexpr(sizeof...(TestsT) > I + 1) {
             results = this->RunAllImpl<I + 1>(pSys);
-            if(res.IsFailure()) {
-                results.fail++;
-            }
-            else {
-                results.pass++;
-            }
+        }
+
+        /* Check if test passed or failed. */
+        if(res.IsFailure()) {
+            results.fail++;
+        }
+        else {
+            results.pass++;
         }
 
         return results;
