@@ -168,9 +168,7 @@ constexpr TestFramework g_TestRunner{
 
 } // namespace
 
-extern constexpr std::string_view ProgramName = "TestOpcodeSTORE";
-
-Result Main([[maybe_unused]] Args args) {
+TestResults Main([[maybe_unused]] Args args) {
     HartTestSystem sys;
 
     sys.Initialize();

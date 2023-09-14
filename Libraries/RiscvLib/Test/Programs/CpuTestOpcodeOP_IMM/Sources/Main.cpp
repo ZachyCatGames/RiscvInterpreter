@@ -407,9 +407,7 @@ constexpr TestFramework g_TestRunner {
 
 } // namespace
 
-extern const std::string_view ProgramName = "TestOpcodeOP_IMM";
-
-extern Result Main([[maybe_unused]] Args args) {
+TestResults Main([[maybe_unused]] Args args) {
     static HartTestSystem sys;
 
     sys.Initialize();

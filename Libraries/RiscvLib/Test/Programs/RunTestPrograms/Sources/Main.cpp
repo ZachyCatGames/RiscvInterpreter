@@ -1,3 +1,4 @@
+#include <RiscvEmuTest/test_TestResults.h>
 #include <RiscvEmu/cfg/cpu/cpu_Extensions.h>
 #include <format>
 #include <fstream>
@@ -16,7 +17,7 @@ constexpr std::string_view g_TestFor64Path  = "TestFor64.txt";
 
 int RunTestFile(std::string_view testFilePath, std::string_view logPath, bool suppressStdout) {
     /* Open test file. */
-    std::ifstream testFile(testFilePath);
+    std::ifstream testFile(testFilePath.data());
 
     if(testFile.fail()) {
         std::cerr << std::format("Failed to open test file: {} (errno = {})\n", testFilePath, errno);
@@ -38,18 +39,25 @@ int RunTestFile(std::string_view testFilePath, std::string_view logPath, bool su
             break;
         }
 
+        /* Notify the user we're running a program. */
+        std::cout << std::format("Starting {}\n", programPath);
+
         /* Run the program. */
-        if(RunProgram(programPath, logPath, suppressStdout) == 0) {
+        int programRes = RunProgram(programPath, logPath, suppressStdout);
+        if(programRes == EXIT_SUCCESS) {
             pass++;
         }
         else {
             fail++;
         }
+
+        /* Notify the user we've finished running the program. */
+        std::cout << std::format("Completed {}\n\n", programPath);
     }
 
     std::cout << std::format("{}:\n"
-                             "    {} Tests Passed\n"
-                             "    {} Tests Failed.\n\n",
+                             "    {} Test Programs Passed\n"
+                             "    {} Test Programs Failed\n\n",
                              testFilePath, pass, fail);
 
     return 0;

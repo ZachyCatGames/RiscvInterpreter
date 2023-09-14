@@ -271,9 +271,7 @@ constexpr TestFramework g_TestRunner(
 
 } // namespace
 
-extern constexpr std::string_view ProgramName = "TestOpcodeLOAD";
-
-extern Result Main([[maybe_unused]] Args args) {
+TestResults Main([[maybe_unused]] Args args) {
     static HartTestSystem sys;
 
     sys.Initialize();

@@ -452,9 +452,7 @@ constexpr TestFramework g_TestRunner {
 
 } // namespace
 
-extern constexpr std::string_view ProgramName = "CpuTestOpcodeBRANCH";
-
-Result Main([[maybe_unused]] Args arg) {
+TestResults Main([[maybe_unused]] Args arg) {
     HartTestSystem sys;
 
     sys.Initialize();

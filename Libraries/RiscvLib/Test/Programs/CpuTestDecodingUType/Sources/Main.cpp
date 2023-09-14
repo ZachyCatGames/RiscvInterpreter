@@ -61,11 +61,8 @@ static_assert(TestFieldOpcode() == -1);
 static_assert(TestFieldRd()     == -1);
 static_assert(TestFieldImm()    == -1);
 
-extern constexpr std::string_view ProgramName = "CpuTestDecodingUType";
-
-Result Main([[maybe_unused]] Args args) {
-    return ResultSuccess();
+TestResults Main([[maybe_unused]] Args args) {
+    return {};
 }
-
 } // namespace test
 } // namespace riscv

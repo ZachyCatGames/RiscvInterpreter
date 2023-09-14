@@ -107,9 +107,7 @@ constexpr TestFramework g_TestRunner{
 
 } // namespace
 
-extern constexpr std::string_view ProgramName = "CpuTestOpcodeJAL";
-
-Result Main([[maybe_unused]] Args args) {
+TestResults Main([[maybe_unused]] Args args) {
     HartTestSystem sys;
 
     sys.Initialize();

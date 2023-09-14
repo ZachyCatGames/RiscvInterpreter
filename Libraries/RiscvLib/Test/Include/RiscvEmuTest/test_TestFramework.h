@@ -1,4 +1,5 @@
 #pragma once
+#include <RiscvEmuTest/test_TestResults.h>
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
 #include <iostream>
@@ -25,7 +26,7 @@ public:
         m_ResetFunc(reset),
         m_Tests(tests) {}
 
-    constexpr Result RunAll(SysT* pSys) const {
+    constexpr TestResults RunAll(SysT* pSys) const {
         /* Start running tests at test 0. */
         return this->RunAllImpl<0>(pSys);
     }
@@ -51,19 +52,23 @@ private:
     }
 
     template<std::size_t I>
-    constexpr Result RunAllImpl(SysT* pSys) const {
+    constexpr TestResults RunAllImpl(SysT* pSys) const {
         /* Run test. */
         Result res = this->RunImpl<I>(pSys);
-        if(res.IsFailure()) {
-            return res;
-        }
 
         /* Run next test. */
+        TestResults results{};
         if constexpr(sizeof...(TestsT) > I + 1) {
-            return this->RunAllImpl<I + 1>(pSys);
+            results = this->RunAllImpl<I + 1>(pSys);
+            if(res.IsFailure()) {
+                results.fail++;
+            }
+            else {
+                results.pass++;
+            }
         }
 
-        return ResultSuccess();
+        return results;
     }
 private:
     ResetType m_ResetFunc;

@@ -1,28 +1,34 @@
+#include <RiscvEmuTest/test_TestResults.h>
 #include <RiscvEmu/result.h>
 #include <RiscvEmuTest/test_Args.h>
 #include <string>
-#include <span>
-#include <ranges>
 #include <iostream>
+#include <format>
 
 namespace riscv {
 namespace test {
 
-extern const std::string_view ProgramName;
-
-extern Result Main(Args args);
+extern TestResults Main(Args args);
 
 } // namespace test
 } // namespace riscv
 
 int main(int argc, const char* argv[]) {
-    /* Announce that's we've started. */
-    std::cerr << "Program " << riscv::test::ProgramName << " has started..." << std::endl;
-
     /* Run main. */
     riscv::test::Args args(argc, argv);
-    riscv::Result res = riscv::test::Main(args);
-    std::cerr << "Program " << riscv::test::ProgramName << " finished with Result = " << res.GetValue() << std::endl;
+    riscv::test::TestResults res = riscv::test::Main(args);
 
-    return res.GetValue();
+    /* Print our results. */
+    std::cout << std::format("    Test Results:\n"
+                             "        Pass: {}\n"
+                             "        Fail: {}\n",
+                             res.pass, res.fail);
+    
+    /* If any tests failed, indicate that. */
+    if(res.fail) {
+        std::cout << "    WARNING: Tests Failed!\n";
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
