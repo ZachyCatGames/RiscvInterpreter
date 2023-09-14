@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 
 /* TODO: Load Access/Page faults. */
 

@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 #include <limits>
 
 namespace riscv {
@@ -14,7 +14,7 @@ constexpr TestFramework g_TestRunner {
 
     std::tuple{
         /* Test ADDI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -24,7 +24,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDI with a positive immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_PosImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -34,7 +34,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDI with a negative immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_NegImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -44,7 +44,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDI with negative rs1 and immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_NegRs1NegImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -54,7 +54,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDI with overflow. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_Overflow",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -64,7 +64,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDI with underflow. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDI_Underflow",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ADDI,
@@ -74,7 +74,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLLI,
@@ -84,7 +84,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLI with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLI_PosRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLLI,
@@ -94,7 +94,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLI with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLI_NegRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLLI,
@@ -104,7 +104,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm == rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_PosEq",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -114,7 +114,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm == rs1, both negative. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_NegEq",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -124,7 +124,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm > rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_PosGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -134,7 +134,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm > rs1, both negative. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_NegGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -144,7 +144,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm > rs1, positive imm & negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_NegRs1PosImmGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -154,7 +154,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm < rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_PosGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -164,7 +164,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm < rs1, both negative. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_NegGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -174,7 +174,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTI with imm < rs1, negative imm & positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTI_PosRs1NegImmGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTI,
@@ -184,7 +184,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm == rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_PosEq",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -194,7 +194,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm == rs1, both "negative". */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_NegEq",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -204,7 +204,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm > rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_PosGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -214,7 +214,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm > rs1, both "negative". */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_NegGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -224,7 +224,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm > rs1, positive imm & "negative" rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_NegRs1PosImmGreaterImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -234,7 +234,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm < rs1, both positive. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_PosGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -244,7 +244,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm < rs1, both negative. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_NegGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -254,7 +254,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTIU with imm < rs1, negative imm & positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLTIU_PosRs1NegImmGreaterRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLTIU,
@@ -264,7 +264,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XORI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "XORI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
@@ -274,7 +274,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XORI with a positive immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "XORI_PosImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
@@ -284,7 +284,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XORI with a negative immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "XORI_NegImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::XORI,
@@ -294,7 +294,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -304,7 +304,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLI with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLI_PosRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -314,7 +314,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLI with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLI_NegRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -324,7 +324,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -334,7 +334,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAI with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAI_PosRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -344,7 +344,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAI with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAI_NegRs1",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -354,7 +354,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ORI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ORI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
@@ -364,7 +364,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ORI with a positive immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ORI_PosImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
@@ -374,7 +374,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ORI with a negative immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ORI_NegImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ORI,
@@ -384,7 +384,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ANDI with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ANDI_ZeroImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,
@@ -394,7 +394,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ANDI with a positive immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ANDI_PosImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,
@@ -404,7 +404,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ANDI with a negative immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ANDI_NegImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::ANDI,

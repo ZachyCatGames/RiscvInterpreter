@@ -12,7 +12,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(RiscvEmuTestLib
-    "${CMAKE_CURRENT_SOURCE_DIR}/Sources/test_HartTestSystem.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Sources/cpu/test_HartTestCase.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Sources/cpu/test_HartTestSystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/Sources/test_Main.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/Sources/test_TestFramework.cpp"
 )
@@ -35,12 +36,5 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeLOAD")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeLUI")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM_32")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeSTORE")
-
-# Conditionally add RV32/RV64 tests.
-if(RISCV_CFG_CPU_ENABLE_RV64)
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM_32-For64")
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Programs/CpuTestOpcodeOP_IMM-For64")
-else()
-    # ...
-endif()

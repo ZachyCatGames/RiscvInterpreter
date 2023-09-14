@@ -1,4 +1,4 @@
-#include <RiscvEmuTest/test_HartTestSystem.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 
 namespace riscv {
 namespace test {

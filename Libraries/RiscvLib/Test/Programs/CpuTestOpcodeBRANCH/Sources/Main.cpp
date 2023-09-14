@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 
 /* TODO: Test misalignment. */
 
@@ -57,7 +57,6 @@ private:
 
 constexpr TestFramework g_TestRunner {
     &HartTestSystem::DefaultReset,
-
 
     std::tuple {
         /* Test BEQ with non-equal values. */

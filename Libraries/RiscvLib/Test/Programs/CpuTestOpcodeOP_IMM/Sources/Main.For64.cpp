@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 #include <limits>
 
 namespace riscv {
@@ -14,7 +14,7 @@ constexpr TestFramework g_TestRunner {
 
     std::tuple{
         /* Test SLLI shift with upper bit set. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLI_UpperImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SLLI,
@@ -24,7 +24,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLI shift with upper bit set. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLI_UpperImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,
@@ -34,7 +34,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAI shift with upper bit set. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAI_UpperImm",
             cpu::Opcode::OP_IMM,
             cpu::Funct3::SRLI,

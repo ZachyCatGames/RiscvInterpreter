@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 #include <limits>
 
 namespace riscv {
@@ -14,7 +14,7 @@ constexpr TestFramework g_TestRunner {
 
     std::tuple {
         /* Test ADD with both rs1 and rs2 as zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_ZeroRs1ZeroRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -25,7 +25,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD with rs1 and rs2 as positive values. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_PosRs1PosRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -36,7 +36,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD with rs1 and rs2 as negative values. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_NegRs1NegRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -47,7 +47,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD with positive rs1 and negative rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_PosRs1NegRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -58,7 +58,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD with negative rs1 and positive rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_NegRs1PosRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -69,7 +69,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD overflow. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_Overflow",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -80,7 +80,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADD underflow. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "ADD_Underflow",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -91,7 +91,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB with both rs1 and rs2 as zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_ZeroRs1ZeroRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -102,7 +102,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB with rs1 and rs2 as positive values. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_PosRs1PosRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -113,7 +113,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB with rs1 and rs2 as negative values. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_NegRs1NegRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -124,7 +124,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB with positive rs1 and negative rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_PosRs1NegRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -135,7 +135,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB with negative rs1 and positive rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_NegRs1PosRs2",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -146,7 +146,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SUB overflow. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_Overflow",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -157,7 +157,7 @@ constexpr TestFramework g_TestRunner {
         },
         
         /* Test SUB underflow. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SUB_Underflow",
             cpu::Opcode::OP,
             cpu::Funct3::ADD,
@@ -168,7 +168,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLL with a rs2ediate of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLL_ZeroRs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLL,
@@ -179,7 +179,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLL with a positive rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLL_PosRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLL,
@@ -190,7 +190,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLL with a negative rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLL_NegRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLL,
@@ -201,7 +201,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 == rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_PosEq",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -212,7 +212,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 == rs1, both negative. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_NegEq",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -223,7 +223,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 > rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_PosGreaterRs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -234,7 +234,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 > rs1, both negative. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_NegGreaterRs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -245,7 +245,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 > rs1, positive rs2 & negative rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_NegRs1PosRs2Greaterrs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -256,7 +256,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 < rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_PosGreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -267,7 +267,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 < rs1, both negative. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_NegGreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -278,7 +278,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLT with rs2 < rs1, negative rs2 & positive rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLT_PosRs1NegRs2GreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLT,
@@ -289,7 +289,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 == rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_PosEq",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -300,7 +300,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 == rs1, both "negative". */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_NegEq",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -311,7 +311,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 > rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_PosGreaterrs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -322,7 +322,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 > rs1, both "negative". */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_NegGreaterrs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -333,7 +333,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 > rs1, positive rs2 & "negative" rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_NegRs1PosRs2Greaterrs2",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -344,7 +344,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 < rs1, both positive. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_PosGreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -355,7 +355,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 < rs1, both negative. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_NegGreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -366,7 +366,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLTU with rs2 < rs1, negative rs2 & positive rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SLTU_PosRs1NegRs2GreaterRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SLTU,
@@ -377,7 +377,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XOR with a rs2 of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "XOR_ZeroImm",
             cpu::Opcode::OP,
             cpu::Funct3::XOR,
@@ -388,7 +388,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XOR with a positive rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "XOR_PosImm",
             cpu::Opcode::OP,
             cpu::Funct3::XOR,
@@ -399,7 +399,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test XOR with a negative rs2. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "XOR_NegImm",
             cpu::Opcode::OP,
             cpu::Funct3::XOR,
@@ -410,7 +410,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRL with a rs2 of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRL_ZeroImm",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -421,7 +421,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRL with a positive rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRL_PosRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -432,7 +432,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRL with a negative rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRL_NegRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -443,7 +443,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test that upper bits get chopped off in SRL. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRL_Truncate",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -454,7 +454,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRA with a rs2 of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRA_ZeroImm",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -465,7 +465,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRA with a positive rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRA_PosRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -476,7 +476,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRA with a negative rs1. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRA_NegRs1",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -487,7 +487,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test that upper bits get chopped off in SRA. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "SRA_Truncate",
             cpu::Opcode::OP,
             cpu::Funct3::SRL,
@@ -498,7 +498,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test OR with a immediate of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "OR_ZeroImm",
             cpu::Opcode::OP,
             cpu::Funct3::OR,
@@ -509,7 +509,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test OR with a positive immediate. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "OR_PosImm",
             cpu::Opcode::OP,
             cpu::Funct3::OR,
@@ -520,7 +520,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test OR with a negative immediate. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "OR_NegImm",
             cpu::Opcode::OP,
             cpu::Funct3::OR,
@@ -531,7 +531,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test AND with a immediate of zero. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "AND_ZeroImm",
             cpu::Opcode::OP,
             cpu::Funct3::AND,
@@ -542,7 +542,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test AND with a positive immediate. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "AND_PosImm",
             cpu::Opcode::OP,
             cpu::Funct3::AND,
@@ -553,7 +553,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test AND with a negative immediate. */
-        HartSimpleRTypeTest{
+        HartRTypeInstTest{
             "AND_NegImm",
             cpu::Opcode::OP,
             cpu::Funct3::AND,

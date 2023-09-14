@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
-#include <RiscvEmuTest/test_HartTestCase.h>
-#include <RiscvEmuTest/test_HartTestSystem.h>
 #include <RiscvEmuTest/test_TestFramework.h>
+#include <RiscvEmuTest/cpu/test_HartTestCase.h>
+#include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 #include <limits>
 
 namespace riscv {
@@ -14,7 +14,7 @@ constexpr TestFramework g_TestRunner {
 
     std::tuple{
         /* Test ADDIW with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -24,7 +24,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with a positive immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_PosImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -34,7 +34,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with a negative immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_NegImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -44,7 +44,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with negative rs1 and immediate. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_NegRs1NegImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -54,7 +54,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with overflow. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_Overflow",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -64,7 +64,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with underflow. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_Underflow",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -74,7 +74,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test ADDIW with rs1 greater than 2^31-1, upper bits should be ignored. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "ADDIW_IgnoreUpper",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::ADDIW,
@@ -84,7 +84,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLIW with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SLLIW,
@@ -94,7 +94,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLIW with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SLLIW,
@@ -104,7 +104,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SLLIW with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SLLIW,
@@ -114,7 +114,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test that SLLIW sign extends rd. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SLLIW_SignExt",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SLLIW,
@@ -124,7 +124,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLIW with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -134,7 +134,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLIW with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -144,7 +144,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRLIW with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -154,7 +154,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test that SRLIW sign extends rd. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRLIW_SignExt",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -164,7 +164,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAIW with a immediate of zero. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -174,7 +174,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAIW with a positive rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -184,7 +184,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test SRAIW with a negative rs1. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
@@ -194,7 +194,7 @@ constexpr TestFramework g_TestRunner {
         },
 
         /* Test that SRAIW sign extends rd. */
-        HartSimpleITypeTest{
+        HartITypeInstTest{
             "SRAIW_SignExt",
             cpu::Opcode::OP_IMM_32,
             cpu::Funct3::SRLIW,
