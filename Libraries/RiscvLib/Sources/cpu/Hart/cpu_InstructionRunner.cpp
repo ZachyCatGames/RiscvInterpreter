@@ -102,12 +102,22 @@ private:
     Result ParseInstLW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->InstLoadImpl<true, Word>(&Hart::MemoryReadWord, rd, rs1, imm);
     }
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+    Result ParseInstLD(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<true, DWord>(&Hart::MemoryReadDWord, rd, rs1, imm);
+    }
+#endif  // RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstLBU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->InstLoadImpl<false, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
     }
     Result ParseInstLHU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->InstLoadImpl<false, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
     }
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+    Result ParseInstLWU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->InstLoadImpl<false, Word>(&Hart::MemoryReadWord, rd, rs1, imm);
+    }
+#endif // RISCV_CFG_CPU_ENABLE_RV64
 
     /*
      * Opcode MISC_MEM.
@@ -191,7 +201,7 @@ private:
         rd.Set(rs1.Get<WordS>() >> imm.Get<Word>());
         return ResultSuccess();
     }
-#endif
+#endif // RISCV_CFG_CPU_ENABLE_RV64
 
     /*
      * Opcode STORE.
@@ -205,6 +215,11 @@ private:
     Result ParseInstSW(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         return m_pParent->MemoryWriteWord(rs2.Get<Word>(), rs1.Get<Address>() + imm.Get<Address>());
     }
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+    Result ParseInstSD(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        return m_pParent->MemoryWriteDWord(rs2.Get<DWord>(), rs1.Get<Address>() + imm.Get<Address>());
+    }
+#endif // RISCV_CFG_CPU_ENABLE_RV64
 
     /*
      * Opcode OP.
@@ -274,7 +289,7 @@ private:
         rd.Set(rs1.Get<WordS>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32));
         return ResultSuccess();
     }
-#endif
+#endif // RISCV_CFG_CPU_ENABLE_RV64
 
     /*
      * Opcode LUI.

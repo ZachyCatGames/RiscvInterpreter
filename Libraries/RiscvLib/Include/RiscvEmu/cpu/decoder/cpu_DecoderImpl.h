@@ -115,10 +115,18 @@ private:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLH);
         case Funct3::LW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLW);
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+        case Funct3::LD:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstLD);
+#endif // RISCV_CFG_CPU_ENABLE_RV64
         case Funct3::LBU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLBU);
         case Funct3::LHU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLHU);
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+        case Funct3::LWU:
+            return this->CallStandardITypeExt(inst, &Derived::ParseInstLWU);
+#endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
             break;
         }
@@ -210,7 +218,7 @@ private:
             /* Otherwise parse as SRLI. */
             return GetDerived()->ParseInstSRLIW(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
         }
-#endif
+#endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
             break;
         }
@@ -226,6 +234,10 @@ private:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSH);
         case Funct3::SW:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSW);
+#ifdef RISCV_CFG_CPU_ENABLE_RV64
+        case Funct3::SD:
+            return this->CallStandardSTypeExt(inst, &Derived::ParseInstSD);
+#endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
             break;
         }
@@ -310,7 +322,7 @@ private:
             }
             break;
         }
-#endif
+#endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
             break;
         }

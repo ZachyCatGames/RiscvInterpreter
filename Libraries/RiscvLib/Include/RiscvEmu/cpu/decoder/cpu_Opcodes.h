@@ -61,8 +61,10 @@ enum class Funct3 {
     LB = 0b000,
     LH = 0b001,
     LW = 0b010,
+    LD = 0b011,
     LBU = 0b100,
     LHU = 0b101,
+    LWU = 0b110,
 
     /* Opcode MISC_MEM. */
     FENCE = 0b000,
@@ -86,6 +88,7 @@ enum class Funct3 {
     SB = 0b000,
     SH = 0b001,
     SW = 0b010,
+    SD = 0b011,
 
     /* Opcode OP. */
     ADD = 0b000,
