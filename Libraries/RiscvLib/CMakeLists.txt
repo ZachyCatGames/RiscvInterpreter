@@ -72,4 +72,6 @@ add_library(RiscvLib
 target_include_directories(RiscvLib PUBLIC "${PROJECT_SOURCE_DIR}/Include")
 
 # Include tests.
-add_subdirectory(Test)
+if(NOT DEFINED ${RISCV_EMU_DISABLE_UNIT_TESTS})
+    add_subdirectory(Test)
+endif()
