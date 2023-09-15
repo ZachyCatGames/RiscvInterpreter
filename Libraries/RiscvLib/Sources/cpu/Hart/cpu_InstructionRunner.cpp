@@ -236,21 +236,36 @@ private:
         rd.Set(rs1.Get<NativeWord>() - rs2.Get<NativeWord>());
         return ResultSuccess();
     }
+    Result ParseInstMUL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstSLL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() << (rs2.Get<Word>() & ShiftAmtMask));
         return ResultSuccess();
+    }
+    Result ParseInstMULH(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
     }
     Result ParseInstSLT(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWordS>() < rs2.Get<NativeWordS>());
         return ResultSuccess();
     }
+    Result ParseInstMULHSU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstSLTU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() < rs2.Get<NativeWord>());
         return ResultSuccess();
     }
+    Result ParseInstMULHU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstXOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() ^ rs2.Get<NativeWord>());
         return ResultSuccess();
+    }
+    Result ParseInstDIV(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
     }
     Result ParseInstSRL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() >> (rs2.Get<Word>() & ShiftAmtMask));
@@ -260,13 +275,22 @@ private:
         rd.Set(rs1.Get<NativeWordS>() >> (rs2.Get<Word>() & ShiftAmtMask));
         return ResultSuccess();
     }
+    Result ParseInstDIVU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() | rs2.Get<NativeWord>());
         return ResultSuccess();
     }
+    Result ParseInstREM(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstAND(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() & rs2.Get<NativeWord>());
         return ResultSuccess();
+    }
+    Result ParseInstREMU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
     }
 
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
@@ -281,9 +305,15 @@ private:
         rd.Set(rs1.Get<WordS>() - rs2.Get<WordS>());
         return ResultSuccess();
     }
+    Result ParseInstMULW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
     Result ParseInstSLLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(static_cast<WordS>(rs1.Get<Word>() << (rs2.Get<Word>() & ShiftAmtMaskFor32)));
         return ResultSuccess();
+    }
+    Result ParseInstDIVW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
     }
     Result ParseInstSRLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(static_cast<WordS>(rs1.Get<Word>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32)));
@@ -292,6 +322,15 @@ private:
     Result ParseInstSRAW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<WordS>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32));
         return ResultSuccess();
+    }
+    Result ParseInstDIVUW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstREMW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstREMUW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
+        return ResultNotImplemented();
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
 
