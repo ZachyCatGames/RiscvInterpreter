@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(RiscvLib LANGUAGES C CXX)
+project(RiscvLib LANGUAGES C CXX ASM)
 
 # Set C++ Language.
 set(CMAKE_CXX_STANDARD 23)
