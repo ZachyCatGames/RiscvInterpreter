@@ -1,4 +1,5 @@
 Programs/CpuTestOpcodeLOAD/CpuTestOpcodeLOAD-For64
+Programs/CpuTestOpcodeOP_32/CpuTestOpcodeOP_32-For64
 Programs/CpuTestOpcodeOP_IMM_32/CpuTestOpcodeOP_IMM_32-For64
 Programs/CpuTestOpcodeOP_IMM/CpuTestOpcodeOP_IMM-For64
 Programs/CpuTestOpcodeSTORE/CpuTestOpcodeSTORE-For64
