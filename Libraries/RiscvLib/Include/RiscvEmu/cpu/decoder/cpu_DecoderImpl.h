@@ -74,8 +74,7 @@ private:
         case Opcode::LUI:
             return this->CallStandardUTypeExt(UTypeInstruction(inst), &Derived::ParseInstLUI);
         case Opcode::OP_32:
-            /* TODO */
-            break;
+            return this->ParseOP_32(RTypeInstruction(inst));
         case Opcode::MADD:
             /* TODO */
             break;
