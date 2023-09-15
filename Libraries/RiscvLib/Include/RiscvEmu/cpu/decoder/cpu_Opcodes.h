@@ -100,7 +100,7 @@ enum class Funct3 {
     SRL    = 0b101,
     OR     = 0b110,
     AND    = 0b111,
-    MUL    = 0b000,
+    MUL    = 0b000, // M extension.
     MULH   = 0b001,
     MULHSU = 0b010,
     MULHU  = 0b011,
@@ -113,7 +113,7 @@ enum class Funct3 {
     ADDW  = 0b000,
     SLLW  = 0b001,
     SRLW  = 0b101,
-    MULW  = 0b000,
+    MULW  = 0b000, // M extension.
     DIVW  = 0b100,
     DIVUW = 0b101,
     REMW  = 0b110,
@@ -141,16 +141,39 @@ enum class Funct7 {
     /* For use when Funct7 isn't used within a Funct3 namespace. */
     Zero = 0,
 
-    /* Used my multiply/divide extension. */
-    ExtM = 0b0000001,
-
     /* OP::ADD. */
     ADD = 0b0000000,
     SUB = 0b0100000,
+    MUL = 0b0000001,
+
+    /* OP::SLL. */
+    SLL  = 0b0000000,
+    MULH = 0b0000001,
+
+    /* OP::SLT. */
+    SLT    = 0b0000000,
+    MULHSU = 0b0000001,
+
+    /* OP::SLTU. */
+    SLTU  = 0b0000000,
+    MULHU = 0b0000001,
+
+    /* OP::XOR. */
+    XOR = 0b0000000,
+    DIV = 0b0000001,
 
     /* OP::SRL. */
-    SRL = 0b0000000,
-    SRA = 0b0100000,
+    SRL  = 0b0000000,
+    SRA  = 0b0100000,
+    DIVU = 0b0000001,
+
+    /* OP::OR. */
+    OR  = 0b0000000,
+    REM = 0b0000001,
+
+    /* OP::AND. */
+    AND  = 0b0000000,
+    REMU = 0b0000001,
 
     /* OP_32::ADDW. */
     ADDW = 0b0000000,
