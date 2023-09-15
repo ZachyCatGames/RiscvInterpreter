@@ -100,22 +100,22 @@ enum class Funct3 {
     SRL    = 0b101,
     OR     = 0b110,
     AND    = 0b111,
-    MUL    = 0b000, // M extension.
-    MULH   = 0b001,
-    MULHSU = 0b010,
-    MULHU  = 0b011,
-    DIV    = 0b100,
-    DIVU   = 0b101,
-    REM    = 0b110,
-    REMU   = 0b111,
+    MUL    = ADD, // M extension.
+    MULH   = SLL,
+    MULHSU = SLT,
+    MULHU  = SLTU,
+    DIV    = XOR,
+    DIVU   = SRL,
+    REM    = OR,
+    REMU   = AND,
 
     /* Opcode OP_32. */
     ADDW  = 0b000,
     SLLW  = 0b001,
     SRLW  = 0b101,
-    MULW  = 0b000, // M extension.
+    MULW  = ADDW, // M extension.
     DIVW  = 0b100,
-    DIVUW = 0b101,
+    DIVUW = SRLW,
     REMW  = 0b110,
     REMUW = 0b111,
 
@@ -178,10 +178,12 @@ enum class Funct7 {
     /* OP_32::ADDW. */
     ADDW = 0b0000000,
     SUBW = 0b0100000,
+    MULW = 0b0000001,
 
     /* OP_32::SRLW. */
     SRLW = 0b0000000,
     SRAW = 0b0100000,
+    DIVUW = 0b0000001,
 
     /* Highest possible Funct7 value. */
     Max = 0b1111111
