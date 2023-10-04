@@ -420,6 +420,28 @@ private:
         /* Signal branch. */
         return m_pParent->SignalBranch(imm.Get<Address>());
     }
+
+    /*
+     * Opcode SYSTEM.
+     */
+    Result ParseInstCSRRW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstCSRRWI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstCSRRSI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return ResultNotImplemented();
+    }
+    Result ParseInstCSRRCI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return ResultNotImplemented();
+    }
 private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
