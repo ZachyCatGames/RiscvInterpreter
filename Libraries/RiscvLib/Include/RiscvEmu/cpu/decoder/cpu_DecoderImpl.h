@@ -25,6 +25,10 @@ private:
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateInReg(inst.rs2()));
     }
 
+    constexpr Result CallStandardIType(ITypeInstruction inst, auto func) {
+        return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(inst.imm()));
+    }
+
     constexpr Result CallStandardITypeExt(ITypeInstruction inst, auto func) {
         return (*GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(inst.imm_ext()));
     }
@@ -97,7 +101,7 @@ private:
         case Opcode::JAL:
             return this->CallStandardJTypeExt(JTypeInstruction(inst), &Derived::ParseInstJAL);
         case Opcode::SYSTEM:
-            /* TODO */
+            return this->ParseSYSTEM(ITypeInstruction(inst));
             break;
         default:
             break;
@@ -417,6 +421,31 @@ private:
         switch(inst.funct3()) {
         case Funct3::JALR:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstJALR);
+        default:
+            break;
+        }
+
+        return ResultInvalidInstruction();
+    }
+
+    constexpr Result ParseSYSTEM(ITypeInstruction inst) {
+        auto callCsrImm = [this](ITypeInstruction inst, auto func) {
+            (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(inst.rs1()), CreateImmediate(inst.imm()));
+        };
+
+        switch(inst.funct3()) {
+        case Funct3::CSRRW:
+            return this->CallStandardIType(inst, &Derived::ParseInstCSRRW);
+        case Funct3::CSRRS:
+            return this->CallStandardIType(inst, &Derived::ParseInstCSRRS);
+        case Funct3::CSRRC:
+            return this->CallStandardIType(inst, &Derived::ParseInstCSRRC);
+        case Funct3::CSRRWI:
+            return callCsrImm(inst, &Derived::ParseInstCSRRWI);
+        case Funct3::CSRRSI:
+            return callCsrImm(inst, &Derived::ParseInstCSRRSI);
+        case Funct3::CSRRCI:
+            return callCsrImm(inst, &Derived::ParseInstCSRRCI);
         default:
             break;
         }

@@ -130,6 +130,14 @@ enum class Funct3 {
     /* Opcode JALR. */
     JALR = 0b000,
 
+    /* Opcode SYSTEM. */
+    CSRRW = 0b001,
+    CSRRS = 0b010,
+    CSRRC = 0b011,
+    CSRRWI = 0b101,
+    CSRRSI = 0b110,
+    CSRRCI = 0b111,
+
     /* Highest possible Funct3 value. */
     Max = 0b111
 }; // enum class Funct3
