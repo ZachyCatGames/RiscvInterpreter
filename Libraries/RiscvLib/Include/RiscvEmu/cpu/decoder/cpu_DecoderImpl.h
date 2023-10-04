@@ -247,7 +247,6 @@ private:
     }
 
     constexpr Result ParseOP(RTypeInstruction inst) {
-        auto func7 = inst.funct7();
         switch(inst.funct3()) {
         case Funct3::ADD: {
             switch(inst.funct7()) {

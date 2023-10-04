@@ -2,6 +2,7 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
 #include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
 #include <RiscvEmu/cpu/decoder/cpu_Values.h>
+#include <RiscvEmu/cpu/detail/cpu_IntegerMultiply.h>
 #include <bit>
 #include <concepts>
 
@@ -237,35 +238,55 @@ private:
         return ResultSuccess();
     }
     Result ParseInstMUL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<NativeWord>() * rs2.Get<NativeWord>());
+        return ResultSuccess();
     }
     Result ParseInstSLL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() << (rs2.Get<Word>() & ShiftAmtMask));
         return ResultSuccess();
     }
     Result ParseInstMULH(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        if constexpr(cfg::cpu::EnableIsaRV64I) {
+            rd.Set(detail::MultiplyGetUpper64S(rs1.Get<DWordS>(), rs2.Get<DWordS>()));
+        }
+        else {
+            rd.Set(static_cast<Word>(rs1.Get<DWordS>() * rs2.Get<DWordS>() >> 32));
+        }
+        return ResultSuccess();
     }
     Result ParseInstSLT(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWordS>() < rs2.Get<NativeWordS>());
         return ResultSuccess();
     }
     Result ParseInstMULHSU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        if constexpr(cfg::cpu::EnableIsaRV64I) {
+            rd.Set(detail::MultiplyGetUpper64SU(rs1.Get<DWordS>(), rs2.Get<DWord>()));
+        }
+        else {
+            rd.Set(static_cast<Word>(rs1.Get<DWordS>() * static_cast<DWordS>(rs2.Get<DWord>()) >> 32));
+        }
+        return ResultSuccess();
     }
     Result ParseInstSLTU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() < rs2.Get<NativeWord>());
         return ResultSuccess();
     }
     Result ParseInstMULHU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        if constexpr(cfg::cpu::EnableIsaRV64I) {
+            rd.Set(detail::MultiplyGetUpper64U(rs1.Get<DWord>(), rs2.Get<DWord>()));
+        }
+        else {
+            rd.Set(static_cast<Word>(rs1.Get<DWord>() * rs2.Get<DWord>() >> 32));
+        }
+        return ResultSuccess();
     }
     Result ParseInstXOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() ^ rs2.Get<NativeWord>());
         return ResultSuccess();
     }
     Result ParseInstDIV(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<NativeWordS>() / rs2.Get<NativeWordS>());
+        return ResultSuccess();
     }
     Result ParseInstSRL(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() >> (rs2.Get<Word>() & ShiftAmtMask));
@@ -276,21 +297,24 @@ private:
         return ResultSuccess();
     }
     Result ParseInstDIVU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<NativeWord>() / rs2.Get<NativeWord>());
+        return ResultSuccess();
     }
     Result ParseInstOR(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() | rs2.Get<NativeWord>());
         return ResultSuccess();
     }
     Result ParseInstREM(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<NativeWordS>() % rs2.Get<NativeWordS>());
+        return ResultSuccess();
     }
     Result ParseInstAND(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(rs1.Get<NativeWord>() & rs2.Get<NativeWord>());
         return ResultSuccess();
     }
     Result ParseInstREMU(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<NativeWord>() % rs2.Get<NativeWord>());
+        return ResultSuccess();
     }
 
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
@@ -306,14 +330,16 @@ private:
         return ResultSuccess();
     }
     Result ParseInstMULW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<WordS>() * rs2.Get<WordS>());
+        return ResultSuccess();
     }
     Result ParseInstSLLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(static_cast<WordS>(rs1.Get<Word>() << (rs2.Get<Word>() & ShiftAmtMaskFor32)));
         return ResultSuccess();
     }
     Result ParseInstDIVW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<WordS>() / rs2.Get<WordS>());
+        return ResultSuccess();
     }
     Result ParseInstSRLW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
         rd.Set(static_cast<WordS>(rs1.Get<Word>() >> (rs2.Get<Word>() & ShiftAmtMaskFor32)));
@@ -324,13 +350,16 @@ private:
         return ResultSuccess();
     }
     Result ParseInstDIVUW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<Word>() / rs2.Get<Word>());
+        return ResultSuccess();
     }
     Result ParseInstREMW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<WordS>() % rs2.Get<WordS>());
+        return ResultSuccess();
     }
     Result ParseInstREMUW(OutRegObject rd, InRegObject rs1, InRegObject rs2) {
-        return ResultNotImplemented();
+        rd.Set(rs1.Get<Word>() % rs2.Get<Word>());
+        return ResultSuccess();
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
 

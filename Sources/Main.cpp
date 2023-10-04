@@ -8,7 +8,7 @@
 int main(int argc, const char* argv[]) {
     uint64_t out[2]{0};
 
-    uint64_t a  = riscv::cpu::detail::Multiply64(out, 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFFull);
+    uint64_t a  = riscv::cpu::detail::Multiply64U(out, 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFFull);
 
     std::cout << out[0] << std::endl;
     std::cout << out[1] << std::endl;

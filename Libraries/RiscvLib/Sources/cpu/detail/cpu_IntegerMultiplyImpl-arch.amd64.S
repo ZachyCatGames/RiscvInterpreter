@@ -1,27 +1,36 @@
 .section .text
 
-.global __riscvCpuMultiply64Impl
-.global __riscvCpuMultiplyGetLower64Impl
-.global __riscvCpuMultiplyGetUpper64Impl
+.global __riscvCpuMultiply64UImpl
+.global __riscvCpuMultiply64SImpl
+
+.global __riscvCpuMultiplyGetUpper64UImpl
+.global __riscvCpuMultiplyGetUpper64SImpl
 
 #define POUT_REG %rdi
 
 #define VAL0_REG %rsi
 #define VAL1_REG %rdx
 
-__riscvCpuMultiply64Impl:
+__riscvCpuMultiply64UImpl:
     mov VAL0_REG, %rax
     mulq VAL1_REG
     mov %rdx, (POUT_REG)
     ret
 
-__riscvCpuMultiplyGetLower64Impl:
+__riscvCpuMultiply64SImpl:
+    mov VAL0_REG, %rax
+    imulq VAL1_REG
+    mov %rdx, (POUT_REG)
+    ret
+
+__riscvCpuMultiplyGetUpper64UImpl:
     mov VAL0_REG, %rax
     mulq VAL1_REG
     mov %rdx, %rax
     ret
 
-__riscvCpuMultiplyGetUpper64Impl:
+__riscvCpuMultiplyGetUpper64SImpl:
     mov VAL0_REG, %rax
-    mulq VAL1_REG
+    imulq VAL1_REG
+    mov %rdx, %rax
     ret
