@@ -74,27 +74,27 @@ private:
         return ResultSuccess();
     }
 
-    constexpr Result FormatStandardIType(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+    constexpr Result FormatStandardITypeExt(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, x{}, {}", name, rd.GetId(), rs1.GetId(), imm.Get<WordS>());
         return ResultSuccess();
     }
 
-    constexpr Result FormatStandardSType(std::string_view name, InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+    constexpr Result FormatStandardSTypeExt(std::string_view name, InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, x{}, {}", name, rs1.GetId(), rs2.GetId(), imm.Get<WordS>());
         return ResultSuccess();
     }
 
-    constexpr Result FormatStandardBType(std::string_view name, InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+    constexpr Result FormatStandardBTypeExt(std::string_view name, InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, x{}, {}", name, rs1.GetId(), rs2.GetId(), imm.Get<WordS>());
         return ResultSuccess();
     }
 
-    constexpr Result FormatStandardUType(std::string_view name, OutRegObject rd, ImmediateObject imm) {
+    constexpr Result FormatStandardUTypeExt(std::string_view name, OutRegObject rd, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, {}", name, rd.GetId(), imm.Get<WordS>());
         return ResultSuccess();
     }
 
-    constexpr Result FormatStandardJType(std::string_view name, OutRegObject rd, ImmediateObject imm) {
+    constexpr Result FormatStandardJTypeExt(std::string_view name, OutRegObject rd, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, {}", name, rd.GetId(), imm.Get<WordS>());
         return ResultSuccess();
     }
@@ -147,38 +147,38 @@ private:
      * Opcode OP_IMM.
      */
     constexpr Result ParseInstADDI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("ADDI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("ADDI", rd, rs1, imm);
     }
     constexpr Result ParseInstSLLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SLLI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SLLI", rd, rs1, imm);
     }
     constexpr Result ParseInstSLTI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SLTI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SLTI", rd, rs1, imm);
     }
     constexpr Result ParseInstSLTIU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SLTIU", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SLTIU", rd, rs1, imm);
     }
     constexpr Result ParseInstXORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("XORI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("XORI", rd, rs1, imm);
     }
     constexpr Result ParseInstSRLI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SRLI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SRLI", rd, rs1, imm);
     }
     constexpr Result ParseInstSRAI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SRAI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SRAI", rd, rs1, imm);
     }
     constexpr Result ParseInstORI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("ORI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("ORI", rd, rs1, imm);
     }
     constexpr Result ParseInstANDI(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("ANDI", rd, rs1, imm);
+        return this->FormatStandardITypeExt("ANDI", rd, rs1, imm);
     }
 
     /*
      * Opcode AUIPC.
      */
     constexpr Result ParseInstAUIPC(OutRegObject rd, ImmediateObject imm) {
-        return this->FormatStandardUType("AUIPC", rd, imm);
+        return this->FormatStandardUTypeExt("AUIPC", rd, imm);
     }
 
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
@@ -186,16 +186,16 @@ private:
      * Opcode OP_IMM_32.
      */
     constexpr Result ParseInstADDIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("ADDIW", rd, rs1, imm);
+        return this->FormatStandardITypeExt("ADDIW", rd, rs1, imm);
     }
     constexpr Result ParseInstSLLIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SLLIW", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SLLIW", rd, rs1, imm);
     }
     constexpr Result ParseInstSRLIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SRLIW", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SRLIW", rd, rs1, imm);
     }
     constexpr Result ParseInstSRAIW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("SRAIW", rd, rs1, imm);
+        return this->FormatStandardITypeExt("SRAIW", rd, rs1, imm);
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
 
@@ -283,7 +283,7 @@ private:
      * Opcode LUI.
      */
     constexpr Result ParseInstLUI(OutRegObject rd, ImmediateObject imm) {
-        return this->FormatStandardUType("LUI", rd, imm);
+        return this->FormatStandardUTypeExt("LUI", rd, imm);
     }
 
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
@@ -326,37 +326,38 @@ private:
      * Opcode BRANCH.
      */
     constexpr Result ParseInstBEQ(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BEQ", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BEQ", rs1, rs2, imm);
     }
     constexpr Result ParseInstBNE(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BNE", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BNE", rs1, rs2, imm);
     }
     constexpr Result ParseInstBLT(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BLT", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BLT", rs1, rs2, imm);
     }
     constexpr Result ParseInstBGE(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BGE", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BGE", rs1, rs2, imm);
     }
     constexpr Result ParseInstBLTU(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BLTU", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BLTU", rs1, rs2, imm);
     }
     constexpr Result ParseInstBGEU(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return this->FormatStandardBType("BGEU", rs1, rs2, imm);
+        return this->FormatStandardBTypeExt("BGEU", rs1, rs2, imm);
     }
 
     /*
      * Opcode JALR.
      */
     constexpr Result ParseInstJALR(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->FormatStandardIType("JALR", rd, rs1, imm);
+        return this->FormatStandardITypeExt("JALR", rd, rs1, imm);
     }
 
     /*
      * Opcode JAL.
      */
     constexpr Result ParseInstJAL(OutRegObject rd, ImmediateObject imm) {
-        return this->FormatStandardJType("JAL", rd, imm);
+        return this->FormatStandardJTypeExt("JAL", rd, imm);
     }
+
 private:
     std::string m_StrTmp;
 }; // class DisassemblerImpl
