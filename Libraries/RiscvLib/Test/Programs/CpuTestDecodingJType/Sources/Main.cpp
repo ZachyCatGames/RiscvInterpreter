@@ -10,15 +10,15 @@ namespace test {
 namespace {
 
 constexpr int TestFieldOpcode() noexcept {
-    for(Word i = static_cast<Word>(cpu::Opcode::Min); i < static_cast<Word>(cpu::Opcode::Max); i++) {
+    for(int i = static_cast<int>(cpu::Opcode::Min); i < static_cast<int>(cpu::Opcode::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::JTypeInstruction(cpu::EncodeJTypeInstruction(static_cast<cpu::Opcode>(i), 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
 
         /* Test that rd is what we expect. */
-        if(static_cast<Word>(inst.opcode()) != i) {
-            return static_cast<int>(i);
+        if(static_cast<int>(inst.opcode()) != i) {
+            return i;
         }
     }
 
@@ -26,15 +26,15 @@ constexpr int TestFieldOpcode() noexcept {
 }
 
 constexpr int TestFieldRd() noexcept {
-    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
+    for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::JTypeInstruction(cpu::EncodeJTypeInstruction(cpu::Opcode::Max, 
-                                                                      static_cast<int>(i), 
+                                                                      i, 
                                                                       std::numeric_limits<Word>::max()));
 
         /* Test that rd is what we expect. */
         if(inst.rd() != i) {
-            return static_cast<int>(i);
+            return i;
         }
     }
 

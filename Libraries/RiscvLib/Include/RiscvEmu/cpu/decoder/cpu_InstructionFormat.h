@@ -28,7 +28,7 @@ public:
     constexpr explicit Instruction(const detail::InstructionBase inst) noexcept : detail::InstructionBase(inst) {}
     constexpr explicit Instruction(Word val) noexcept : detail::InstructionBase(val) {}
 
-    constexpr auto opcode() const noexcept {
+    constexpr Opcode opcode() const noexcept {
         return static_cast<Opcode>(this->Get() & c_OpcodeMask);
     }
 private:
@@ -41,16 +41,16 @@ class SBTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
-    constexpr auto rs2() const noexcept { return util::ExtractBitfield(this->Get(), 20, 5); }
+    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
+    constexpr int rs2() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 20, 5)); }
 };
 
 class UJTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5); }
+    constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5)); }
 };
 
 } // namespace detail
@@ -59,64 +59,64 @@ class RTypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5); }
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
-    constexpr auto rs2() const noexcept { return util::ExtractBitfield(this->Get(), 20, 5); }
-    constexpr auto funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(this->Get(), 25, 7)); }
+    constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5)); }
+    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
+    constexpr int rs2() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 20, 5)); }
+    constexpr Funct7 funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(this->Get(), 25, 7)); }
 };
 
 class ITypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr auto rd() const noexcept { return util::ExtractBitfield(this->Get(), 7, 5 ); }
-    constexpr auto funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
-    constexpr auto rs1() const noexcept { return util::ExtractBitfield(this->Get(), 15, 5); }
-    constexpr auto imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
+    constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5 )); }
+    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
+    constexpr Word imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
+    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 12, WordBitLen); }
 };
 
 class STypeInstruction : public detail::SBTypeBase {
 public:
     using detail::SBTypeBase::SBTypeBase;
 
-    constexpr auto imm() const noexcept {
+    constexpr Word imm() const noexcept {
         return util::ExtractBitfield(this->Get(), 7u, 5u) | ((this->Get() & 0x7Fu << 25u) >> 20u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
+    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 12, WordBitLen); }
 };
 
 class BTypeInstruction : public detail::SBTypeBase {
 public:
     using detail::SBTypeBase::SBTypeBase;
 
-    constexpr auto imm() const noexcept {
+    constexpr Word imm() const noexcept {
         return ((this->Get() & (0xFu << 8u)) >> 7u) | ((this->Get() & (0x3Fu << 25u)) >> 20u) | ((this->Get() & (1u << 7u)) << 4u) | ((this->Get() & (1u << 31u)) >> 19u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 13u, NativeWordBitLen); }
+    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 13u, WordBitLen); }
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr auto imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
+    constexpr Word imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 32, NativeWordBitLen); }
+    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 32, WordBitLen); }
 };
 
 class JTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr auto imm() const noexcept {
+    constexpr Word imm() const noexcept {
         return ((this->Get() & (0x3FFu << 21u)) >> 20u) | ((this->Get() & (1u << 20u)) >> 9u) | (this->Get() & (0xFFu << 12u)) | ((this->Get() & (1u << 31u)) >> 11u);
     }
 
-    constexpr auto imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 21, NativeWordBitLen); }
+    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 21, WordBitLen); }
 };
 
 } // namespace cpu

@@ -67,18 +67,18 @@ constexpr int TestFieldFunct7() noexcept {
 }
 
 constexpr int TestFieldRd() noexcept {
-    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
+    for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
                                                                       cpu::Funct7::Max, 
-                                                                      static_cast<int>(i), 
+                                                                      i, 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister));
 
         /* Test that rd is what we expect. */
         if(inst.rd() != i) {
-            return static_cast<int>(i);
+            return i;
         }
     }
 
@@ -86,18 +86,18 @@ constexpr int TestFieldRd() noexcept {
 }
 
 constexpr int TestFieldRs1() noexcept {
-    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
+    for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
                                                                       cpu::Funct7::Max, 
                                                                       cpu::InstMaxRegister, 
-                                                                      static_cast<int>(i), 
+                                                                      i, 
                                                                       cpu::InstMaxRegister));
 
         /* Test that rd is what we expect. */
         if(inst.rs1() != i) {
-            return static_cast<int>(i);
+            return i;
         }
     }
 
@@ -105,18 +105,18 @@ constexpr int TestFieldRs1() noexcept {
 }
 
 constexpr int TestFieldRs2() noexcept {
-    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
+    for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::Funct3::Max, 
                                                                       cpu::Funct7::Max, 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister, 
-                                                                      static_cast<int>(i)));
+                                                                      i));
 
         /* Test that rd is what we expect. */
         if(inst.rs2() != i) {
-            return static_cast<int>(i);
+            return i;
         }
     }
 
