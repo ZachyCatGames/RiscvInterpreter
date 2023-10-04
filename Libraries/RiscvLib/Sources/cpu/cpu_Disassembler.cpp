@@ -74,6 +74,10 @@ private:
         return ResultSuccess();
     }
 
+    constexpr Result FormatStandardIType(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        m_StrTmp = std::format("{} x{}, x{}, {}", name, rd.GetId(), rs1.GetId(), imm.Get<Word>());
+    }
+
     constexpr Result FormatStandardITypeExt(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, x{}, {}", name, rd.GetId(), rs1.GetId(), imm.Get<WordS>());
         return ResultSuccess();
