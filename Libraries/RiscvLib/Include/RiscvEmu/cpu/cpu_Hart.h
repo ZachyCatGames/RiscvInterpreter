@@ -2,6 +2,7 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
+#include <RiscvEmu/cpu/cpu_TrapCode.h>
 #include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
@@ -26,14 +27,14 @@ public:
 
     Result ExecuteInstruction(Instruction inst);
 
-    void WritePC(NativeWord addr) noexcept { m_PC = addr; }
-    void WriteGPR(int index, NativeWord value) noexcept {
+    constexpr void WritePC(NativeWord addr) noexcept { m_PC = addr; }
+    constexpr void WriteGPR(int index, NativeWord value) noexcept {
         assert(index < NumGPR && index >= 0);
         m_GPR[index] = value;
     }
 
-    NativeWord ReadPC() const noexcept { return m_PC; }
-    NativeWord ReadGPR(int index) const noexcept {
+    constexpr NativeWord ReadPC() const noexcept { return m_PC; }
+    constexpr NativeWord ReadGPR(int index) const noexcept {
         assert(index < NumGPR && index >= 0);
         return m_GPR[index];
     }
@@ -43,16 +44,15 @@ public:
     Result Reset();
 private:
     class InstructionRunner;
-
 private:
-    Result SignalBranch(Address offset) {
+    constexpr Result SignalBranch(Address offset) {
         /* TODO: Check alignment, throw exception if misaligned. */
 
         m_PC += offset;
         return ResultSuccess();
     }
 
-    Result SignalJump(Address addr) {
+    constexpr Result SignalJump(Address addr) {
         m_PC = addr;
         return ResultSuccess();
     }
@@ -76,7 +76,32 @@ public:
     Result MemoryWriteDWord(DWord in, Address addr);
 
     Result FetchInstruction(Instruction* pOut, Address addr);
+private:
+    Result TriggerTrap(TrapCode code);
+private:
+    constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
+        return m_PrivPC[static_cast<int>(level)];
+    }
 
+    constexpr void WritePrivPC(NativeWord val, PrivilageLevel level) noexcept {
+        m_PrivPC[static_cast<int>(level)] = val;
+    }
+
+    constexpr void SwapPrivPC(PrivilageLevel newLevel) noexcept {
+        /* Write our current PC to the slot for our current priv level. */
+        this->WritePrivPC(m_PC, m_CurPrivLevel);
+
+        /* Load PC for newLevel. */
+        m_PC = this->ReadPrivPC(newLevel);
+    }
+private:
+    constexpr NativeWord GetExcVectAddr(PrivilageLevel level) const noexcept {
+        return m_TrapVectAddr[static_cast<int>(level)];
+    }
+
+    constexpr NativeWord GetActiveExcVectAddr() const noexcept {
+        return this->GetExcVectAddr(m_CurPrivLevel);
+    }
 public:
     static constexpr auto NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
 private:
@@ -84,6 +109,17 @@ private:
     NativeWord m_GPR[NumGPR];
 
     PrivilageLevel m_CurPrivLevel;
+
+    NativeWord m_HartId;
+
+    /** Cycle & retired inst count. */
+    DWord m_CycleCount;
+
+    /** Stored PC for each privilage level. */
+    NativeWord m_PrivPC[4];
+
+    /** Trap vector address for each privilage level. */
+    NativeWord m_TrapVectAddr[4];
 
     SharedContext m_SharedCtx;
 }; // class Hart
