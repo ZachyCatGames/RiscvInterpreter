@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <compare>
 
 namespace riscv {
 namespace cpu {
