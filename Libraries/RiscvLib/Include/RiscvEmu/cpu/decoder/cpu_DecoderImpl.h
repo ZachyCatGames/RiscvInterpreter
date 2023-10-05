@@ -430,7 +430,7 @@ private:
 
     constexpr Result ParseSYSTEM(ITypeInstruction inst) {
         auto callCsrImm = [this](ITypeInstruction inst, auto func) {
-            (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(inst.rs1()), CreateImmediate(inst.imm()));
+            return (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(static_cast<Word>(inst.rs1())), CreateImmediate(inst.imm()));
         };
 
         switch(inst.funct3()) {
