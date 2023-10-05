@@ -76,6 +76,7 @@ private:
 
     constexpr Result FormatStandardIType(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         m_StrTmp = std::format("{} x{}, x{}, {}", name, rd.GetId(), rs1.GetId(), imm.Get<Word>());
+        return ResultSuccess();
     }
 
     constexpr Result FormatStandardITypeExt(std::string_view name, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
@@ -360,6 +361,32 @@ private:
      */
     constexpr Result ParseInstJAL(OutRegObject rd, ImmediateObject imm) {
         return this->FormatStandardJTypeExt("JAL", rd, imm);
+    }
+
+    /*
+     * Opcode SYSTEM.
+     */
+    constexpr Result FormatCSRI(std::string_view name, OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        m_StrTmp = std::format("{} x{}, {}, {}", name, rd.GetId(), src.Get<Word>(), csr.Get<Word>());
+        return ResultSuccess();
+    }
+    constexpr Result ParseInstCSRRW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->FormatStandardIType("CSRRW", rd, rs1, imm);
+    }
+    constexpr Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->FormatStandardIType("CSRRS", rd, rs1, imm);
+    }
+    constexpr Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        return this->FormatStandardIType("CSRRC", rd, rs1, imm);
+    }
+    constexpr Result ParseInstCSRRWI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return this->FormatCSRI("CSRRWI", rd, src, csr);
+    }
+    constexpr Result ParseInstCSRRSI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return this->FormatCSRI("CSRRSI", rd, src, csr);
+    }
+    constexpr Result ParseInstCSRRCI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
+        return this->FormatCSRI("CSRRCI", rd, src, csr);
     }
 
 private:
