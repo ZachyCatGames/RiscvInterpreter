@@ -69,6 +69,21 @@ Result MemoryController::ReadDWord(DWord* pOut, Address addr) {
     return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadDWord, &IMmioDev::ReadDWord>(pOut, addr);
 }
 
+Result MemoryController::ReadNativeWord(NativeWord* pOut, Address addr) {
+    Result res;
+    if constexpr (cfg::cpu::EnableIsaRV64I) {
+        DWord val = 0;
+        res = this->ReadDWord(&val, addr);
+        *pOut = static_cast<NativeWord>(val);
+    }
+    else {
+        Word val = 0;
+        res = this->ReadWord(&val, addr);
+        *pOut = static_cast<NativeWord>(val);
+    }
+    return res;
+}
+
 Result MemoryController::WriteByte(Byte in, Address addr) {
     return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteByte, &IMmioDev::WriteByte>(in, addr);
 }
@@ -83,6 +98,15 @@ Result MemoryController::WriteWord(Word in, Address addr) {
 
 Result MemoryController::WriteDWord(DWord in, Address addr) {
     return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteDWord, &IMmioDev::WriteDWord>(in, addr);
+}
+
+Result MemoryController::WriteNativeWord(NativeWord in, Address addr) {
+    if constexpr (cfg::cpu::EnableIsaRV64I) {
+        return this->WriteDWord(static_cast<NativeWord>(in), addr);
+    }
+    else {
+        return this->WriteWord(static_cast<NativeWord>(in), addr);
+    }
 }
 
 template<auto MemRead, auto IoRead, typename T>

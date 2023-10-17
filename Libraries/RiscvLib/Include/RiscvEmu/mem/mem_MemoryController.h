@@ -50,6 +50,8 @@ public:
 
     Result ReadDWord(DWord* pOut, Address addr);
 
+    Result ReadNativeWord(NativeWord* pOut, Address addr);
+
     Result WriteByte(Byte in, Address addr);
 
     Result WriteHWord(HWord in, Address addr);
@@ -57,6 +59,8 @@ public:
     Result WriteWord(Word in, Address addr);
 
     Result WriteDWord(DWord in, Address addr);
+
+    Result WriteNativeWord(NativeWord in, Address addr);
 private:
     detail::MemRegion m_MemRegion;
     std::vector<detail::IoRegion> m_IoRegions;
