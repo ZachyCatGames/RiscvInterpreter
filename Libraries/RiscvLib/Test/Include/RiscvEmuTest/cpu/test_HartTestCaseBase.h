@@ -20,7 +20,7 @@ private:
         }
 
         /* Run the instruction. */
-        res = pSys->ExecuteInstruction(m_Inst);
+        res = pSys->ExecuteInst(m_Inst);
         if(res.IsFailure()) {
             return res;
         }

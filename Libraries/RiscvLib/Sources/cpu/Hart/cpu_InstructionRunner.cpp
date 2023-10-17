@@ -9,7 +9,6 @@
 namespace riscv {
 namespace cpu {
 
-
 class Hart::InstructionRunner : public DecoderImpl<Hart::InstructionRunner> {
 public:
     constexpr InstructionRunner(Hart* pParent) :
@@ -95,28 +94,28 @@ private:
         return res;
     }
     Result ParseInstLB(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<true, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
+        return this->InstLoadImpl<true, Byte>(&Hart::MemReadByte, rd, rs1, imm);
     }
     Result ParseInstLH(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<true, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
+        return this->InstLoadImpl<true, HWord>(&Hart::MemReadHWord, rd, rs1, imm);
     }
     Result ParseInstLW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<true, Word>(&Hart::MemoryReadWord, rd, rs1, imm);
+        return this->InstLoadImpl<true, Word>(&Hart::MemReadWord, rd, rs1, imm);
     }
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstLD(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<true, DWord>(&Hart::MemoryReadDWord, rd, rs1, imm);
+        return this->InstLoadImpl<true, DWord>(&Hart::MemReadDWord, rd, rs1, imm);
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstLBU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<false, Byte>(&Hart::MemoryReadByte, rd, rs1, imm);
+        return this->InstLoadImpl<false, Byte>(&Hart::MemReadByte, rd, rs1, imm);
     }
     Result ParseInstLHU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<false, HWord>(&Hart::MemoryReadHWord, rd, rs1, imm);
+        return this->InstLoadImpl<false, HWord>(&Hart::MemReadHWord, rd, rs1, imm);
     }
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstLWU(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return this->InstLoadImpl<false, Word>(&Hart::MemoryReadWord, rd, rs1, imm);
+        return this->InstLoadImpl<false, Word>(&Hart::MemReadWord, rd, rs1, imm);
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
 
@@ -212,17 +211,17 @@ private:
      * Opcode STORE.
      */
     Result ParseInstSB(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return m_pParent->MemoryWriteByte(rs2.Get<Byte>(), rs1.Get<Address>() + imm.Get<Address>());
+        return m_pParent->MemWriteByte(rs2.Get<Byte>(), rs1.Get<Address>() + imm.Get<Address>());
     }
     Result ParseInstSH(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return m_pParent->MemoryWriteHWord(rs2.Get<HWord>(), rs1.Get<Address>() + imm.Get<Address>());
+        return m_pParent->MemWriteHWord(rs2.Get<HWord>(), rs1.Get<Address>() + imm.Get<Address>());
     }
     Result ParseInstSW(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return m_pParent->MemoryWriteWord(rs2.Get<Word>(), rs1.Get<Address>() + imm.Get<Address>());
+        return m_pParent->MemWriteWord(rs2.Get<Word>(), rs1.Get<Address>() + imm.Get<Address>());
     }
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
     Result ParseInstSD(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
-        return m_pParent->MemoryWriteDWord(rs2.Get<DWord>(), rs1.Get<Address>() + imm.Get<Address>());
+        return m_pParent->MemWriteDWord(rs2.Get<DWord>(), rs1.Get<Address>() + imm.Get<Address>());
     }
 #endif // RISCV_CFG_CPU_ENABLE_RV64
 
@@ -446,7 +445,7 @@ private:
     Hart* const m_pParent = 0;
 }; // class Hart::InstructionRunner
 
-Result Hart::ExecuteInstruction(Instruction inst) {
+Result Hart::ExecuteInstructionImpl(Instruction inst) {
     return InstructionRunner(this).ParseInstruction(inst);
 }
 

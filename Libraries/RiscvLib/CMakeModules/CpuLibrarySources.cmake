@@ -8,14 +8,18 @@ set(RISCV_CPU_LIBRARY_HEADERS
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_InstructionFormat.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_Opcodes.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_Values.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_IntegerMultiply.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_MemoryManager.h"
 )
 
 set(RISCV_CPU_LIBRARY_SOURCES
     "${PROJECT_SOURCE_DIR}/Sources/cpu/cpu_Disassembler.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiply.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiplyImpl-arch.amd64.S"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_MemoryManager.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Initialize.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_InstructionRunner.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_MemoryAccess.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Reset.cpp"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_UserApi.cpp"
 )

@@ -15,8 +15,8 @@ public:
 
     auto GetHart() noexcept { return &m_Hart; }
 
-    Result ExecuteInstruction(cpu::Instruction inst) {
-        return m_Hart.ExecuteInstruction(inst);
+    Result ExecuteInst(cpu::Instruction inst) {
+        return m_Hart.ExecuteInst(inst);
     }
 
     void WritePC(NativeWord val) { m_Hart.WritePC(val); }
@@ -48,14 +48,14 @@ public:
 
     /* Access memory as the hart. */
     /* TODO: Properly implement to bypass memory restrictions. */
-    Result HartReadByte(Byte* pOut, Address addr)   { return m_Hart.MemoryReadByte(pOut, addr); }
-    Result HartReadHWord(HWord* pOut, Address addr) { return m_Hart.MemoryReadHWord(pOut, addr); }
-    Result HartReadWord(Word* pOut, Address addr)   { return m_Hart.MemoryReadWord(pOut, addr); }
-    Result HartReadDWord(DWord* pOut, Address addr) { return m_Hart.MemoryReadDWord(pOut, addr); }
-    Result HartWriteByte(Byte in, Address addr)     { return m_Hart.MemoryWriteByte(in, addr); }
-    Result HartWriteHWord(HWord in, Address addr)   { return m_Hart.MemoryWriteHWord(in, addr); }
-    Result HartWriteWord(Word in, Address addr)     { return m_Hart.MemoryWriteWord(in, addr); }
-    Result HartWriteDWord(DWord in, Address addr)   { return m_Hart.MemoryWriteDWord(in, addr); }
+    Result HartReadByte(Byte* pOut, Address addr)   { return m_Hart.MappedReadByte(pOut, addr); }
+    Result HartReadHWord(HWord* pOut, Address addr) { return m_Hart.MappedReadHWord(pOut, addr); }
+    Result HartReadWord(Word* pOut, Address addr)   { return m_Hart.MappedReadWord(pOut, addr); }
+    Result HartReadDWord(DWord* pOut, Address addr) { return m_Hart.MappedReadDWord(pOut, addr); }
+    Result HartWriteByte(Byte in, Address addr)     { return m_Hart.MappedWriteByte(in, addr); }
+    Result HartWriteHWord(HWord in, Address addr)   { return m_Hart.MappedWriteHWord(in, addr); }
+    Result HartWriteWord(Word in, Address addr)     { return m_Hart.MappedWriteWord(in, addr); }
+    Result HartWriteDWord(DWord in, Address addr)   { return m_Hart.MappedWriteDWord(in, addr); }
 
     Result ClearMem();
 

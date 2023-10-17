@@ -3,84 +3,35 @@
 namespace riscv {
 namespace cpu {
 
-template<typename T>
-Result Hart::MemoryReadImpl(auto func, T* pOut, Address addr) {
-    Result res;
-
-    /* If running in Machine mode perform a direct physical memory read. */
-    if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        res = (*m_SharedCtx.GetMemController().*func)(pOut, addr);
-
-        /* TODO: Throw exception on failure. */
-
-        return res;
-    }
-
-    /* Otherwise obtain a physical address from the MMU. */
-    /* TODO: Supervisor. */
-    /* TODO: MMU. */
-    return ResultNotImplemented();
+Result Hart::MemReadByte(Byte* pOut, Address addr) {
+    return m_MemMgr.ReadByte(pOut, addr, m_CurPrivLevel);
 }
-
-template<typename T>
-Result Hart::MemoryWriteImpl(auto func, T in, Address addr) {
-    Result res;
-
-    /* If running in machine mode perform a direct physical memory write. */
-    if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        res = (*m_SharedCtx.GetMemController().*func)(in, addr);
-
-        /* TODO: Throw exception on failure. */
-
-        return res;
-    }
-
-    /* Otherwise obtain a physical address from the MMU. */
-    /* TODO: Supervisor. */
-    /* TODO: MMU. */
-    return ResultNotImplemented();
+Result Hart::MemReadHWord(HWord* pOut, Address addr) {
+    return m_MemMgr.ReadHWord(pOut, addr, m_CurPrivLevel);
 }
-
-Result Hart::MemoryReadByte(Byte* pOut, Address addr) { 
-    return this->MemoryReadImpl(&MemCtlT::ReadByte, pOut, addr); 
+Result Hart::MemReadWord(Word* pOut, Address addr) {
+    return m_MemMgr.ReadWord(pOut, addr, m_CurPrivLevel);
 }
-Result Hart::MemoryReadHWord(HWord* pOut, Address addr) {
-    return this->MemoryReadImpl(&MemCtlT::ReadHWord, pOut, addr);
+Result Hart::MemReadDWord(DWord* pOut, Address addr) {
+    return m_MemMgr.ReadDWord(pOut, addr, m_CurPrivLevel);
 }
-Result Hart::MemoryReadWord(Word* pOut, Address addr) {
-    return this->MemoryReadImpl(&MemCtlT::ReadWord, pOut, addr);
+Result Hart::MemWriteByte(Byte in, Address addr) {
+    return m_MemMgr.WriteByte(in, addr, m_CurPrivLevel);
 }
-Result Hart::MemoryReadDWord(DWord* pOut, Address addr) {
-    return this->MemoryReadImpl(&MemCtlT::ReadDWord, pOut, addr);
+Result Hart::MemWriteHWord(HWord in, Address addr) {
+    return m_MemMgr.WriteHWord(in, addr, m_CurPrivLevel);
 }
-Result Hart::MemoryWriteByte(Byte in, Address addr) {
-    return this->MemoryWriteImpl(&MemCtlT::WriteByte, in, addr);
+Result Hart::MemWriteWord(Word in, Address addr) {
+    return m_MemMgr.WriteWord(in, addr, m_CurPrivLevel);
 }
-Result Hart::MemoryWriteHWord(HWord in, Address addr) {
-    return this->MemoryWriteImpl(&MemCtlT::WriteHWord, in, addr);
-}
-Result Hart::MemoryWriteWord(Word in, Address addr) {
-    return this->MemoryWriteImpl(&MemCtlT::WriteWord, in, addr);
-}
-Result Hart::MemoryWriteDWord(DWord in, Address addr) {
-    return this->MemoryWriteImpl(&MemCtlT::WriteDWord, in, addr);
+Result Hart::MemWriteDWord(DWord in, Address addr) {
+    return m_MemMgr.WriteDWord(in, addr, m_CurPrivLevel);
 }
 
 Result Hart::FetchInstruction(Instruction* pOut, Address addr) {
     Word inst = 0;
-    Result res;
-
-    /* If running in machine mode perform a direct physical memory write. */
-    if(m_CurPrivLevel == PrivilageLevel::Machine) {
-        res = m_SharedCtx.GetMemController()->ReadWord(&inst, addr);
-        *pOut = Instruction(inst);
-        return res;
-    }
-
-    /* Otherwise obtain a physical address from the MMU. */
-    /* TODO: Supervisor. */
-    /* TODO: MMU. */
-    return ResultNotImplemented();
+    Result res = m_MemMgr.InstFetch(&inst, addr, m_CurPrivLevel);
+    *pOut = Instruction(inst);
 }
 
 } // namespace cpu

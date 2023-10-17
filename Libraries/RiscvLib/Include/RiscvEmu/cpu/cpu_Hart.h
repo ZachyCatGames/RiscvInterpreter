@@ -4,6 +4,7 @@
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/cpu_TrapCode.h>
 #include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
 
@@ -23,27 +24,70 @@ public:
         mem::MemoryController* m_pMemCtlr;
     }; // SharedContext
 public:
+    /** Initialize the Hart. */
     Result Initialize(SharedContext pSharedCtx);
+public:
+    /** Read the instruction currently at PC. */
+    Result FetchInstAtPc(Instruction* pOut);
 
-    Result ExecuteInstruction(Instruction inst);
+    /** Execute an instruction. */
+    Result ExecuteInst(Instruction inst);
 
+    /** Execute the instruction at PC (atomic ReadInstructionAtPc + ExecuteInstruction) */
+    Result ExecuteInstAtPc();
+
+    /** Write the PC register. */
     constexpr void WritePC(NativeWord addr) noexcept { m_PC = addr; }
+
+    /** Write a general purpose register. */
     constexpr void WriteGPR(int index, NativeWord value) noexcept {
         assert(index < NumGPR && index >= 0);
         m_GPR[index] = value;
     }
 
+    /** Read the PC register. */
     constexpr NativeWord ReadPC() const noexcept { return m_PC; }
+
+    /** Read a general purpose register. */
     constexpr NativeWord ReadGPR(int index) const noexcept {
         assert(index < NumGPR && index >= 0);
         return m_GPR[index];
     }
 
-    Result ExecuteAtPc();
+    /** Write a control/status register. */
+    Result WriteCSR(int index, NativeWord value);
+
+    /** Read a control/status register. */
+    Result ReadCSR(int index, NativeWord* pOut);
+
+    /** Read mapped Byte with highest privilage. */
+    Result MappedReadByte(Byte* pOut, Address addr);
+
+    /** Read mapped HWord with highest privilage. */
+    Result MappedReadHWord(HWord* pOut, Address addr);
+
+    /** Read mapped Word with highest privilage. */
+    Result MappedReadWord(Word* pOut, Address addr);
+
+    /** Read mapped DWord with highest privilage. */
+    Result MappedReadDWord(DWord* pOut, Address addr);
+
+    /** Write mapped Byte with highest privilage. */
+    Result MappedWriteByte(Byte in, Address addr);
+
+    /** Write mapped HWord with highest privilage. */
+    Result MappedWriteHWord(HWord in, Address addr);
+
+    /** Write mapped Word with highest privilage. */
+    Result MappedWriteWord(Word in, Address addr);
+
+    /** Write mapped DWord with highest privilage. */
+    Result MappedWriteDWord(DWord in, Address addr);
 
     Result Reset();
 private:
     class InstructionRunner;
+    Result ExecuteInstructionImpl(Instruction inst);
 private:
     constexpr Result SignalBranch(Address offset) {
         /* TODO: Check alignment, throw exception if misaligned. */
@@ -57,23 +101,14 @@ private:
         return ResultSuccess();
     }
 private:
-    using MemCtlT = mem::MemoryController;
-
-    template<typename T>
-    Result MemoryReadImpl(auto func, T* pOut, Address addr);
-
-    template<typename T>
-    Result MemoryWriteImpl(auto func, T in, Address addr);
-
-public:
-    Result MemoryReadByte(Byte* pOut, Address addr);
-    Result MemoryReadHWord(HWord* pOut, Address addr);
-    Result MemoryReadWord(Word* pOut, Address addr);
-    Result MemoryReadDWord(DWord* pOut, Address addr);
-    Result MemoryWriteByte(Byte in, Address addr);
-    Result MemoryWriteHWord(HWord in, Address addr);
-    Result MemoryWriteWord(Word in, Address addr);
-    Result MemoryWriteDWord(DWord in, Address addr);
+    Result MemReadByte(Byte* pOut, Address addr);
+    Result MemReadHWord(HWord* pOut, Address addr);
+    Result MemReadWord(Word* pOut, Address addr);
+    Result MemReadDWord(DWord* pOut, Address addr);
+    Result MemWriteByte(Byte in, Address addr);
+    Result MemWriteHWord(HWord in, Address addr);
+    Result MemWriteWord(Word in, Address addr);
+    Result MemWriteDWord(DWord in, Address addr);
 
     Result FetchInstruction(Instruction* pOut, Address addr);
 private:
@@ -120,6 +155,8 @@ private:
 
     /** Trap vector address for each privilage level. */
     NativeWord m_TrapVectAddr[4];
+
+    detail::MemoryManager m_MemMgr;
 
     SharedContext m_SharedCtx;
 }; // class Hart
