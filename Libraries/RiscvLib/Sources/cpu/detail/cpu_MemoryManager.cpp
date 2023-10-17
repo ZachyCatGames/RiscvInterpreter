@@ -42,7 +42,7 @@ public:
     constexpr void SetDirty(bool val) noexcept { this->SetBit(7, val); }
 
     constexpr bool IsLeaf() const noexcept {
-        return ((m_Value >> 1) & 0x7) == 0;
+        return ((m_Value >> 1) & 0x7) != 0;
     }
 protected:
     constexpr bool GetBit(int index) const noexcept { return util::ExtractBitfield(m_Value, index, 1); }
@@ -103,7 +103,7 @@ void MemoryManager::Finalize() {
     m_pMemCtlr = nullptr;
 }
 
-bool MemoryManager::SetTransMode(AddrTransMode mode) {
+bool MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
     m_Mode = mode;
 
     /* Update page table level count. */
@@ -154,7 +154,7 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
 
 Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
     Result res;
-    Address curPT = m_PageTableAddr;
+    Address curPT = m_PTAddr;
     NativeWord pteVal = 0;
     int curLevel = m_PTLevelCount - 1;
     while(curLevel >= 0) {
