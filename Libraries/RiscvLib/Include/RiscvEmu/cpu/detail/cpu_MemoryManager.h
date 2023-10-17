@@ -20,7 +20,9 @@ public:
     Result Initialize(mem::MemoryController* pMemCtlr);
     void Finalize();
 
-    bool SetTransMode(AddrTransMode mode);
+    bool SetTransMode(AddrTransMode mode) noexcept;
+
+    void SetEnabledSUM(bool val) noexcept;
 
     Result ReadByte(Byte* pOut, Address addr, PrivilageLevel level);
     Result ReadHWord(HWord* pOut, Address addr, PrivilageLevel level);
@@ -56,10 +58,22 @@ private:
     template<typename T>
     Result MappedWriteImpl(auto readFunc, T in, Address addr);
 
-    Result TranslateAddress(Address* pOut, Address addr, PrivilageLevel level, MemAccessReason reason);
+    Result GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr);
+
+    Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, auto chkFunc);
+
+    Result TranslateForRead(Address* pOut, Address addr, PrivilageLevel level);
+    Result TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level);
+    Result TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level);
+    Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
 private:
     mem::MemoryController* m_pMemCtlr;
+    Address m_PageTableAddr;
+
     AddrTransMode m_Mode;
+    int m_PTLevelCount;
+
+    bool m_SUMEnabled;
 }; // class MemoryManager
 
 } // namespace detail

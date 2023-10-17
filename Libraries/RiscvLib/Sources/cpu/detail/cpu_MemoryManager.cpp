@@ -1,5 +1,6 @@
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
+#include <RiscvEmu/util/util_Bitfields.h>
 
 namespace riscv {
 namespace cpu {
@@ -8,6 +9,87 @@ namespace detail {
 namespace {
 
 using MemCtlrT = mem::MemoryController;
+
+class PTEBase {
+public:
+    constexpr PTEBase() noexcept : m_Value(0) {}
+    constexpr PTEBase(NativeWord val) noexcept : m_Value(val) {}
+
+    constexpr NativeWord GetValue() const noexcept { return m_Value; }
+
+    constexpr bool GetValid() const noexcept { return this->GetBit(0); }
+    constexpr void SetValid(bool val) noexcept { this->SetBit(0, val); }
+
+    constexpr bool GetReadable() const noexcept { return this->GetBit(1); }
+    constexpr void SetReadable(bool val) noexcept { this->SetBit(1, val); }
+
+    constexpr bool GetWriteable() const noexcept { return this->GetBit(2); }
+    constexpr void SetWriteable(bool val) noexcept { this->SetBit(2, val); }
+
+    constexpr bool GetExecutable() const noexcept { return this->GetBit(3); }
+    constexpr void SetExecutable(bool val) noexcept { this->SetBit(3, val); }
+
+    constexpr bool GetForUser() const noexcept { return this->GetBit(4); }
+    constexpr void SetForUser(bool val) noexcept { this->SetBit(4, val); }
+
+    constexpr bool GetGlobal() const noexcept { return this->GetBit(5); }
+    constexpr void SetGlobal(bool val) noexcept { this->SetBit(5, val); }
+
+    constexpr bool GetAccessed() const noexcept { return this->GetBit(6); }
+    constexpr void SetAccessed(bool val) noexcept { this->SetBit(6, val); }
+
+    constexpr bool GetDirty() const noexcept { return this->GetBit(7); }
+    constexpr void SetDirty(bool val) noexcept { this->SetBit(7, val); }
+
+    constexpr bool IsLeaf() const noexcept {
+        return ((m_Value >> 1) & 0x7) == 0;
+    }
+protected:
+    constexpr bool GetBit(int index) const noexcept { return util::ExtractBitfield(m_Value, index, 1); }
+    constexpr void SetBit(int index, bool val) noexcept {
+        m_Value = util::AssignBitfield(m_Value, index, 1, static_cast<NativeWord>(val));
+    }
+protected:
+    NativeWord m_Value;
+}; // class PTEBase
+
+class PTEFor32 : public PTEBase {
+public:
+    constexpr PTEFor32() noexcept : PTEBase() {}
+    constexpr PTEFor32(NativeWord val) noexcept : PTEBase(val) {}
+
+    constexpr NativeWord GetPPN() const noexcept { return m_Value & (0x3FFFFFu << 10); }
+}; // class PTEFor32
+
+class PTEFor64 : public PTEBase {
+public:
+    constexpr PTEFor64() noexcept : PTEBase() {}
+    constexpr PTEFor64(NativeWord val) noexcept : PTEBase(val) {}
+
+    constexpr NativeWord GetPPN() const noexcept { return m_Value & (0xFFFFFFFFFFFull << 10); }
+
+    constexpr NativeWord GetPBMT() const noexcept { return util::ExtractBitfield(m_Value, 61, 2); }
+
+    constexpr bool GetN() const noexcept { return this->GetBit(63); }
+}; // class PTEFor64
+
+using PTE = std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32>;
+
+constexpr int GetMaxPageTableLevelCount(AddrTransMode mode) {
+    switch(mode) {
+        case AddrTransMode::Sv32: return 2;
+        case AddrTransMode::Sv39: return 3;
+        case AddrTransMode::Sv48: return 4;
+        case AddrTransMode::Sv57: return 5;
+        default: return 0;
+    }
+}
+
+constexpr auto VPNPartSize = cfg::cpu::EnableIsaRV64I ? 9 : 10;
+
+constexpr NativeWord GetPTOffset(Address vaddr, int level) {
+    return (vaddr >> (VPNPartSize * level + 12)) & (cfg::cpu::EnableIsaRV64I ? 0x1F : 0x3F);
+}
 
 } // namespace
 
@@ -21,13 +103,26 @@ void MemoryManager::Finalize() {
     m_pMemCtlr = nullptr;
 }
 
+bool MemoryManager::SetTransMode(AddrTransMode mode) {
+    m_Mode = mode;
+
+    /* Update page table level count. */
+    m_PTLevelCount = GetMaxPageTableLevelCount(mode);
+
+    return true;
+}
+
+void MemoryManager::SetEnabledSUM(bool val) noexcept {
+    m_SUMEnabled = val;
+}
+
 template<typename T>
 Result MemoryManager::ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLevel level) {
     Result res;
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateAddress(&addr, addr, level, MemAccessReason::Read);
+        res = this->TranslateForRead(&addr, addr, level);
         if(res.IsFailure()) {
             return res;
         }
@@ -45,7 +140,7 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateAddress(&addr, addr, level, MemAccessReason::Write);
+        res = this->TranslateForWrite(&addr, addr, level);
         if(res.IsFailure()) {
             return res;
         }
@@ -57,9 +152,169 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
     return (*m_pMemCtlr.*writeFunc)(in, addr);
 }
 
-Result MemoryManager::TranslateAddress([[maybe_unused]] Address* pOut, [[maybe_unused]] Address addr, [[maybe_unused]] PrivilageLevel level, [[maybe_unused]] MemAccessReason reason) {
-    /* TODO: Implement translation. */
-    return ResultNotImplemented();
+Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
+    Result res;
+    Address curPT = m_PageTableAddr;
+    NativeWord pteVal = 0;
+    int curLevel = m_PTLevelCount - 1;
+    while(curLevel >= 0) {
+        /* Calculate pte offset. */
+        auto offset = GetPTOffset(addr, curLevel);
+        auto pteAddr = curPT + offset * sizeof(NativeWord);
+
+        /* Read PTE. */
+        res = m_pMemCtlr->ReadNativeWord(&pteVal, pteAddr);
+        if(res.IsFailure()) {
+            return res;
+        }
+
+        /* Check valid bit. */
+        PTE pte(pteVal);
+        if(!pte.GetValid()) {
+            return ResultNoValidPteFound();
+        }
+
+        /* Check if this is a leaf, return if it is. */
+        if(pte.IsLeaf()) {
+            *pLevelFound = curLevel;
+            *pPte = pteVal;
+            *pPteAddr = pteAddr;
+            return ResultSuccess();
+        }
+
+        /* The next level of the page table is at pte.PPN. */
+        curPT = pte.GetPPN();
+
+        /* Decrement current level. */
+        curLevel--;
+    }
+
+    return ResultNoValidPteFound();
+}
+
+Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, auto chkFunc) {
+    Result res;
+
+    /* Get PTE. */
+    NativeWord pteVal = 0;
+    Address pteAddr = 0;
+    int levelFound = 0;
+    res = this->GetPteImpl(&pteVal, &pteAddr, &levelFound, addr);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* If we're running in userspace, make sure User bit is set. */
+    PTE pte(pteVal);
+    if(level == PrivilageLevel::User) {
+        if(!pte.GetForUser()) {
+            return ResultCannotAccessMapFromPriv();
+        }
+    }
+
+    /* If we're running as supervisor, make sure User bit is unset or SUM is enabled. */
+    else if (level == PrivilageLevel::Supervisor) {
+        if(pte.GetForUser() && m_SUMEnabled) {
+            return ResultCannotAccessMapFromPriv();
+        }
+    }
+
+    /* Run provided check function. */
+    res = chkFunc(&pte);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Set PTE accessed bit. */
+    pte.SetAccessed(true);
+
+    /* Write PTE back. */
+    res = m_pMemCtlr->WriteNativeWord(pte.GetValue(), pteAddr);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Calculate new address. */
+    Address newAddr = pte.GetPPN() | (addr & 0xFFF); // start with PPN & 4K offset.
+
+    /* If this PTE was at any level other than zero, perform handling for large pages. */
+    if(levelFound) {
+        auto mask = util::GenerateMaskRight<Address>(levelFound * VPNPartSize) << 12;
+        newAddr |= addr & mask;
+    }
+
+    /* Return values. */
+    *pAddrOut = newAddr;
+
+    return ResultSuccess();
+}
+
+Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLevel level) {
+    auto chkFunc = [](PTE* pPte) -> Result {
+        /* Make sure we can read this page. */
+        if(!pPte->GetReadable()) {
+            return ResultLoadPageFault();
+        }
+
+        return ResultSuccess();
+    };
+
+    /* Translate address. */
+    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    if(ResultCannotAccessMapFromPriv::Includes(res)) {
+        return ResultLoadPageFault();
+    }
+
+    return res;
+}
+
+Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level) {
+    auto chkFunc = [](PTE* pPte) -> Result {
+        /* Make sure we can write this page. */
+        if(!pPte->GetWriteable()) {
+            return ResultStorePageFault();
+        }
+
+        /* Set dirty bit. */
+        pPte->SetDirty(true);
+
+        return ResultSuccess();
+    };
+
+    /* Translate address. */
+    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    if(ResultCannotAccessMapFromPriv::Includes(res)) {
+        return ResultStorePageFault();
+    }
+
+    return res;
+}
+
+Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level) {
+    auto chkFunc = [](PTE* pPte) -> Result {
+        /* Make sure we can fetch from this page. */
+        if(!pPte->GetExecutable()) {
+            return ResultFetchPageFault();
+        }
+
+        return ResultSuccess();
+    };
+
+    /* Translate address. */
+    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    if(ResultCannotAccessMapFromPriv::Includes(res)) {
+        return ResultFetchPageFault();
+    }
+
+    return res;
+}
+
+Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
+    auto chkFunc = []([[maybe_unused]] PTE* pPte) -> Result {
+        return ResultSuccess();
+    };
+
+    return this->TranslateImpl(pOut, addr, level, chkFunc);
 }
 
 Result MemoryManager::ReadByte(Byte* pOut, Address addr, PrivilageLevel level) {
@@ -99,7 +354,7 @@ Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) 
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateAddress(&addr, addr, level, MemAccessReason::Instruction);
+        res = this->TranslateForFetch(&addr, addr, level);
         if(res.IsFailure()) {
             return res;
         }
@@ -114,7 +369,7 @@ Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) 
 template<typename T>
 Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
     /* Translate address without permission checks. */
-    Result res = this->TranslateAddress(&addr, addr, PrivilageLevel::Machine, MemAccessReason::Any);
+    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
     if(res.IsFailure()) {
         return res;
     }
@@ -126,7 +381,7 @@ Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
 template<typename T>
 Result MemoryManager::MappedWriteImpl(auto writeFunc, T in, Address addr) {
     /* Translate address without permission checks. */
-    Result res = this->TranslateAddress(&addr, addr, PrivilageLevel::Machine, MemAccessReason::Any);
+    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
     if(res.IsFailure()) {
         return res;
     }
