@@ -446,6 +446,9 @@ private:
 }; // class Hart::InstructionRunner
 
 Result Hart::ExecuteInstructionImpl(Instruction inst) {
+    /* Clear X0 incase the previous instruction wrote to it. */
+    m_GPR[0] = 0;
+
     return InstructionRunner(this).ParseInstruction(inst);
 }
 
