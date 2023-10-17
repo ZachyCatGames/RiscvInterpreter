@@ -73,50 +73,50 @@ public:
     constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5 )); }
     constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
     constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
-    constexpr Word imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
-    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 12, WordBitLen); }
+    constexpr NativeWord imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
+    constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
 };
 
 class STypeInstruction : public detail::SBTypeBase {
 public:
     using detail::SBTypeBase::SBTypeBase;
 
-    constexpr Word imm() const noexcept {
+    constexpr NativeWord imm() const noexcept {
         return util::ExtractBitfield(this->Get(), 7u, 5u) | ((this->Get() & 0x7Fu << 25u) >> 20u);
     }
 
-    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 12, WordBitLen); }
+    constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }
 };
 
 class BTypeInstruction : public detail::SBTypeBase {
 public:
     using detail::SBTypeBase::SBTypeBase;
 
-    constexpr Word imm() const noexcept {
+    constexpr NativeWord imm() const noexcept {
         return ((this->Get() & (0xFu << 8u)) >> 7u) | ((this->Get() & (0x3Fu << 25u)) >> 20u) | ((this->Get() & (1u << 7u)) << 4u) | ((this->Get() & (1u << 31u)) >> 19u);
     }
 
-    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 13u, WordBitLen); }
+    constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 13u, NativeWordBitLen); }
 };
 
 class UTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr Word imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
+    constexpr NativeWord imm() const noexcept { return this->Get() & (0xFFFFFFFFu << 12u); }
 
-    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 32, WordBitLen); }
+    constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 32, NativeWordBitLen); }
 };
 
 class JTypeInstruction : public detail::UJTypeBase {
 public:
     using detail::UJTypeBase::UJTypeBase;
 
-    constexpr Word imm() const noexcept {
+    constexpr NativeWord imm() const noexcept {
         return ((this->Get() & (0x3FFu << 21u)) >> 20u) | ((this->Get() & (1u << 20u)) >> 9u) | (this->Get() & (0xFFu << 12u)) | ((this->Get() & (1u << 31u)) >> 11u);
     }
 
-    constexpr Word imm_ext() const noexcept { return util::SignExtend(static_cast<Word>(this->imm()), 21, WordBitLen); }
+    constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 21, NativeWordBitLen); }
 };
 
 } // namespace cpu

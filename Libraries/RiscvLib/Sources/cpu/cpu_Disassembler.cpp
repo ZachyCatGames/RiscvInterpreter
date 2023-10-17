@@ -65,7 +65,7 @@ private:
         return OutRegObject(id);
     }
 
-    constexpr ImmediateObject CreateImmediateImpl(Word val) const noexcept {
+    constexpr ImmediateObject CreateImmediateImpl(NativeWord val) const noexcept {
         return ImmediateObject(val);
     }
 
