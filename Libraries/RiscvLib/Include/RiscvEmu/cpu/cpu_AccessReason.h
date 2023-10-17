@@ -6,7 +6,8 @@ namespace cpu {
 enum class MemAccessReason {
     Read,
     Write,
-    Instruction
+    Instruction,
+    Any
 }; // enum class MemAccessReason
 
 } // namespace cpu

@@ -33,12 +33,28 @@ public:
     Result WriteDWord(DWord in, Address addr, PrivilageLevel level);
 
     Result InstFetch(Word* pOut, Address addr, PrivilageLevel level);
+
+    Result MappedReadByte(Byte* pOut, Address addr);
+    Result MappedReadHWord(HWord* pOut, Address addr);
+    Result MappedReadWord(Word* pOut, Address addr);
+    Result MappedReadDWord(DWord* pOut, Address addr);
+
+    Result MappedWriteByte(Byte in, Address addr);
+    Result MappedWriteHWord(HWord in, Address addr);
+    Result MappedWriteWord(Word in, Address addr);
+    Result MappedWriteDWord(DWord in, Address addr);
 private:
     template<typename T>
     Result ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLevel level);
 
     template<typename T>
     Result WriteImpl(auto writeFunc, T in, Address addr, PrivilageLevel level);
+
+    template<typename T>
+    Result MappedReadImpl(auto readFunc, T* pOut, Address addr);
+
+    template<typename T>
+    Result MappedWriteImpl(auto readFunc, T in, Address addr);
 
     Result TranslateAddress(Address* pOut, Address addr, PrivilageLevel level, MemAccessReason reason);
 private:

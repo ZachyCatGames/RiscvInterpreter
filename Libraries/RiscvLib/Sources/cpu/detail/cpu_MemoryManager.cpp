@@ -111,6 +111,62 @@ Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) 
     return m_pMemCtlr->ReadWord(pOut, addr);
 }
 
+template<typename T>
+Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
+    /* Translate address without permission checks. */
+    Result res = this->TranslateAddress(&addr, addr, PrivilageLevel::Machine, MemAccessReason::Any);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Perform unmapped read. */
+    return (*m_pMemCtlr.*readFunc)(pOut, addr);
+}
+
+template<typename T>
+Result MemoryManager::MappedWriteImpl(auto writeFunc, T in, Address addr) {
+    /* Translate address without permission checks. */
+    Result res = this->TranslateAddress(&addr, addr, PrivilageLevel::Machine, MemAccessReason::Any);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Perform unmapped write. */
+    return (*m_pMemCtlr.*writeFunc)(in, addr);
+}
+
+Result MemoryManager::MappedReadByte(Byte* pOut, Address addr) {
+    return this->MappedReadImpl(&MemCtlrT::ReadByte, pOut, addr);
+}
+
+Result MemoryManager::MappedReadHWord(HWord* pOut, Address addr) {
+    return this->MappedReadImpl(&MemCtlrT::ReadHWord, pOut, addr);
+}
+
+Result MemoryManager::MappedReadWord(Word* pOut, Address addr) {
+    return this->MappedReadImpl(&MemCtlrT::ReadWord, pOut, addr);
+}
+
+Result MemoryManager::MappedReadDWord(DWord* pOut, Address addr) {
+    return this->MappedReadImpl(&MemCtlrT::ReadDWord, pOut, addr);
+}
+
+Result MemoryManager::MappedWriteByte(Byte in, Address addr) {
+    return this->MappedWriteImpl(&MemCtlrT::WriteByte, in, addr);
+}
+
+Result MemoryManager::MappedWriteHWord(HWord in, Address addr) {
+    return this->MappedWriteImpl(&MemCtlrT::WriteHWord, in, addr);
+}
+
+Result MemoryManager::MappedWriteWord(Word in, Address addr) {
+    return this->MappedWriteImpl(&MemCtlrT::WriteWord, in, addr);
+}
+
+Result MemoryManager::MappedWriteDWord(DWord in, Address addr) {
+    return this->MappedWriteImpl(&MemCtlrT::WriteDWord, in, addr);
+}
+
 } // namespace detail
 } // namespace cpu
 } // namespace riscv
