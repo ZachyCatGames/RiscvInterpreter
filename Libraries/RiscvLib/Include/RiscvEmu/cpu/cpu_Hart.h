@@ -134,9 +134,6 @@ private:
 
     Result CSRReadMscratch(NativeWord* pOut);
     Result CSRWriteMscratch(NativeWord in);
-
-    Result CSRReadTime(NativeWord* pOut);
-    Result CSRReadTimeh(Word* pOut);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];
