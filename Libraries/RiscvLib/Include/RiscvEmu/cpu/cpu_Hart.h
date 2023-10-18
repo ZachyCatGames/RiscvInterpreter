@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/cpu/cpu_CsrId.h>
 #include <RiscvEmu/cpu/cpu_Types.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/cpu_TrapCode.h>
@@ -55,10 +56,13 @@ public:
     }
 
     /** Write a control/status register. */
-    Result WriteCSR(int index, NativeWord value);
+    Result WriteCSR(CsrId id, NativeWord value);
 
     /** Read a control/status register. */
-    Result ReadCSR(int index, NativeWord* pOut);
+    Result ReadCSR(CsrId id, NativeWord* pOut);
+
+    /** Read and write a control/status register. */
+    Result ReadWriteCSR(CsrId id, NativeWord* pOut, NativeWord in);
 
     /** Read mapped Byte with highest privilage. */
     Result MappedReadByte(Byte* pOut, Address addr);
@@ -113,6 +117,10 @@ private:
     Result FetchInstruction(Instruction* pOut, Address addr);
 private:
     Result TriggerTrap(TrapCode code);
+private:
+    using CsrMakeValFunc = NativeWord(*)(NativeWord curVal, NativeWord writeVal);
+    Result ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc);
+
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];

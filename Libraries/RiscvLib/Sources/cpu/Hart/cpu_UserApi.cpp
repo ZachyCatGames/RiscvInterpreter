@@ -22,12 +22,26 @@ Result Hart::ExecuteInstAtPc() {
     return this->ExecuteInst(inst);
 }
 
-Result Hart::WriteCSR([[maybe_unused]] int index, [[maybe_unused]] NativeWord value) {
-    return ResultNotImplemented();
+Result Hart::WriteCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord value) {
+    auto makeValFunc = [](NativeWord, NativeWord writeVal) {
+        return writeVal;
+    };
+
+    NativeWord tmp;
+    return this->ReadWriteCSRImpl(id, &tmp, value, makeValFunc);
+
 }
 
-Result Hart::ReadCSR([[maybe_unused]] int index, [[maybe_unused]] NativeWord* pOut) {
-    return ResultNotImplemented();
+Result Hart::ReadCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord* pOut) {
+    return this->ReadWriteCSRImpl(id, pOut, 0, nullptr);
+}
+
+Result Hart::ReadWriteCSR(CsrId id, NativeWord* pOut, NativeWord in) {
+    auto makeValFunc = [](NativeWord, NativeWord writeVal) {
+        return writeVal;
+    };
+
+    return this->ReadWriteCSRImpl(id, pOut, in, makeValFunc);
 }
 
 Result Hart::MappedReadByte(Byte* pOut, Address addr) {

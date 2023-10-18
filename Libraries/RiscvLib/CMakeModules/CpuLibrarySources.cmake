@@ -17,6 +17,7 @@ set(RISCV_CPU_LIBRARY_SOURCES
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiply.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiplyImpl-arch.amd64.S"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_MemoryManager.cpp"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_CsrReadWrite.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Initialize.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_InstructionRunner.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_MemoryAccess.cpp"

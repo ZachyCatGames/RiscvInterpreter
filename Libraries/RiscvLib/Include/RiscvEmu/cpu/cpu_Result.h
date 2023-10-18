@@ -27,5 +27,11 @@ class ResultInvalidTranslationMode  : public result::ErrorBase<detail::ModuleId,
 class ResultNoValidPteFound         : public result::ErrorBase<detail::ModuleId, 211> {};
 class ResultCannotAccessMapFromPriv : public result::ErrorBase<detail::ModuleId, 212> {};
 
+/* CSR Access errors. */
+class ResultCsrIdInvalid       : public result::ErrorBase<detail::ModuleId, 300> {};
+class ResultCsrPrivilageTooLow : public result::ErrorBase<detail::ModuleId, 301> {};
+class ResultWriteReadOnlyCsr   : public result::ErrorBase<detail::ModuleId, 302> {};
+
+
 } // namespace cpu
 } // namespace riscv
