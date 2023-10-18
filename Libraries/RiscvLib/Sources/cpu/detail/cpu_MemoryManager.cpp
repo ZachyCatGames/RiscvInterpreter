@@ -156,6 +156,9 @@ Result MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
 Address MemoryManager::GetPTAddr() const noexcept { return m_PTAddr; }
 void MemoryManager::SetPTAddr(Address addr) noexcept { m_PTAddr = addr; }
 
+Word MemoryManager::GetASID() const noexcept { return 0; }
+void MemoryManager::SetASID([[maybe_unused]] Word val) noexcept { }
+
 bool MemoryManager::GetEnabledSUM() const noexcept { return m_EnableSUM; }
 void MemoryManager::SetEnabledSUM(bool val) noexcept { m_EnableSUM = val; }
 

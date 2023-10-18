@@ -24,6 +24,9 @@ public:
     Address GetPTAddr() const noexcept;
     void SetPTAddr(Address addr) noexcept;
 
+    Word GetASID() const noexcept;
+    void SetASID(Word val) noexcept;
+
     bool GetEnabledSUM() const noexcept;
     void SetEnabledSUM(bool val) noexcept;
 
