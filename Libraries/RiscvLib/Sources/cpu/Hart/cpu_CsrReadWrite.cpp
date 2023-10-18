@@ -52,6 +52,16 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
     return ResultCsrIdInvalid();
 }
 
+Result Hart::CSRReadSscratch(NativeWord* pOut) {
+    *pOut = m_SupervisorScratch;
+    return ResultSuccess();
+}
+
+Result Hart::CSRWriteSscratch(NativeWord val) {
+    m_SupervisorScratch = val;
+    return ResultSuccess();
+}
+
 Result Hart::CSRReadSatp(NativeWord* pOut) {
     /* Create value. */
     *pOut = csr::satp().SetPPN(m_MemMgr.GetPTAddr() >> 12)
@@ -69,6 +79,16 @@ Result Hart::CSRWriteSatp(NativeWord val) {
     m_MemMgr.SetASID(fmt.GetASID());
     
     return m_MemMgr.SetTransMode(fmt.GetMODE());
+}
+
+Result Hart::CSRReadMscratch(NativeWord* pOut) {
+    *pOut = m_MachineScratch;
+    return ResultSuccess();
+}
+
+Result Hart::CSRWriteMscratch(NativeWord val) {
+    m_MachineScratch = val;
+    return ResultSuccess();
 }
 
 } // namespace cpu

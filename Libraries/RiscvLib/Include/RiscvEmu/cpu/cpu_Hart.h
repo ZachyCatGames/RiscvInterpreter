@@ -125,8 +125,14 @@ private:
     using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
     Result RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
 
+    Result CSRReadSscratch(NativeWord* pOut);
+    Result CSRWriteSscratch(NativeWord val);
+
     Result CSRReadSatp(NativeWord* pOut);
     Result CSRWriteSatp(NativeWord val);
+
+    Result CSRReadMscratch(NativeWord* pOut);
+    Result CSRWriteMscratch(NativeWord in);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];
@@ -169,6 +175,11 @@ private:
 
     /** Trap vector address for each privilage level. */
     NativeWord m_TrapVectAddr[4];
+
+    /* Supervisor/Hypervisor/Machine scratch register. */
+    NativeWord m_MachineScratch;
+    //NativeWord m_HypervisorScratch;
+    NativeWord m_SupervisorScratch;
 
     detail::MemoryManager m_MemMgr;
 
