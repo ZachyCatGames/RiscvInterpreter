@@ -18,9 +18,17 @@ public:
     Result Initialize(mem::MemoryController* pMemCtlr);
     void Finalize();
 
+    AddrTransMode GetTransMode() const noexcept;
     bool SetTransMode(AddrTransMode mode) noexcept;
 
+    Address GetPTAddr() const noexcept;
+    void SetPTAddr(Address addr) noexcept;
+
+    bool GetEnabledSUM() const noexcept;
     void SetEnabledSUM(bool val) noexcept;
+
+    bool GetEnabledMXR() const noexcept;
+    void SetEnabledMXR(bool val) noexcept;
 
     Result ReadByte(Byte* pOut, Address addr, PrivilageLevel level);
     Result ReadHWord(HWord* pOut, Address addr, PrivilageLevel level);
@@ -58,7 +66,11 @@ private:
 
     Result GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr);
 
-    Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, auto chkFunc);
+    class PTE;
+
+    using TransChkFunc = Result(*)(MemoryManager*,PTE*);
+
+    Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TransChkFunc chkFunc);
 
     Result TranslateForRead(Address* pOut, Address addr, PrivilageLevel level);
     Result TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level);
@@ -71,7 +83,8 @@ private:
     AddrTransMode m_Mode;
     int m_PTLevelCount;
 
-    bool m_SUMEnabled;
+    bool m_EnableSUM;
+    bool m_EnableMXR;
 }; // class MemoryManager
 
 } // namespace detail

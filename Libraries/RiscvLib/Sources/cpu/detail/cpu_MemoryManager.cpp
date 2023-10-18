@@ -73,8 +73,6 @@ public:
     constexpr bool GetN() const noexcept { return this->GetBit(63); }
 }; // class PTEFor64
 
-using PTE = std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32>;
-
 constexpr int GetMaxPageTableLevelCount(AddrTransMode mode) {
     switch(mode) {
         case AddrTransMode::Sv32: return 2;
@@ -106,6 +104,8 @@ constexpr Result GetTranslationResult(Result res, Result accessFault, Result pag
 
 } // namespace
 
+class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32> {};
+
 Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr) {
     m_pMemCtlr = pMemCtlr;
     m_Mode = AddrTransMode::Bare;
@@ -116,6 +116,8 @@ void MemoryManager::Finalize() {
     m_pMemCtlr = nullptr;
 }
 
+AddrTransMode MemoryManager::GetTransMode() const noexcept { return m_Mode; }
+
 bool MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
     m_Mode = mode;
 
@@ -125,9 +127,14 @@ bool MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
     return true;
 }
 
-void MemoryManager::SetEnabledSUM(bool val) noexcept {
-    m_SUMEnabled = val;
-}
+Address MemoryManager::GetPTAddr() const noexcept { return m_PTAddr; }
+void MemoryManager::SetPTAddr(Address addr) noexcept { m_PTAddr = addr; }
+
+bool MemoryManager::GetEnabledSUM() const noexcept { return m_EnableSUM; }
+void MemoryManager::SetEnabledSUM(bool val) noexcept { m_EnableSUM = val; }
+
+bool MemoryManager::GetEnabledMXR() const noexcept { return m_EnableMXR; }
+void MemoryManager::SetEnabledMXR(bool val) noexcept { m_EnableMXR = val; }
 
 template<typename T>
 Result MemoryManager::ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLevel level) {
@@ -205,7 +212,7 @@ Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLeve
     return ResultNoValidPteFound();
 }
 
-Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, auto chkFunc) {
+Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TransChkFunc chkFunc) {
     Result res;
 
     /* Get PTE. */
@@ -227,13 +234,13 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
 
     /* If we're running as supervisor, make sure User bit is unset or SUM is enabled. */
     else if (level == PrivilageLevel::Supervisor) {
-        if(pte.GetForUser() && m_SUMEnabled) {
+        if(pte.GetForUser() && !m_EnableSUM) {
             return ResultCannotAccessMapFromPriv();
         }
     }
 
     /* Run provided check function. */
-    res = chkFunc(&pte);
+    res = chkFunc(this, &pte);
     if(res.IsFailure()) {
         return res;
     }
@@ -263,9 +270,9 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
 }
 
 Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = [](PTE* pPte) -> Result {
+    auto chkFunc = [](MemoryManager* pManager, PTE* pPte) -> Result {
         /* Make sure we can read this page. */
-        if(!pPte->GetReadable()) {
+        if(!pPte->GetReadable() && !pManager->GetEnabledMXR()) {
             return ResultLoadPageFault();
         }
 
@@ -279,7 +286,7 @@ Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLev
 }
 
 Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = [](PTE* pPte) -> Result {
+    auto chkFunc = []([[maybe_unused]] MemoryManager*, PTE* pPte) -> Result {
         /* Make sure we can write this page. */
         if(!pPte->GetWriteable()) {
             return ResultStorePageFault();
@@ -298,7 +305,7 @@ Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLe
 }
 
 Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = [](PTE* pPte) -> Result {
+    auto chkFunc = []([[maybe_unused]] MemoryManager*, PTE* pPte) -> Result {
         /* Make sure we can fetch from this page. */
         if(!pPte->GetExecutable()) {
             return ResultFetchPageFault();
@@ -314,7 +321,7 @@ Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLe
 }
 
 Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = []([[maybe_unused]] PTE* pPte) -> Result {
+    auto chkFunc = []([[maybe_unused]] MemoryManager*, [[maybe_unused]] PTE* pPte) -> Result {
         return ResultSuccess();
     };
 
