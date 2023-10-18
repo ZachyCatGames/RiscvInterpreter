@@ -2,7 +2,7 @@
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/cpu_EncodeInstruction.h>
-#include <RiscvEmu/cpu/decoder/cpu_Opcodes.h>
+#include <RiscvEmu/cpu/cpu_Opcodes.h>
 #include <RiscvEmuTest/cpu/test_HartTestCaseBase.h>
 
 namespace riscv {

@@ -1,13 +1,13 @@
 set(RISCV_CPU_LIBRARY_HEADERS
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_EncodeInstruction.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Hart.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_InstructionFormat.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Opcodes.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_PrivilageLevel.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Result.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_TrapCode.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_DecoderImpl.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_InstructionFormat.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_Opcodes.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/decoder/cpu_Values.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Values.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_DecoderImpl.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_IntegerMultiply.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_MemoryManager.h"
 )

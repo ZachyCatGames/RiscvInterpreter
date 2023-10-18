@@ -1,7 +1,7 @@
 #pragma once
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <RiscvEmuTest/test_TestCaseBase.h>
 #include <RiscvEmuTest/cpu/test_HartTestSystem.h>
 

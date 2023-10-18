@@ -1,6 +1,6 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/cpu_Disassembler.h>
-#include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
+#include <RiscvEmu/cpu/detail/cpu_DecoderImpl.h>
 #include <concepts>
 #include <format>
 
@@ -9,7 +9,7 @@ namespace cpu {
 
 namespace {
 
-class DisassemblerImpl : private DecoderImpl<DisassemblerImpl> {
+class DisassemblerImpl : private detail::DecoderImpl<DisassemblerImpl> {
 public:
     constexpr DisassemblerImpl() noexcept = default;
     

@@ -67,7 +67,7 @@ private:
     Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
 private:
     mem::MemoryController* m_pMemCtlr;
-    Address m_PageTableAddr;
+    Address m_PTAddr;
 
     AddrTransMode m_Mode;
     int m_PTLevelCount;

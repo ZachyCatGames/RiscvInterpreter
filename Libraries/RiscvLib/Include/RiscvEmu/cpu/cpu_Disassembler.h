@@ -1,5 +1,5 @@
 #pragma once
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <string>
 
 namespace riscv {

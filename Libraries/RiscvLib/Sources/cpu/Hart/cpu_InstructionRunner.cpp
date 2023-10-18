@@ -1,7 +1,7 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
-#include <RiscvEmu/cpu/decoder/cpu_DecoderImpl.h>
-#include <RiscvEmu/cpu/decoder/cpu_Values.h>
+#include <RiscvEmu/cpu/cpu_Values.h>
+#include <RiscvEmu/cpu/detail/cpu_DecoderImpl.h>
 #include <RiscvEmu/cpu/detail/cpu_IntegerMultiply.h>
 #include <bit>
 #include <concepts>
@@ -9,7 +9,7 @@
 namespace riscv {
 namespace cpu {
 
-class Hart::InstructionRunner : public DecoderImpl<Hart::InstructionRunner> {
+class Hart::InstructionRunner : public detail::DecoderImpl<Hart::InstructionRunner> {
 public:
     constexpr InstructionRunner(Hart* pParent) :
         m_pParent(pParent) {}

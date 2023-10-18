@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
 #include <RiscvEmu/cpu/cpu_EncodeInstruction.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <limits>
 
 namespace riscv {

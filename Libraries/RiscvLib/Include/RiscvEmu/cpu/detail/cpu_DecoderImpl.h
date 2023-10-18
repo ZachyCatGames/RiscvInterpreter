@@ -1,10 +1,11 @@
 #pragma once
 #include <RiscvEmu/cpu/cpu_Result.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
-#include <RiscvEmu/cpu/decoder/cpu_Values.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_Values.h>
 
 namespace riscv {
 namespace cpu {
+namespace detail {
 
 template<typename Derived>
 class DecoderImpl {
@@ -455,5 +456,6 @@ private:
 
 }; // class DecoderImpl
 
+} // namespace detail
 } // namespace cpu
 } // namespace riscv

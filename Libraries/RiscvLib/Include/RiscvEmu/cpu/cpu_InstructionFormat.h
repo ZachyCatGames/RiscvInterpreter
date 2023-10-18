@@ -1,6 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/cpu/decoder/cpu_Opcodes.h>
+#include <RiscvEmu/cpu/cpu_Opcodes.h>
 #include <RiscvEmu/util/util_Bitfields.h>
 #include <RiscvEmu/util/util_SignExtend.h>
 

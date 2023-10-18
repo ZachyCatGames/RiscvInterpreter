@@ -3,7 +3,7 @@
 #include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/cpu_TrapCode.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
