@@ -1,4 +1,5 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/cpu/cpu_CsrFormat.h>
 
 namespace riscv {
 namespace cpu {
@@ -43,10 +44,31 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
     }
 
     switch(id) {
+    case CsrId::satp:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadSatp, &Hart::CSRWriteSatp, makeValFunc);
     default: break;
     }
 
     return ResultCsrIdInvalid();
+}
+
+Result Hart::CSRReadSatp(NativeWord* pOut) {
+    /* Create value. */
+    *pOut = csr::satp().SetPPN(m_MemMgr.GetPTAddr() >> 12)
+        .SetASID(m_MemMgr.GetASID())
+        .SetMODE(m_MemMgr.GetTransMode())
+        .GetValue();
+
+    return ResultSuccess();
+}
+
+Result Hart::CSRWriteSatp(NativeWord val) {
+    /* Give values to MemoryManager. */
+    csr::satp fmt(val);
+    m_MemMgr.SetPTAddr(fmt.GetPPN() << 12);
+    m_MemMgr.SetASID(fmt.GetASID());
+    
+    return m_MemMgr.SetTransMode(fmt.GetMODE());
 }
 
 } // namespace cpu

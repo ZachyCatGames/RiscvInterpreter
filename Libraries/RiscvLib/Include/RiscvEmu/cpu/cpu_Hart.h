@@ -124,6 +124,9 @@ private:
     using RwmCSRReadFunc = Result(Hart::*)(NativeWord*);
     using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
     Result RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
+
+    Result CSRReadSatp(NativeWord* pOut);
+    Result CSRWriteSatp(NativeWord val);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];
