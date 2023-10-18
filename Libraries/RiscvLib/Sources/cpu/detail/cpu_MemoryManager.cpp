@@ -91,6 +91,19 @@ constexpr NativeWord GetPTOffset(Address vaddr, int level) {
     return (vaddr >> (VPNPartSize * level + 12)) & (cfg::cpu::EnableIsaRV64I ? 0x1F : 0x3F);
 }
 
+constexpr Result GetTranslationResult(Result res, Result accessFault, Result pageFault) {
+    if(res.IsFailure()) {
+        /* No PTE found & unprivilaged access are page faults. */
+        if (ResultNoValidPteFound::Includes(res) ||
+            ResultCannotAccessMapFromPriv::Includes(res)) {
+            return pageFault;
+        }
+
+        /* Anything else is a access fault. */
+        return accessFault;
+    }
+}
+
 } // namespace
 
 Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr) {
@@ -261,11 +274,8 @@ Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLev
 
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
-    if(ResultCannotAccessMapFromPriv::Includes(res)) {
-        return ResultLoadPageFault();
-    }
 
-    return res;
+    return GetTranslationResult(res, ResultLoadAccessFault(), ResultLoadPageFault());
 }
 
 Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level) {
@@ -283,11 +293,8 @@ Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLe
 
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
-    if(ResultCannotAccessMapFromPriv::Includes(res)) {
-        return ResultStorePageFault();
-    }
 
-    return res;
+    return GetTranslationResult(res, ResultStoreAccessFault(), ResultStorePageFault());
 }
 
 Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level) {
@@ -302,11 +309,8 @@ Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLe
 
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
-    if(ResultCannotAccessMapFromPriv::Includes(res)) {
-        return ResultFetchPageFault();
-    }
 
-    return res;
+    return GetTranslationResult(res, ResultFetchAccessFault(), ResultFetchPageFault());
 }
 
 Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
