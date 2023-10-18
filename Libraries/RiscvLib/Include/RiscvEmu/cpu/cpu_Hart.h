@@ -1,6 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
-#include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
+#include <RiscvEmu/cpu/cpu_Types.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/cpu_TrapCode.h>
 #include <RiscvEmu/cpu/cpu_InstructionFormat.h>

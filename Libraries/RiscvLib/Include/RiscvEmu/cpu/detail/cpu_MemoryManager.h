@@ -1,6 +1,5 @@
 #pragma once
-#include <RiscvEmu/cpu/cpu_AddrTransMode.h>
-#include <RiscvEmu/cpu/cpu_PrivilageLevel.h>
+#include <RiscvEmu/cpu/cpu_Types.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 
 namespace riscv {
