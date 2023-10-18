@@ -7,6 +7,7 @@ set(RISCV_CPU_LIBRARY_HEADERS
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_TrapCode.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Types.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/cpu_Values.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_ClkTime.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_DecoderImpl.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_IntegerMultiply.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_MemoryManager.h"
@@ -14,6 +15,7 @@ set(RISCV_CPU_LIBRARY_HEADERS
 
 set(RISCV_CPU_LIBRARY_SOURCES
     "${PROJECT_SOURCE_DIR}/Sources/cpu/cpu_Disassembler.cpp"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_ClkTime.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiply.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiplyImpl-arch.amd64.S"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_MemoryManager.cpp"

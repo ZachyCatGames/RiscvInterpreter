@@ -44,8 +44,12 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
     }
 
     switch(id) {
+    case CsrId::sscratch:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadSscratch, &Hart::CSRWriteSscratch, makeValFunc);
     case CsrId::satp:
         return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadSatp, &Hart::CSRWriteSatp, makeValFunc);
+    case CsrId::mscratch:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadMscratch, &Hart::CSRWriteMscratch, makeValFunc);
     default: break;
     }
 
@@ -88,6 +92,25 @@ Result Hart::CSRReadMscratch(NativeWord* pOut) {
 
 Result Hart::CSRWriteMscratch(NativeWord val) {
     m_MachineScratch = val;
+    return ResultSuccess();
+}
+
+Result Hart::CSRReadTime(NativeWord* pOut) {
+    DWord time = 0;
+    m_ClkTime.GetCurrentTime(&time);
+    *pOut = static_cast<NativeWord>(time);
+    return ResultSuccess();
+}
+
+Result Hart::CSRReadTimeh(Word* pOut) {
+    if constexpr(cfg::cpu::EnableIsaRV64I) {
+        return ResultCsrIdInvalid();
+    }
+
+    /* Read upper half of time. */
+    DWord time = 0;
+    m_ClkTime.GetCurrentTime(&time);
+    *pOut = static_cast<Word>(time >> 32);
     return ResultSuccess();
 }
 

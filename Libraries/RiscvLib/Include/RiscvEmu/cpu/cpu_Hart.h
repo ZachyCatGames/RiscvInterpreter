@@ -5,6 +5,7 @@
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/cpu_TrapCode.h>
 #include <RiscvEmu/cpu/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/detail/cpu_ClkTime.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
@@ -133,6 +134,9 @@ private:
 
     Result CSRReadMscratch(NativeWord* pOut);
     Result CSRWriteMscratch(NativeWord in);
+
+    Result CSRReadTime(NativeWord* pOut);
+    Result CSRReadTimeh(Word* pOut);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];
@@ -169,6 +173,9 @@ private:
 
     /** Cycle & retired inst count. */
     DWord m_CycleCount;
+
+    /** Timer for the time csr which counts in ns since reset. */
+    detail::ClkTime m_ClkTime;
 
     /** Stored PC for each privilage level. */
     NativeWord m_PrivPC[4];
