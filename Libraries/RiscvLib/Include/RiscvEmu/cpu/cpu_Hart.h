@@ -121,6 +121,9 @@ private:
     using CsrMakeValFunc = NativeWord(*)(NativeWord curVal, NativeWord writeVal);
     Result ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc);
 
+    using RwmCSRReadFunc = Result(Hart::*)(NativeWord*);
+    using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
+    Result RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];

@@ -15,6 +15,22 @@ constexpr bool CanAccess(CsrId id, PrivilageLevel level) noexcept {
 
 } // namespace
 
+Result Hart::RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc) {
+    Result res;
+
+    /* Read the CSR. */
+    res = (*this.*readFunc)(pOut);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Create new value. */
+    writeVal = makeValFunc(*pOut, writeVal);
+
+    /* Write new value. */
+    return (*this.*writeFunc)(writeVal);
+}
+
 Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc) {
     /* Make sure we can access this register from our current privilage level. */
     if(!CanAccess(id, m_CurPrivLevel)) {
