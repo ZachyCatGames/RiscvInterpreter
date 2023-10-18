@@ -100,6 +100,8 @@ constexpr Result GetTranslationResult(Result res, Result accessFault, Result pag
         /* Anything else is a access fault. */
         return accessFault;
     }
+
+    return ResultSuccess();
 }
 
 } // namespace
