@@ -104,6 +104,25 @@ constexpr Result GetTranslationResult(Result res, Result accessFault, Result pag
     return ResultSuccess();
 }
 
+constexpr bool TranslationModeValid(AddrTransMode mode) {
+    if constexpr(cfg::cpu::EnableIsaRV64I) {
+        if (mode != AddrTransMode::Bare &&
+            mode != AddrTransMode::Sv39 &&
+            mode != AddrTransMode::Sv48 &&
+            mode != AddrTransMode::Sv57) {
+            return false;
+        }
+    }
+    else {
+        if (mode != AddrTransMode::Bare &&
+            mode != AddrTransMode::Sv32) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 } // namespace
 
 class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32> {};
@@ -120,7 +139,12 @@ void MemoryManager::Finalize() {
 
 AddrTransMode MemoryManager::GetTransMode() const noexcept { return m_Mode; }
 
-bool MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
+Result MemoryManager::SetTransMode(AddrTransMode mode) noexcept {
+    /* Make sure mode is valid. */
+    if(!TranslationModeValid(mode)) {
+        return ResultInvalidTranslationMode();
+    }
+
     m_Mode = mode;
 
     /* Update page table level count. */

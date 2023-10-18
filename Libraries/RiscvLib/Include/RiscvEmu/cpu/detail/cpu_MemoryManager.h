@@ -19,7 +19,7 @@ public:
     void Finalize();
 
     AddrTransMode GetTransMode() const noexcept;
-    bool SetTransMode(AddrTransMode mode) noexcept;
+    Result SetTransMode(AddrTransMode mode) noexcept;
 
     Address GetPTAddr() const noexcept;
     void SetPTAddr(Address addr) noexcept;
