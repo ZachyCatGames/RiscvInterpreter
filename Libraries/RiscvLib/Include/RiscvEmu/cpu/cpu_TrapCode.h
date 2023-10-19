@@ -9,6 +9,10 @@ class TrapCode {
 public:
     constexpr explicit operator NativeWord() const noexcept { return m_Code; }
 
+    constexpr bool IsInterrupt() const noexcept {
+        return m_Code >> (NativeWordBitLen - 1);
+    }
+
     constexpr bool operator==(const TrapCode& rhs) const noexcept {
         return this->m_Code == rhs.m_Code;
     }
