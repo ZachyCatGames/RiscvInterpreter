@@ -53,6 +53,8 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
         return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_sscratch, &Hart::CSRWrite_sscratch, makeValFunc);
     case CsrId::satp:
         return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_satp, &Hart::CSRWrite_satp, makeValFunc);
+    case CsrId::misa:
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_misa, &Hart::CSRWrite_misa, makeValFunc);
     case CsrId::mscratch:
         return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_mscratch, &Hart::CSRWrite_mscratch, makeValFunc);
     case CsrId::mcycle:
@@ -105,6 +107,16 @@ Result Hart::CSRWrite_satp(NativeWord val) {
     m_MemMgr.SetASID(fmt.GetASID());
     
     return m_MemMgr.SetTransMode(fmt.GetMODE());
+}
+
+Result Hart::CSRRead_misa(NativeWord* pOut) {
+    *pOut = c_misaValue.GetValue();
+    return ResultSuccess();
+}
+
+Result Hart::CSRWrite_misa([[maybe_unused]] NativeWord) {
+    /* We do not currently allow writing misa. */
+    return ResultSuccess();
 }
 
 Result Hart::CSRRead_mscratch(NativeWord* pOut) {

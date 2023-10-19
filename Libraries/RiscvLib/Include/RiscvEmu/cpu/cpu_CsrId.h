@@ -7,6 +7,8 @@ enum class CsrId {
     sscratch = 0x140,
     satp     = 0x180,
 
+    misa = 0x301,
+
     mscratch = 0x340,
 
     mcycle    = 0xB00,

@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/cpu/cpu_CsrFormat.h>
 #include <RiscvEmu/cpu/cpu_CsrId.h>
 #include <RiscvEmu/cpu/cpu_Types.h>
 #include <RiscvEmu/cpu/cpu_Result.h>
@@ -132,6 +133,9 @@ private:
     Result CSRRead_satp(NativeWord* pOut);
     Result CSRWrite_satp(NativeWord val);
 
+    Result CSRRead_misa(NativeWord* pOut);
+    Result CSRWrite_misa(NativeWord in);
+
     Result CSRRead_mscratch(NativeWord* pOut);
     Result CSRWrite_mscratch(NativeWord in);
 
@@ -176,6 +180,14 @@ private:
     }
 public:
     static constexpr auto NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
+private:
+    static constexpr csr::misa c_misaValue = []() {
+        csr::misa misa;
+        misa.SetMXL(cfg::cpu::EnableIsaRV64I ? 2 : 1);
+        misa.SetI(true);
+        misa.SetM(true);
+        return misa;
+    }();
 private:
     NativeWord m_PC;
     NativeWord m_GPR[NumGPR];
