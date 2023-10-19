@@ -7,8 +7,8 @@ Result Hart::Reset() {
     /* Reset privilage level to machine. */
     m_CurPrivLevel = PrivilageLevel::Machine;
 
-    /* Initialize time. */
-    m_ClkTime.Initialize();
+    /* Initialize cycle counter to zero. */
+    m_CycleCount = 0;
 
     return ResultSuccess();
 }

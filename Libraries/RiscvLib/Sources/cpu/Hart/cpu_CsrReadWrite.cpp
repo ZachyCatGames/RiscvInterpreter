@@ -45,28 +45,45 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
 
     switch(id) {
     case CsrId::sscratch:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadSscratch, &Hart::CSRWriteSscratch, makeValFunc);
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_sscratch, &Hart::CSRWrite_sscratch, makeValFunc);
     case CsrId::satp:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadSatp, &Hart::CSRWriteSatp, makeValFunc);
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_satp, &Hart::CSRWrite_satp, makeValFunc);
     case CsrId::mscratch:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRReadMscratch, &Hart::CSRWriteMscratch, makeValFunc);
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mscratch, &Hart::CSRWrite_mscratch, makeValFunc);
+    case CsrId::mcycle:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycle, &Hart::CSRWrite_mcycle, makeValFunc);
+    case CsrId::minstret:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_minstret, &Hart::CSRWrite_minstret, makeValFunc);
+    case CsrId::mcycleh:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycleh, &Hart::CSRWrite_mcycleh, makeValFunc);
+    case CsrId::minstreth:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_minstreth, &Hart::CSRWrite_minstreth, makeValFunc);
+    case CsrId::cycle:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_cycle, nullptr, nullptr);
+    case CsrId::instret:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_instret, nullptr, nullptr);
+    case CsrId::cycleh:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_cycleh, nullptr, nullptr);
+    case CsrId::instreth:
+        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_instreth, nullptr, nullptr);
+    
     default: break;
     }
 
     return ResultCsrIdInvalid();
 }
 
-Result Hart::CSRReadSscratch(NativeWord* pOut) {
+Result Hart::CSRRead_sscratch(NativeWord* pOut) {
     *pOut = m_SupervisorScratch;
     return ResultSuccess();
 }
 
-Result Hart::CSRWriteSscratch(NativeWord val) {
+Result Hart::CSRWrite_sscratch(NativeWord val) {
     m_SupervisorScratch = val;
     return ResultSuccess();
 }
 
-Result Hart::CSRReadSatp(NativeWord* pOut) {
+Result Hart::CSRRead_satp(NativeWord* pOut) {
     /* Create value. */
     *pOut = csr::satp().SetPPN(m_MemMgr.GetPTAddr() >> 12)
         .SetASID(m_MemMgr.GetASID())
@@ -76,7 +93,7 @@ Result Hart::CSRReadSatp(NativeWord* pOut) {
     return ResultSuccess();
 }
 
-Result Hart::CSRWriteSatp(NativeWord val) {
+Result Hart::CSRWrite_satp(NativeWord val) {
     /* Give values to MemoryManager. */
     csr::satp fmt(val);
     m_MemMgr.SetPTAddr(fmt.GetPPN() << 12);
@@ -85,33 +102,97 @@ Result Hart::CSRWriteSatp(NativeWord val) {
     return m_MemMgr.SetTransMode(fmt.GetMODE());
 }
 
-Result Hart::CSRReadMscratch(NativeWord* pOut) {
+Result Hart::CSRRead_mscratch(NativeWord* pOut) {
     *pOut = m_MachineScratch;
     return ResultSuccess();
 }
 
-Result Hart::CSRWriteMscratch(NativeWord val) {
+Result Hart::CSRWrite_mscratch(NativeWord val) {
     m_MachineScratch = val;
     return ResultSuccess();
 }
 
-Result Hart::CSRReadTime(NativeWord* pOut) {
-    DWord time = 0;
-    m_ClkTime.GetCurrentTime(&time);
-    *pOut = static_cast<NativeWord>(time);
+Result Hart::CSRRead_mcycle(NativeWord* pOut) {
+    /* Read lower 32bits on RV32, full 64bits on RV64. */
+    *pOut = static_cast<NativeWord>(m_CycleCount);
     return ResultSuccess();
 }
 
-Result Hart::CSRReadTimeh(Word* pOut) {
+Result Hart::CSRWrite_mcycle(NativeWord in) {
+    if constexpr(cfg::cpu::EnableIsaRV64I) {
+        /* On RV64, we write to the cycle counter directly. */
+        m_CycleCount = static_cast<DWord>(in);
+    }
+    else {
+        /* On RV32, we replace the lower bits with the provided value. */
+        m_CycleCount = (m_CycleCount & ~0xFFFFFFFF) | in;
+    }
+
+    return ResultSuccess();
+}
+
+Result Hart::CSRRead_mcycleh(NativeWord* pOut) {
+    /* This CSR doesn't exits on RV64. */
     if constexpr(cfg::cpu::EnableIsaRV64I) {
         return ResultCsrIdInvalid();
     }
 
-    /* Read upper half of time. */
-    DWord time = 0;
-    m_ClkTime.GetCurrentTime(&time);
-    *pOut = static_cast<Word>(time >> 32);
+    /* Read upper 32bits. */
+    *pOut = static_cast<NativeWord>(m_CycleCount >> 32);
+
     return ResultSuccess();
+}
+
+Result Hart::CSRWrite_mcycleh(NativeWord in) {
+    /* This CSR doesn't exist on RV64. */
+    if constexpr(cfg::cpu::EnableIsaRV64I) {
+        return ResultCsrIdInvalid();
+    }
+
+    /* Replace the upper bits with the provided value. */
+    m_CycleCount = (m_CycleCount & 0xFFFFFFFF) | (static_cast<DWord>(in) << 32);
+
+    return ResultSuccess();
+}
+
+Result Hart::CSRRead_minstret(NativeWord* pOut) {
+    /* This is functionally the same as read_mcycle on our impl. */
+    return this->CSRRead_mcycle(pOut);
+}
+
+Result Hart::CSRWrite_minstret(NativeWord in) {
+    /* This is functionally the same as write_mcycle on our impl. */
+    return this->CSRWrite_mcycle(in);
+}
+
+Result Hart::CSRRead_minstreth(NativeWord* pOut) {
+    /* This is functionally the same as read_mcycleh on our impl. */
+    return this->CSRRead_mcycleh(pOut);
+}
+
+Result Hart::CSRWrite_minstreth(NativeWord in) {
+    /* This is functionally the same as write_mcycleh on our impl. */
+    return this->CSRWrite_mcycleh(in);
+}
+
+Result Hart::CSRRead_cycle(NativeWord* pOut) {
+    /* This is the same as reading mcycle. */
+    return this->CSRRead_mcycle(pOut);
+}
+
+Result Hart::CSRRead_cycleh(NativeWord* pOut) {
+    /* This is the same as reading mcycleh. */
+    return this->CSRRead_mcycleh(pOut);
+}
+
+Result Hart::CSRRead_instret(NativeWord* pOut) {
+    /* This is the same as reading minstret. */
+    return this->CSRRead_minstret(pOut);
+}
+
+Result Hart::CSRRead_instreth(NativeWord* pOut) {
+    /* This is the same as reading minstreth. */
+    return this->CSRRead_minstreth(pOut);
 }
 
 } // namespace cpu

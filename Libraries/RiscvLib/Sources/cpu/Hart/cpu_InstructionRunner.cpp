@@ -449,7 +449,12 @@ Result Hart::ExecuteInstructionImpl(Instruction inst) {
     /* Clear X0 incase the previous instruction wrote to it. */
     m_GPR[0] = 0;
 
-    return InstructionRunner(this).ParseInstruction(inst);
+    Result res = InstructionRunner(this).ParseInstruction(inst);
+
+    /* Increment cycle counter. */
+    ++m_CycleCount;
+
+    return res;
 }
 
 } // namespace cpu

@@ -126,14 +126,30 @@ private:
     using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
     Result RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
 
-    Result CSRReadSscratch(NativeWord* pOut);
-    Result CSRWriteSscratch(NativeWord val);
+    Result CSRRead_sscratch(NativeWord* pOut);
+    Result CSRWrite_sscratch(NativeWord val);
 
-    Result CSRReadSatp(NativeWord* pOut);
-    Result CSRWriteSatp(NativeWord val);
+    Result CSRRead_satp(NativeWord* pOut);
+    Result CSRWrite_satp(NativeWord val);
 
-    Result CSRReadMscratch(NativeWord* pOut);
-    Result CSRWriteMscratch(NativeWord in);
+    Result CSRRead_mscratch(NativeWord* pOut);
+    Result CSRWrite_mscratch(NativeWord in);
+
+    Result CSRRead_mcycle(NativeWord* pOut);
+    Result CSRWrite_mcycle(NativeWord in);
+    Result CSRRead_mcycleh(NativeWord* pOut);
+    Result CSRWrite_mcycleh(NativeWord in);
+
+    Result CSRRead_minstret(NativeWord* pOut);
+    Result CSRWrite_minstret(NativeWord in);
+    Result CSRRead_minstreth(NativeWord* pOut);
+    Result CSRWrite_minstreth(NativeWord in);
+
+    Result CSRRead_cycle(NativeWord* pOut);
+    Result CSRRead_cycleh(NativeWord* pOut);
+
+    Result CSRRead_instret(NativeWord* pOut);
+    Result CSRRead_instreth(NativeWord* pOut);
 private:
     constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
         return m_PrivPC[static_cast<int>(level)];
@@ -170,9 +186,6 @@ private:
 
     /** Cycle & retired inst count. */
     DWord m_CycleCount;
-
-    /** Timer for the time csr which counts in ns since reset. */
-    detail::ClkTime m_ClkTime;
 
     /** Stored PC for each privilage level. */
     NativeWord m_PrivPC[4];
