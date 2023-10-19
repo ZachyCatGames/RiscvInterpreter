@@ -9,6 +9,22 @@
 namespace riscv {
 namespace cpu {
 
+namespace {
+
+constexpr NativeWord MakeValForCSRRW([[maybe_unused]] NativeWord, NativeWord writeVal) noexcept {
+    return writeVal;
+}
+
+constexpr NativeWord MakeValForCSRRS(NativeWord curVal, NativeWord writeVal) noexcept {
+    return curVal | writeVal;
+}
+
+constexpr NativeWord MakeValForCSRRC(NativeWord curVal, NativeWord writeVal) noexcept {
+    return curVal & ~writeVal;
+}
+
+} // namespace
+
 class Hart::InstructionRunner : public detail::DecoderImpl<Hart::InstructionRunner> {
 public:
     constexpr InstructionRunner(Hart* pParent) :
@@ -424,22 +440,56 @@ private:
      * Opcode SYSTEM.
      */
     Result ParseInstCSRRW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return ResultNotImplemented();
+        NativeWord val = 0;
+        
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(imm.Get<int>()), &val, rs1.Get<NativeWord>(), &MakeValForCSRRW);
+        rd.Set(val);
+
+        return res;
     }
-    Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return ResultNotImplemented();
+    Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm, ImmediateObject rsId) {
+        NativeWord val = 0;
+        auto makeValFunc = rsId.Get<int>() == 0 ? nullptr : &MakeValForCSRRS;
+
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(imm.Get<int>()), &val, rs1.Get<NativeWord>(), makeValFunc);
+        rd.Set(val);
+
+        return res;
     }
-    Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
-        return ResultNotImplemented();
+    Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm, ImmediateObject rsId) {
+        NativeWord val = 0;
+        auto makeValFunc = rsId.Get<int>() == 0 ? nullptr : &MakeValForCSRRC;
+
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(imm.Get<int>()), &val, rs1.Get<NativeWord>(), makeValFunc);
+        rd.Set(val);
+
+        return res;
     }
     Result ParseInstCSRRWI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
-        return ResultNotImplemented();
+        NativeWord val = 0;
+        
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(csr.Get<int>()), &val, src.Get<NativeWord>(), &MakeValForCSRRW);
+        rd.Set(val);
+
+        return res;
     }
     Result ParseInstCSRRSI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
-        return ResultNotImplemented();
+        NativeWord val = 0;
+        auto makeValFunc = src.Get<NativeWord>() == 0 ? nullptr : &MakeValForCSRRS;
+
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(csr.Get<int>()), &val, src.Get<NativeWord>(), makeValFunc);
+        rd.Set(val);
+
+        return res;
     }
     Result ParseInstCSRRCI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
-        return ResultNotImplemented();
+        NativeWord val = 0;
+        auto makeValFunc = src.Get<NativeWord>() == 0 ? nullptr : &MakeValForCSRRC;
+
+        Result res = m_pParent->ReadWriteCSRImpl(static_cast<CsrId>(csr.Get<int>()), &val, src.Get<NativeWord>(), makeValFunc);
+        rd.Set(val);
+
+        return res;
     }
 private:
     Hart* const m_pParent = 0;

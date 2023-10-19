@@ -373,10 +373,10 @@ private:
     constexpr Result ParseInstCSRRW(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
         return this->FormatStandardIType("CSRRW", rd, rs1, imm);
     }
-    constexpr Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+    constexpr Result ParseInstCSRRS(OutRegObject rd, InRegObject rs1, ImmediateObject imm, [[maybe_unused]] ImmediateObject rsId) {
         return this->FormatStandardIType("CSRRS", rd, rs1, imm);
     }
-    constexpr Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+    constexpr Result ParseInstCSRRC(OutRegObject rd, InRegObject rs1, ImmediateObject imm, [[maybe_unused]] ImmediateObject rsId) {
         return this->FormatStandardIType("CSRRC", rd, rs1, imm);
     }
     constexpr Result ParseInstCSRRWI(OutRegObject rd, ImmediateObject src, ImmediateObject csr) {
