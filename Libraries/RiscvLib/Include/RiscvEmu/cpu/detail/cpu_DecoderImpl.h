@@ -430,6 +430,10 @@ private:
     }
 
     constexpr Result ParseSYSTEM(ITypeInstruction inst) {
+        auto callCsrWithRs1Val = [this](ITypeInstruction inst, auto func) {
+            return (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(inst.imm()), CreateImmediate(static_cast<Word>(inst.rs1())));
+        };
+
         auto callCsrImm = [this](ITypeInstruction inst, auto func) {
             return (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(static_cast<Word>(inst.rs1())), CreateImmediate(inst.imm()));
         };
@@ -438,9 +442,9 @@ private:
         case Funct3::CSRRW:
             return this->CallStandardIType(inst, &Derived::ParseInstCSRRW);
         case Funct3::CSRRS:
-            return this->CallStandardIType(inst, &Derived::ParseInstCSRRS);
+            return callCsrWithRs1Val(inst, &Derived::ParseInstCSRRS);
         case Funct3::CSRRC:
-            return this->CallStandardIType(inst, &Derived::ParseInstCSRRC);
+            return callCsrWithRs1Val(inst, &Derived::ParseInstCSRRC);
         case Funct3::CSRRWI:
             return callCsrImm(inst, &Derived::ParseInstCSRRWI);
         case Funct3::CSRRSI:
