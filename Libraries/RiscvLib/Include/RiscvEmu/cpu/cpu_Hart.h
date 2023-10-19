@@ -122,9 +122,9 @@ private:
     using CsrMakeValFunc = NativeWord(*)(NativeWord curVal, NativeWord writeVal);
     Result ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal = 0, CsrMakeValFunc makeValFunc = nullptr);
 
-    using RwmCSRReadFunc = Result(Hart::*)(NativeWord*);
-    using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
-    Result RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
+    using RmwCSRReadFunc = Result(Hart::*)(NativeWord*);
+    using RmwCSRWriteFunc = Result(Hart::*)(NativeWord);
+    Result RmwCSRImpl(NativeWord* pOut, NativeWord writeVal, RmwCSRReadFunc readFunc, RmwCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc);
 
     Result CSRRead_sscratch(NativeWord* pOut);
     Result CSRWrite_sscratch(NativeWord val);

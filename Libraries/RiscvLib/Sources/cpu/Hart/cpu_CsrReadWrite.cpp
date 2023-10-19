@@ -16,7 +16,7 @@ constexpr bool CanAccess(CsrId id, PrivilageLevel level) noexcept {
 
 } // namespace
 
-Result Hart::RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc readFunc, RwmCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc) {
+Result Hart::RmwCSRImpl(NativeWord* pOut, NativeWord writeVal, RmwCSRReadFunc readFunc, RmwCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc) {
     Result res;
 
     /* Read the CSR. */
@@ -50,27 +50,27 @@ Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, C
 
     switch(id) {
     case CsrId::sscratch:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_sscratch, &Hart::CSRWrite_sscratch, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_sscratch, &Hart::CSRWrite_sscratch, makeValFunc);
     case CsrId::satp:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_satp, &Hart::CSRWrite_satp, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_satp, &Hart::CSRWrite_satp, makeValFunc);
     case CsrId::mscratch:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mscratch, &Hart::CSRWrite_mscratch, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_mscratch, &Hart::CSRWrite_mscratch, makeValFunc);
     case CsrId::mcycle:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycle, &Hart::CSRWrite_mcycle, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycle, &Hart::CSRWrite_mcycle, makeValFunc);
     case CsrId::minstret:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_minstret, &Hart::CSRWrite_minstret, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_minstret, &Hart::CSRWrite_minstret, makeValFunc);
     case CsrId::mcycleh:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycleh, &Hart::CSRWrite_mcycleh, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_mcycleh, &Hart::CSRWrite_mcycleh, makeValFunc);
     case CsrId::minstreth:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_minstreth, &Hart::CSRWrite_minstreth, makeValFunc);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_minstreth, &Hart::CSRWrite_minstreth, makeValFunc);
     case CsrId::cycle:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_cycle, nullptr, nullptr);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_cycle, nullptr, nullptr);
     case CsrId::instret:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_instret, nullptr, nullptr);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_instret, nullptr, nullptr);
     case CsrId::cycleh:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_cycleh, nullptr, nullptr);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_cycleh, nullptr, nullptr);
     case CsrId::instreth:
-        return this->RwmCSRImpl(pOut, writeVal, &Hart::CSRRead_instreth, nullptr, nullptr);
+        return this->RmwCSRImpl(pOut, writeVal, &Hart::CSRRead_instreth, nullptr, nullptr);
     
     default: break;
     }
