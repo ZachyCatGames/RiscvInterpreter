@@ -25,11 +25,16 @@ Result Hart::RwmCSRImpl(NativeWord* pOut, NativeWord writeVal, RwmCSRReadFunc re
         return res;
     }
 
-    /* Create new value. */
-    writeVal = makeValFunc(*pOut, writeVal);
+    /* Modify and write back value if possible. */
+    if(makeValFunc) {
+        /* Create new value. */
+        writeVal = makeValFunc(*pOut, writeVal);
 
-    /* Write new value. */
-    return (*this.*writeFunc)(writeVal);
+        /* Write new value if possible. */
+        return (*this.*writeFunc)(writeVal);
+    }
+
+    return ResultSuccess();
 }
 
 Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc) {

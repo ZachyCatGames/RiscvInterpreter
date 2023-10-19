@@ -33,7 +33,7 @@ Result Hart::WriteCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord val
 }
 
 Result Hart::ReadCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord* pOut) {
-    return this->ReadWriteCSRImpl(id, pOut, 0, nullptr);
+    return this->ReadWriteCSRImpl(id, pOut);
 }
 
 Result Hart::ReadWriteCSR(CsrId id, NativeWord* pOut, NativeWord in) {

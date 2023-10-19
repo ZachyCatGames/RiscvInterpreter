@@ -120,7 +120,7 @@ private:
     Result TriggerTrap(TrapCode code);
 private:
     using CsrMakeValFunc = NativeWord(*)(NativeWord curVal, NativeWord writeVal);
-    Result ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc);
+    Result ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal = 0, CsrMakeValFunc makeValFunc = nullptr);
 
     using RwmCSRReadFunc = Result(Hart::*)(NativeWord*);
     using RwmCSRWriteFunc = Result(Hart::*)(NativeWord);
