@@ -11,6 +11,7 @@ set(RISCV_CPU_LIBRARY_HEADERS
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_DecoderImpl.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_IntegerMultiply.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_MemoryManager.h"
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/cpu/detail/cpu_MemoryMonitor.h"
 )
 
 set(RISCV_CPU_LIBRARY_SOURCES
@@ -19,6 +20,7 @@ set(RISCV_CPU_LIBRARY_SOURCES
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiply.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_IntegerMultiplyImpl-arch.amd64.S"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_MemoryManager.cpp"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/detail/cpu_MemoryMonitor.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_CsrReadWrite.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Initialize.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_InstructionRunner.cpp"
