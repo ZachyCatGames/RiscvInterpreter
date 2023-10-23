@@ -1,21 +1,16 @@
 #pragma once
 #include <RiscvEmu/cpu/cpu_Types.h>
+#include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 
 namespace riscv {
 namespace cpu {
+
 namespace detail {
 
 class MemoryManager {
 public:
-    MemoryManager() :
-        m_pMemCtlr(nullptr) {}
-
-    MemoryManager(mem::MemoryController* pMemCtlr) :
-        m_pMemCtlr(pMemCtlr),
-        m_Mode(AddrTransMode::Bare) {}
-
-    Result Initialize(mem::MemoryController* pMemCtlr);
+    Result Initialize(mem::MemoryController* pMemCtlr, MemoryMonitor* pMonitor);
     void Finalize();
 
     AddrTransMode GetTransMode() const noexcept;

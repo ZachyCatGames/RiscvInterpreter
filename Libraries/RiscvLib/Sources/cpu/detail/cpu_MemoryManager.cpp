@@ -127,7 +127,7 @@ constexpr bool TranslationModeValid(AddrTransMode mode) {
 
 class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32> {};
 
-Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr) {
+Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr, MemoryMonitor* pMonitor) {
     m_pMemCtlr = pMemCtlr;
     m_Mode = AddrTransMode::Bare;
     return ResultSuccess();
