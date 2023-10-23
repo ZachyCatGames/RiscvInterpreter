@@ -8,6 +8,7 @@
 #include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <RiscvEmu/cpu/detail/cpu_ClkTime.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
+#include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <cassert>
 
@@ -16,19 +17,21 @@ namespace cpu {
 
 class Hart {
 public:
-    class SharedContext {
+    class SharedState {
     public:
-        constexpr SharedContext() noexcept = default;
-        constexpr SharedContext(mem::MemoryController* pMemCtlr) noexcept :
-            m_pMemCtlr(pMemCtlr) {}
-        
-        constexpr auto GetMemController() const noexcept { return m_pMemCtlr; }
+        void Initialize(std::size_t hartCount, mem::MemoryController* pMemCtlr) noexcept;
+
+        mem::MemoryController* GetMemController() noexcept;
+
+        detail::MemoryMonitor* GetMemMonitor() noexcept;
     private:
+        std::size_t m_HartCount;
         mem::MemoryController* m_pMemCtlr;
-    }; // SharedContext
+        detail::MemoryMonitor m_MemMonitor;
+    }; // SharedState
 public:
     /** Initialize the Hart. */
-    Result Initialize(SharedContext pSharedCtx);
+    Result Initialize(SharedState* pSharedCtx);
 public:
     /** Read the instruction currently at PC. */
     Result FetchInstAtPc(Instruction* pOut);
@@ -212,7 +215,7 @@ private:
 
     detail::MemoryManager m_MemMgr;
 
-    SharedContext m_SharedCtx;
+    SharedState* m_pSharedCtx;
 }; // class Hart
 
 } // namespace cpu

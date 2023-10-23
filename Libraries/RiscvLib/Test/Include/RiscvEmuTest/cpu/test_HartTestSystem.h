@@ -62,6 +62,7 @@ public:
     static Result DefaultReset(HartTestSystem* pSys);
 
 private:
+    cpu::Hart::SharedState m_HartSharedState;
     cpu::Hart m_Hart;
     mem::MemoryController m_MemCtlr;
 }; // class HartTestSystem
