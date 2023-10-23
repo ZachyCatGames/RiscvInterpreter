@@ -4,8 +4,10 @@ namespace riscv {
 namespace cpu {
 namespace detail {
 
-MemoryMonitor::MemoryMonitor(std::size_t hartCount) :
-    m_ActiveCount(0), m_Entries(hartCount) {}
+void MemoryMonitor::Initialize(std::size_t hartCount) {
+    m_ActiveCount = 0;
+    m_Entries.resize(hartCount);
+}
 
 void MemoryMonitor::AddReservation(std::size_t hartIndex, Address addr) noexcept {
     auto& entry = m_Entries[hartIndex];

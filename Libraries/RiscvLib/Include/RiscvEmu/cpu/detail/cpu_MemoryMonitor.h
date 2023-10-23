@@ -8,7 +8,9 @@ namespace detail {
 
 class MemoryMonitor {
 public:
-    MemoryMonitor(std::size_t hartCount);
+    MemoryMonitor() = default;
+
+    void Initialize(std::size_t hartCount);
 
     void AddReservation(std::size_t hartIndex, Address addr) noexcept;
     void ClearReservation(std::size_t hartIndex) noexcept;
