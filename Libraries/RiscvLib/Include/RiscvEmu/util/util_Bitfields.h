@@ -68,5 +68,19 @@ constexpr auto AssignBitfield(const T& target, std::pair<int, int> pair, const T
     return Bitfields(target).SetField(pair, val).GetValue();
 }
 
+template<typename T>
+constexpr bool ExtractBitArray(const T* pTarget, int offset) noexcept {
+    return pTarget[offset / (sizeof(T) * 8)] >> (offset % (sizeof(T) * 8));
+}
+
+template<typename T>
+constexpr void AssignBitArray(T* pTarget, int offset, bool val) noexcept {
+    auto index = offset / (sizeof(T) * 8);
+    auto bitIndex = offset % (sizeof(T) * 8);
+    auto mask = ~(1 << bitIndex);
+
+    pTarget[index] = (pTarget[index] & mask) | (static_cast<T>(val) << bitIndex);
+}
+
 } // namespace util
 } // namespace riscv
