@@ -5,7 +5,42 @@
 namespace riscv {
 namespace intrpt {
 
-NativeWord PLIC::MmioInterface::GetMappedSize() { return PLIC::AddrSpaceSize; }
+namespace {
+
+[[maybe_unused]] constexpr auto AddrSpaceSize = 0x4000000;
+[[maybe_unused]] constexpr auto MinSourceCount = 0;
+[[maybe_unused]] constexpr auto MaxSourceCount = 1024;
+[[maybe_unused]] constexpr auto MinTargetCount = 0;
+[[maybe_unused]] constexpr auto MaxTargetCount = 15872;
+
+[[maybe_unused]] constexpr auto PriorityRegStart = 0x0 / sizeof(Word);
+[[maybe_unused]] constexpr auto PriorityRegEnd   = 0x1000 / sizeof(Word);
+
+[[maybe_unused]] constexpr auto PendingRegStart = 0x1000 / sizeof(Word);
+[[maybe_unused]] constexpr auto PendingRegEnd   = 0x2000 / sizeof(Word);
+
+[[maybe_unused]] constexpr auto EnabledRegStart = 0x2000 / sizeof(Word);
+[[maybe_unused]] constexpr auto EnabledRegEnd   = 0x20000 / sizeof(Word);
+
+[[maybe_unused]] constexpr auto ContextRegStart = 0x200000 / sizeof(Word);
+[[maybe_unused]] constexpr auto ContextRegEnd   = AddrSpaceSize / sizeof(Word);
+
+[[maybe_unused]] constexpr auto EnabledWordsPerContext = 1024 / 32;
+
+[[maybe_unused]] constexpr auto ContextSize = 0x1000;
+[[maybe_unused]] constexpr auto ContextRegWordCount = 0x1000 / sizeof(Word);
+[[maybe_unused]] constexpr auto ContextPriorityThresholdReg = 0;
+[[maybe_unused]] constexpr auto ContextClaimReg = 1;
+
+constexpr Word GetEnabledTarget(Word val) noexcept { return val / EnabledWordsPerContext; }
+constexpr Word GetEnabledSource(Word val) noexcept { return val % EnabledWordsPerContext; }
+
+constexpr Word GetContextTarget(Word val) noexcept { return val / ContextRegWordCount; }
+constexpr Word GetContextRegId (Word val) noexcept { return val % ContextSize; }
+
+} // namespace
+
+NativeWord PLIC::MmioInterface::GetMappedSize() { return AddrSpaceSize; }
 
 /* TODO: What do we want to do here? */
 Result PLIC::MmioInterface::ReadByte([[maybe_unused]] Byte*, [[maybe_unused]] Address) { return ResultSuccess(); }
@@ -16,13 +51,11 @@ Result PLIC::MmioInterface::WriteHWord([[maybe_unused]] HWord, [[maybe_unused]] 
 Result PLIC::MmioInterface::WriteDWord([[maybe_unused]] DWord, [[maybe_unused]] Address) { return ResultSuccess(); }
 
 Result PLIC::MmioInterface::ReadWord(Word* pOut, Address addr) {
-    /* Perform read. */
     *pOut = m_pParent->ReadRegister(static_cast<Word>(addr));
     return ResultSuccess();
 }
 
 Result PLIC::MmioInterface::WriteWord(Word in, Address addr) {
-    /* Perform write. */
     m_pParent->WriteRegister(static_cast<Word>(addr), in);
     return ResultSuccess();
 }
@@ -46,6 +79,7 @@ void PLIC::SourceImpl::Initialize(PLIC* pParent) noexcept {
     this->priority = 0;
     this->pendingCount = 0;
 }
+
 void PLIC::SourceImpl::Finalize() noexcept { this->pParent = nullptr; }
 
 bool PLIC::SourceImpl::IsInitialized() const noexcept { return this->pParent != nullptr; }
@@ -64,12 +98,12 @@ Result PLIC::SourceImpl::SignalInterrupt() {
 
 Result PLIC::Initialize(int sourceCount, int targetCount) {
     /* Make sure source count is valid. */
-    if (sourceCount >= MaxSourceCount) {
+    if (sourceCount >= MaxSourceCount || sourceCount < MinSourceCount) {
         return ResultPLICInvalidSourceCount();
     }
 
     /* Make sure target count is valid. */
-    if (targetCount >= MaxTargetCount) {
+    if (targetCount >= MaxTargetCount || targetCount < MinTargetCount) {
         return ResultPLICInvalidTargetCount();
     }
 
@@ -234,13 +268,27 @@ Word PLIC::ReadEnabledReg(Word index) const noexcept {
     return val;
 }
 
-void PLIC::WriteEnabledReg(Word index, Word val) noexcept { this->WriteEnabledRegImpl(index, val); }
+void PLIC::WriteEnabledReg(Word index, Word val) noexcept {
+    /* Read current value. */
+    Word cur = 0;
+    this->ReadEnabledRegImpl(&cur, index);
+
+    /* Write new value. */
+    this->WriteEnabledRegImpl(index, val);
+
+    /* Interrupt any targets that we just enabled. */
+    Word changed = (val ^ cur) & val;
+    if(changed) {
+        auto target = GetEnabledTarget(index);
+        this->InterruptTarget(target);
+    }
+}
 
 Word PLIC::ReadContextReg(Word index) {
-    auto target = index / ContextRegWordCount;
-    auto regId = index % ContextRegSize;
+    auto target = GetContextTarget(index);
+    auto regId = GetContextRegId(index);
 
-    /* Read priority threshold. */
+    /* Handle reading from priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
         return m_Targets[target].priorityThreshold;
     }
@@ -255,10 +303,10 @@ Word PLIC::ReadContextReg(Word index) {
 }
 
 void PLIC::WriteContextReg(Word index, Word val) {
-    Word target = index / ContextRegWordCount;
-    Word regId = index % ContextRegSize;
+    auto target = GetContextTarget(index);
+    auto regId = GetContextRegId(index);
 
-    /* Write priority threshold. */
+    /* Handle writing to priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
         m_Targets[target].priorityThreshold = val;
 
@@ -284,6 +332,7 @@ bool PLIC::ReadPriorityRegImpl(Word* pOut, Word index) const noexcept {
     *pOut = m_Sources[index].priority;
     return true;
 }
+
 bool PLIC::WritePriorityRegImpl(Word index, Word val) noexcept {
     if (index >= m_Sources.size()) {
         return false;
@@ -311,8 +360,8 @@ bool PLIC::WritePendingRegImpl(Word index, Word val) noexcept {
 }
 
 bool PLIC::ReadEnabledRegImpl(Word* pOut, Word index) const noexcept {
-    auto target = index / EnabledWordsPerContext;
-    auto source = index % EnabledWordsPerContext;
+    auto target = GetEnabledTarget(index);
+    auto source = GetEnabledSource(index);
 
     if (target >= m_TargetCount || source >= m_SourceCount) {
         return false;
@@ -323,8 +372,8 @@ bool PLIC::ReadEnabledRegImpl(Word* pOut, Word index) const noexcept {
 }
 
 bool PLIC::WriteEnabledRegImpl(Word index, Word val) noexcept {
-    auto target = index / EnabledWordsPerContext;
-    auto source = index % EnabledWordsPerContext;
+    auto target = GetEnabledTarget(index);
+    auto source = GetEnabledSource(index);
 
     if (target >= m_TargetCount || source >= m_SourceCount) {
         return false;
@@ -374,7 +423,7 @@ Word PLIC::ClaimTopRequest() {
     /* Decrement pending count. */
     pTop->pendingCount--;
 
-    /* Set state to awaiting completion. */
+    /* Indicate that this source is waiting to be handled. */
     pTop->state = InterruptState::AwaitCompletion;
 
     /* Calculate source id. */
@@ -387,16 +436,16 @@ Word PLIC::ClaimTopRequest() {
 }
 
 void PLIC::MarkCompletion(Word sourceId) {
-    /* Get source. */
+    /* Get the source we're marking as completed. */
     auto* pSrc = &m_Sources[sourceId];
 
-    /* Set state to waiting if no further interrupts are pending. */
+    /* If this source doesn't have any additional pending interrupts, set status to waiting. */
     if (!pSrc->pendingCount) {
         pSrc->state = InterruptState::Waiting;
         return;
     }
 
-    /* Add source to queue. */
+    /* If this source does have pending interrupts, add it back to the queue. */
     this->AddSourceToQueue(pSrc);
 }
 
@@ -404,12 +453,12 @@ void PLIC::InterruptTarget(Word targetId) {
     auto* pSrc = &m_Queue.top();
     auto* pTargetCtx = &m_Targets[targetId];
 
-    /* Quit if the source priority is too low for this target. */
+    /* Return if the source priority is too low for this target. */
     if(pSrc->priority < pTargetCtx->priorityThreshold) {
         return;
     }
 
-    /* Quit if this target doesn't have this interrupt enabled. */
+    /* Return if this target doesn't have this interrupt enabled. */
     if(!this->GetEnabled(static_cast<int>(this->GetSourceIndex(pSrc->pImpl)), static_cast<int>(targetId))) {
         return;
     }
@@ -422,7 +471,7 @@ void PLIC::InterruptAllTargets() {
     /* Cleanup queue. */
     this->CleanupQueue();
 
-    /* Quit if queue is empty. */
+    /* Return if queue is empty. */
     if (m_Queue.empty()) {
         return;
     }

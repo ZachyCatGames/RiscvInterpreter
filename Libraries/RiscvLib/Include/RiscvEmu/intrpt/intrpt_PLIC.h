@@ -102,7 +102,7 @@ private:
         Waiting,
         Pending,
         AwaitCompletion
-    };
+    }; // enum class InterruptState
 
     struct SourceImpl : public ISource {
     public:
@@ -123,10 +123,10 @@ private:
         constexpr QueueData(SourceImpl* p, Word prio) noexcept :
             pImpl(p), priority(prio) {}
 
+        constexpr auto operator<=>(const QueueData& rhs) const noexcept { return this->priority <=> rhs.priority; }
+
         SourceImpl* pImpl;
         Word priority;
-
-        constexpr auto operator<=>(const QueueData& rhs) const noexcept { return this->priority <=> rhs.priority; }
     }; // struct QueueData
 
     struct TargetContext {
@@ -136,31 +136,6 @@ private:
         std::vector<Word> enableBits;
     }; // struct TargetContextRegisters
 private:
-    static constexpr auto AddrSpaceSize = 0x4000000;
-    static constexpr auto MinSourceCount = 0;
-    static constexpr auto MaxSourceCount = 1024;
-    static constexpr auto MinTargetCount = 0;
-    static constexpr auto MaxTargetCount = 15872;
-
-    static constexpr auto PriorityRegStart = 0x0 / sizeof(Word);
-    static constexpr auto PriorityRegEnd   = 0x1000 / sizeof(Word);
-
-    static constexpr auto PendingRegStart = 0x1000 / sizeof(Word);
-    static constexpr auto PendingRegEnd   = 0x2000 / sizeof(Word);
-
-    static constexpr auto EnabledRegStart = 0x2000 / sizeof(Word);
-    static constexpr auto EnabledRegEnd   = 0x20000 / sizeof(Word);
-
-    static constexpr auto ContextRegStart = 0x200000 / sizeof(Word);
-    static constexpr auto ContextRegEnd   = AddrSpaceSize / sizeof(Word);
-
-    static constexpr auto EnabledWordsPerContext = 1024 / 32;
-
-    static constexpr auto ContextRegSize = 0x1000;
-    static constexpr auto ContextRegWordCount = 0x1000 / sizeof(Word);
-    static constexpr auto ContextPriorityThresholdReg = 0;
-    static constexpr auto ContextClaimReg = 1;
-
     bool m_Claimed;
 
     Word m_SourceCount;
