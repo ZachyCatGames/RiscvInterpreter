@@ -158,29 +158,11 @@ private:
     Result CSRRead_instret(NativeWord* pOut);
     Result CSRRead_instreth(NativeWord* pOut);
 private:
-    constexpr NativeWord ReadPrivPC(PrivilageLevel level) const noexcept {
-        return m_PrivPC[static_cast<int>(level)];
-    }
+    NativeWord& GetEPC() noexcept;
+    NativeWord& GetTrapVecBase() noexcept;
 
-    constexpr void WritePrivPC(NativeWord val, PrivilageLevel level) noexcept {
-        m_PrivPC[static_cast<int>(level)] = val;
-    }
+    Result SetupTrap(TrapCode code);
 
-    constexpr void SwapPrivPC(PrivilageLevel newLevel) noexcept {
-        /* Write our current PC to the slot for our current priv level. */
-        this->WritePrivPC(m_PC, m_CurPrivLevel);
-
-        /* Load PC for newLevel. */
-        m_PC = this->ReadPrivPC(newLevel);
-    }
-private:
-    constexpr NativeWord GetExcVectAddr(PrivilageLevel level) const noexcept {
-        return m_TrapVectAddr[static_cast<int>(level)];
-    }
-
-    constexpr NativeWord GetActiveExcVectAddr() const noexcept {
-        return this->GetExcVectAddr(m_CurPrivLevel);
-    }
 public:
     static constexpr auto NumGPR = cfg::cpu::EnableIsaRV32E ? 16 : 32;
 private:
@@ -202,11 +184,17 @@ private:
     /** Cycle & retired inst count. */
     DWord m_CycleCount;
 
+    /** EPC for each privilage level. */
+    NativeWord m_EPC[4];
+
+    /** tvec for each privilage level. */
+    NativeWord m_TrapVecBase[4];
+
     /** Stored PC for each privilage level. */
     NativeWord m_PrivPC[4];
 
-    /** Trap vector address for each privilage level. */
-    NativeWord m_TrapVectAddr[4];
+    /** Trap cause for each privilage level. */
+    TrapCode m_TrapCause[4];
 
     /* Supervisor/Hypervisor/Machine scratch register. */
     NativeWord m_MachineScratch;
