@@ -228,9 +228,6 @@ void PLIC::WriteRegister(Word index, Word val) {
     else /* if (index >= PriorityRegStart) */ {
         this->WriteRegister(index - PriorityRegStart, val);
     }
-
-    /* Any type of update may cause a change in state, so perform an update. */
-    this->PerformUpdate();
 }
 
 Word PLIC::ReadPriorityReg(Word index) const noexcept {

@@ -30,8 +30,6 @@ public:
     bool GetEnabled(int source, int target) noexcept;
     void SetEnabled(int source, int target, bool val) noexcept;
 private:
-    Result PerformUpdate();
-private:
     Word ReadRegister(Word index);
     void WriteRegister(Word index, Word val);
 
