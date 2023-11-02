@@ -27,5 +27,6 @@ set(RISCV_CPU_LIBRARY_SOURCES
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_MemoryAccess.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Reset.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_SharedState.cpp"
+    "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_Trap.cpp"
     "${PROJECT_SOURCE_DIR}/Sources/cpu/Hart/cpu_UserApi.cpp"
 )

@@ -34,6 +34,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 # Include library modules.
 include(CpuLibrarySources)
 include(HwLibrarySources)
+include(IntrptLibrarySources)
 include(MemLibrarySources)
 include(ResultLibrarySources)
 include(TestLibrarySources)
@@ -50,6 +51,10 @@ add_library(RiscvLib
     # HW Library.
     ${RISCV_HW_LIBRARY_HEADERS}
     ${RISCV_HW_LIBRARY_SOURCES}
+
+    # Intrpt Library.
+    ${RISCV_INTRPT_LIBRARY_HEADERS}
+    ${RISCV_INTRPT_LIBRARY_SOURCES}
 
     # Memory library.
     ${RISCV_MEM_LIBRARY_HEADERS}
