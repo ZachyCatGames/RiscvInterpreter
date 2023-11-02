@@ -17,6 +17,8 @@ namespace mem {
 template<std::derived_from<IMmioDev> ImplT>
 class AlignedMmioDev : public IMmioDev {
 public:
+    constexpr virtual NativeWord GetMappedSize() override { return m_Impl.GetMappedSize(); } 
+
     constexpr virtual Result ReadByte(Byte* pOut, Address addr) override {
         return m_Impl.ReadByte(pOut, addr);
     }
