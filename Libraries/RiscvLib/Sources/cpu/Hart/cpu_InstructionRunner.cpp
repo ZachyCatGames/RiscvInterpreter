@@ -97,9 +97,12 @@ private:
      */
     template<bool Signed, typename T>
     Result InstLoadImpl(auto func, OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+        /* Perform load. */
         T out = 0;
         Result res = (*m_pParent.*func)(&out, rs1.Get<Address>() + imm.Get<Address>());
+
         if(res.IsSuccess()) {
+            /* Sign extend if needed, write to output register. */
             if constexpr(Signed) {
                 rd.Set(util::SignExtend(static_cast<NativeWord>(out), sizeof(T) * 8, NativeWordBitLen));
             }
@@ -107,6 +110,7 @@ private:
                 rd.Set(out);
             }
         }
+
         return res;
     }
     Result ParseInstLB(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
@@ -226,6 +230,20 @@ private:
     /*
      * Opcode STORE.
      */
+    template<typename T>
+    Result StoreInstImpl(auto func, InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
+        auto addr = rs1.Get<Address>() + imm.Get<Address>();
+
+        /* Perform store. */
+        Result res = (*m_pParent.*func)(rs2.Get<T>(), addr);
+
+        /* Revoke any reservations at this address aligned to sizeof(NativeWord). */
+        if(res.IsSuccess()) {
+            m_pParent->m_pSharedCtx->GetMemMonitor()->TryRevokeReservation(addr % sizeof(NativeWord));
+        }
+
+        return res;
+    }
     Result ParseInstSB(InRegObject rs1, InRegObject rs2, ImmediateObject imm) {
         return m_pParent->MemWriteByte(rs2.Get<Byte>(), rs1.Get<Address>() + imm.Get<Address>());
     }

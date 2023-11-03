@@ -29,7 +29,7 @@ void MemoryMonitor::ClearReservation(std::size_t hartIndex) noexcept {
     }
 }
 
-bool MemoryMonitor::CheckAndKillReservation(Address addr) noexcept {
+bool MemoryMonitor::TryRevokeReservation(Address addr) noexcept {
     if(!m_ActiveCount) {
         return false;
     }

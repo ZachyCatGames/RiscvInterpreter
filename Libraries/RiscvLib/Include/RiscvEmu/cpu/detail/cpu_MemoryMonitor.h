@@ -15,12 +15,10 @@ public:
     void AddReservation(std::size_t hartIndex, Address addr) noexcept;
     void ClearReservation(std::size_t hartIndex) noexcept;
 
-    bool CheckAndKillReservation(Address addr) noexcept;
+    bool TryRevokeReservation(Address addr) noexcept;
 
     bool ReservationExist() noexcept;
     Address GetReservation(std::size_t hartIndex) noexcept;
-private:
-
 private:
     struct Entry {
         bool active;

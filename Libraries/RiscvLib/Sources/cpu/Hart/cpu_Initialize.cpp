@@ -8,7 +8,7 @@ Result Hart::Initialize(SharedState* pSharedCtx) {
     m_pSharedCtx = pSharedCtx;
 
     /* Initialize memory manager. */
-    m_MemMgr.Initialize(m_pSharedCtx->GetMemController(), m_pSharedCtx->GetMemMonitor());
+    m_MemMgr.Initialize(m_pSharedCtx->GetMemController());
 
     return ResultSuccess();
 }

@@ -10,7 +10,7 @@ namespace detail {
 
 class MemoryManager {
 public:
-    Result Initialize(mem::MemoryController* pMemCtlr, MemoryMonitor* pMonitor);
+    Result Initialize(mem::MemoryController* pMemCtlr);
     void Finalize();
 
     AddrTransMode GetTransMode() const noexcept;
@@ -76,7 +76,6 @@ private:
     Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
 private:
     mem::MemoryController* m_pMemCtlr;
-    MemoryMonitor* m_pMonitor;
     Address m_PTAddr;
 
     AddrTransMode m_Mode;
