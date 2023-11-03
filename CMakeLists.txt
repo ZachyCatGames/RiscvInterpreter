@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable additional compilier warnings.
-add_compile_options(-Wall -Wextra -Wconversion)
+add_compile_options(-Werror -Wall -Wextra -Wconversion)
 
 # Disable C++ exceptions and stack protector.
 add_compile_options(-fno-exceptions -fno-stack-protector)

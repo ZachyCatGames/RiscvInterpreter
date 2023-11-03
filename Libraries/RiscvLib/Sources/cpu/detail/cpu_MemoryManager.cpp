@@ -129,6 +129,7 @@ class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, P
 
 Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr, MemoryMonitor* pMonitor) {
     m_pMemCtlr = pMemCtlr;
+    m_pMonitor = pMonitor;
     m_Mode = AddrTransMode::Bare;
     return ResultSuccess();
 }

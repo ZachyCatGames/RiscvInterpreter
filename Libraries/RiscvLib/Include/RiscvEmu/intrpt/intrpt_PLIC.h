@@ -145,7 +145,6 @@ private:
     std::vector<TargetContext> m_Targets;
 
     std::vector<Word> m_PendingBits;
-    //std::vector<Word> m_EnabledBits;
 
     std::priority_queue<QueueData> m_Queue;
 

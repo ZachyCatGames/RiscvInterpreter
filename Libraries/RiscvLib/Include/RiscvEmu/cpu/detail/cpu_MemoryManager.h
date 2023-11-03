@@ -76,6 +76,7 @@ private:
     Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
 private:
     mem::MemoryController* m_pMemCtlr;
+    MemoryMonitor* m_pMonitor;
     Address m_PTAddr;
 
     AddrTransMode m_Mode;

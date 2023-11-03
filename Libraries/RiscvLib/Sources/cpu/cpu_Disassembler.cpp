@@ -140,7 +140,7 @@ private:
     /*
      * Opcode MISC_MEM.
      */
-    constexpr Result ParseInstFENCE(OutRegObject rd, InRegObject rs1, ImmediateObject imm) {
+    constexpr Result ParseInstFENCE([[maybe_unused]] OutRegObject rd, [[maybe_unused]] InRegObject rs1, [[maybe_unused]] ImmediateObject imm) {
         return ResultSuccess();
     }
     constexpr Result ParseInstFENCEI([[maybe_unused]] OutRegObject rd, [[maybe_unused]] InRegObject rs1, [[maybe_unused]] ImmediateObject imm) {

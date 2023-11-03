@@ -5,7 +5,7 @@
 #include <RiscvEmu/cpu/detail/cpu_IntegerMultiply.h>
 #include <iostream>
 
-int main(int argc, const char* argv[]) {
+int main() {
     uint64_t out[2]{0};
 
     uint64_t a  = riscv::cpu::detail::Multiply64U(out, 0xFFFFFFFFFFFFFFFFull, 0xFFFFFFFFFFFFFFFFull);

@@ -13,6 +13,8 @@ Result Hart::SetupTrap(TrapCode code) {
 
     /* Store trap code in Cause staging. */
     m_TrapCause[0] = code;
+
+    return ResultSuccess();
 }
 
 } // namespace cpu
