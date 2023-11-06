@@ -6,16 +6,35 @@
 namespace riscv {
 namespace diag {
 
+namespace detail {
+
 template<typename... Args>
-struct Assert {
-    Assert(bool cond, std::string_view format, Args&&... args, std::source_location location = std::source_location::current()) {
+struct AssertImpl {
+    AssertImpl() = default;
+    AssertImpl(bool cond, std::string_view format, Args&&... args, std::source_location location = std::source_location::current()) {
         detail::AssertWithMessageImpl(stderr, cond, location, format, std::forward<Args...>(args)...);
     }
+}; // struct AssertImpl
 
-    Assert(bool cond, std::source_location location = std::source_location::current()) {
+struct AssertNoMsgImpl {
+    AssertNoMsgImpl() = default;
+    AssertNoMsgImpl(bool cond, std::source_location location = std::source_location::current()) {
         detail::AssertNoMessageImpl(stderr, cond, location);
     }
+}; // struct AssertNoMsgImpl
+
+} // namespace detail
+
+template<typename... Args>
+struct Assert : detail::AssertImpl<Args...> {
+    using detail::AssertImpl<Args...>::AssertImpl;
 }; // struct Assert
+
+template<>
+struct Assert<> : detail::AssertImpl<>, detail::AssertNoMsgImpl {
+    using detail::AssertImpl<>::AssertImpl;
+    using detail::AssertNoMsgImpl::AssertNoMsgImpl;
+}; // struct Assert<>
 
 template<typename... Args>
 Assert(bool cond, std::string_view format, Args&&... args) -> Assert<Args...>;
