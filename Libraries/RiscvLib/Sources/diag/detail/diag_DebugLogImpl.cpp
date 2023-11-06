@@ -1,4 +1,5 @@
 #include <RiscvEmu/diag/detail/diag_DebugLogImpl.h>
+#include <RiscvEmu/diag/detail/diag_PrintSourceLocation.h>
 #include <cstdarg>
 
 namespace riscv {
@@ -9,8 +10,7 @@ void DebugPrintImpl(FILE* stream, const std::source_location& location, std::str
     va_list lst;
     va_start(lst, format);
 
-    std::fprintf(stream, "[DEBUG LOG]: %s; %s:%d:%d\n  Message: ", location.function_name(), location.file_name(), location.line(), location.column());
-    std::vfprintf(stream, format.data(), lst);
+    PrintMessageWithSourceLocation(stream, "DEBUG LOG", location, format, lst);
 }
 
 } // namespace detail

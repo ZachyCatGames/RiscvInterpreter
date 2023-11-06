@@ -39,7 +39,6 @@ struct Assert<> : detail::AssertImpl<>, detail::AssertNoMsgImpl {
 template<typename... Args>
 Assert(bool cond, std::string_view format, Args&&... args) -> Assert<Args...>;
 
-template<typename... Args>
 Assert(bool cond) -> Assert<>;
 
 } // namespace diag
