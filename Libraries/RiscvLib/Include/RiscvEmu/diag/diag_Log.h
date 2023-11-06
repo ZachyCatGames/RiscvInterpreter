@@ -1,13 +1,15 @@
 #pragma once
-#include <cstdio>
+#include <RiscvEmu/diag/detail/diag_LogImpl.h>
 #include <string_view>
 
 namespace riscv {
 namespace diag {
 
 template<typename... Args>
-void Log(std::string_view format, Args&&... args) {
-    std::printf(format, std::forward<Args...>(args)...);
+constexpr void Log(std::string_view format, Args&&... args) {
+    if(!std::is_constant_evaluated()) {
+        detail::LogImpl(stdout, format, std::forward<Args...>(args)...);
+    }
 }
 
 } // namespace diag

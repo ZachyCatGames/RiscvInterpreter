@@ -20,6 +20,11 @@ void PrintSourceLocation(FILE* stream, std::string_view logType, const std::sour
     PrintSourceLocationImpl(stream, logType, location);
 }
 
+void PrintMessage(FILE* stream, std::string_view format, va_list lst) {
+    std::scoped_lock lock(g_Mutex);
+    std::vfprintf(stream, format.data(), lst);
+}
+
 void PrintMessageWithSourceLocation(FILE* stream, std::string_view logType, const std::source_location& location, std::string_view format, va_list formatList) {
     std::scoped_lock lock(g_Mutex);
     PrintSourceLocationImpl(stream, logType, location);
