@@ -1,5 +1,5 @@
 #include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
-#include <cassert>
+#include <RiscvEmu/diag.h>
 
 namespace riscv {
 namespace cpu {
@@ -18,32 +18,32 @@ MemoryMonitor::Context::Context(MemoryMonitor* pParent, std::size_t hartId) noex
     m_pParent(pParent), m_HartId(hartId) {}
 
 void MemoryMonitor::Context::AddReservation(Address addr) noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->AddReservation(m_HartId, addr);
 }
 
 void MemoryMonitor::Context::ClearReservation() noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->ClearReservation(m_HartId);
 }
 
 bool MemoryMonitor::Context::HasReservation() const noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->HartHasReservation(m_HartId);
 }
 
 Address MemoryMonitor::Context::GetReservedAddress() const noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->HartGetReservedAddress(m_HartId);
 }
 
 bool MemoryMonitor::Context::IsAddressReserved(Address addr) const noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->IsAddressReserved(addr);
 }
 
 bool MemoryMonitor::Context::TryRevokeAnyReservation(Address addr) noexcept {
-    assert(m_pParent);
+    diag::Assert(m_pParent != nullptr);
     return m_pParent->TryRevokeReservation(addr);
 }
 
@@ -55,7 +55,7 @@ void MemoryMonitor::Initialize(std::size_t hartCount) {
 MemoryMonitor::Context MemoryMonitor::GetContext(std::size_t hartId) noexcept { return Context(this, hartId); }
 
 void MemoryMonitor::AddReservation(std::size_t hartId, Address addr) noexcept {
-    assert(hartId < m_Entries.size());
+    diag::Assert(hartId < m_Entries.size());
 
     /* Align reservation address. */
     addr = GetAlignedAddress(addr);
@@ -76,7 +76,7 @@ void MemoryMonitor::AddReservation(std::size_t hartId, Address addr) noexcept {
 }
 
 void MemoryMonitor::ClearReservation(std::size_t hartId) noexcept {
-    assert(hartId < m_Entries.size());
+    diag::Assert(hartId < m_Entries.size());
     auto& entry = m_Entries[hartId];
 
     if(entry.active) {
@@ -86,11 +86,11 @@ void MemoryMonitor::ClearReservation(std::size_t hartId) noexcept {
 }
 
 bool MemoryMonitor::HartHasReservation(std::size_t hartId) const noexcept {
-    assert(hartId < m_Entries.size());
+    diag::Assert(hartId < m_Entries.size());
     return m_Entries[hartId].active;
 }
 Address MemoryMonitor::HartGetReservedAddress(std::size_t hartId) const noexcept {
-    assert(hartId < m_Entries.size());
+    diag::Assert(hartId < m_Entries.size());
     return m_Entries[hartId].addr;
 }
 
