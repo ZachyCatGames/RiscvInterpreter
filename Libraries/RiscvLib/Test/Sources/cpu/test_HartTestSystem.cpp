@@ -6,7 +6,7 @@ namespace test {
 Result HartTestSystem::Initialize() {
     /* Initialize the Hart. */
     m_HartSharedState.Initialize(1, &m_MemCtlr);
-    Result res = m_Hart.Initialize(&m_HartSharedState);
+    Result res = m_Hart.Initialize(&m_HartSharedState, 0);
     if(res.IsFailure()) {
         return res;
     }

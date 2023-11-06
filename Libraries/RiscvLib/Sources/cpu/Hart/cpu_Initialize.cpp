@@ -3,12 +3,17 @@
 namespace riscv {
 namespace cpu {
 
-Result Hart::Initialize(SharedState* pSharedCtx) {
+Result Hart::Initialize(SharedState* pSharedCtx, std::size_t hartId) {
+    m_HartId = hartId;
+
     /* Init shared context. */
     m_pSharedCtx = pSharedCtx;
 
     /* Initialize memory manager. */
     m_MemMgr.Initialize(m_pSharedCtx->GetMemController());
+
+    /* Initialize memory monitor context. */
+    m_MemMonitorCtx = m_pSharedCtx->GetMemMonitor()->GetContext(m_HartId);
 
     return ResultSuccess();
 }

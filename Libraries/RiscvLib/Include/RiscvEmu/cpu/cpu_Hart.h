@@ -31,7 +31,7 @@ public:
     }; // SharedState
 public:
     /** Initialize the Hart. */
-    Result Initialize(SharedState* pSharedCtx);
+    Result Initialize(SharedState* pSharedCtx, std::size_t hartId);
 public:
     /** Read the instruction currently at PC. */
     Result FetchInstAtPc(Instruction* pOut);
@@ -179,7 +179,7 @@ private:
 
     PrivilageLevel m_CurPrivLevel;
 
-    NativeWord m_HartId;
+    std::size_t m_HartId;
 
     /** Cycle & retired inst count. */
     DWord m_CycleCount;
@@ -201,7 +201,11 @@ private:
     //NativeWord m_HypervisorScratch;
     NativeWord m_SupervisorScratch;
 
+    /* Memory manager. */
     detail::MemoryManager m_MemMgr;
+
+    /* Memory monitor context for this hart. */
+    detail::MemoryMonitor::Context m_MemMonitorCtx;
 
     SharedState* m_pSharedCtx;
 }; // class Hart

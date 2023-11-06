@@ -239,7 +239,7 @@ private:
 
         /* Revoke any reservations at this address aligned to sizeof(NativeWord). */
         if(res.IsSuccess()) {
-            m_pParent->m_pSharedCtx->GetMemMonitor()->TryRevokeReservation(addr % sizeof(NativeWord));
+            m_pParent->m_MemMonitorCtx.TryRevokeAnyReservation(addr);
         }
 
         return res;
