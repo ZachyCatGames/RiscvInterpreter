@@ -7,16 +7,16 @@ namespace riscv {
 namespace diag {
 namespace detail {
 
-void AbortImpl() {
+[[noreturn]] void AbortImpl() {
     std::abort();
 }
 
-void AbortNoMessageImpl(FILE* stream, const std::source_location& location) {
+[[noreturn]] void AbortNoMessageImpl(FILE* stream, const std::source_location& location) {
     PrintSourceLocation(stream, "ABORT", location);
     AbortImpl();
 }
 
-void AbortWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...) {
+[[noreturn]] void AbortWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...) {
     va_list lst;
     va_start(lst, format);
 
@@ -25,12 +25,12 @@ void AbortWithMessageImpl(FILE* stream, const std::source_location& location, st
     AbortImpl();
 }
 
-void UnexpectedDefaultNoMessageImpl(FILE* stream, const std::source_location location) {
+[[noreturn]] void UnexpectedDefaultNoMessageImpl(FILE* stream, const std::source_location location) {
     PrintSourceLocation(stream, "UNEXPECTED DEFAULT", location);
     AbortImpl();
 }
 
-void UnexpectedDefaultWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...){
+[[noreturn]] void UnexpectedDefaultWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...){
     va_list lst;
     va_start(lst, format);
 

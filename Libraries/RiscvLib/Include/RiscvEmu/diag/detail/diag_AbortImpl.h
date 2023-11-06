@@ -7,15 +7,15 @@ namespace riscv {
 namespace diag {
 namespace detail {
 
-void AbortImpl();
+[[noreturn]] void AbortImpl();
 
-void AbortNoMessageImpl(FILE* stream, const std::source_location& location);
+[[noreturn]] void AbortNoMessageImpl(FILE* stream, const std::source_location& location);
 
-void AbortWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...);
+[[noreturn]] void AbortWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...);
 
-void UnexpectedDefaultNoMessageImpl(FILE* stream, const std::source_location location);
+[[noreturn]] void UnexpectedDefaultNoMessageImpl(FILE* stream, const std::source_location location);
 
-void UnexpectedDefaultWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...);
+[[noreturn]] void UnexpectedDefaultWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...);
 
 } // namespace detail
 } // namespace diag

@@ -1,4 +1,5 @@
 #pragma once
+#include <RiscvEmu/diag/diag_FormatString.h>
 #include <RiscvEmu/diag/detail/diag_DebugLogImpl.h>
 #include <source_location>
 #include <string_view>
@@ -9,19 +10,16 @@ namespace diag {
 #ifdef NDEBUG
 
 template<typename... Args>
-void DebugLog(std::string_view, Args&&...) { }
+constexpr void DebugLog(std::string_view, Args&&...) { }
 
 #else
 
 template<typename... Args>
-struct DebugLog {
-    DebugLog(std::string_view format, Args&&... args, std::source_location location = std::source_location::current()) {
-        detail::DebugPrintImpl(stdout, location, format, std::forward<Args...>(args)...);
+constexpr void DebugLog(const FormatString& format, Args&&... args) {
+    if(!std::is_constant_evaluated()) {
+        detail::DebugPrintImpl(stdout, format.location, format.format, std::forward<Args...>(args)...);
     }
-}; // struct DebugLog
-
-template<typename... Args>
-DebugLog(std::string_view format, Args&&... args) -> DebugLog<Args...>;
+}
 
 #endif
 

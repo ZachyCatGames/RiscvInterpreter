@@ -7,9 +7,9 @@ namespace riscv {
 namespace diag {
 namespace detail {
 
-void AssertNoMessageImpl(FILE* stream, bool cond, const std::source_location& location);
+void AssertNoMessageImpl(FILE* stream, const std::source_location& location);
 
-void AssertWithMessageImpl(FILE* stream, bool cond, const std::source_location& location, std::string_view format, ...);
+void AssertWithMessageImpl(FILE* stream, const std::source_location& location, std::string_view format, ...);
 
 } // namespace detail
 } // namespace diag
