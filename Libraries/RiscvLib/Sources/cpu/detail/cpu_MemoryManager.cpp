@@ -1,5 +1,6 @@
 #include <RiscvEmu/cpu/cpu_Result.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
+#include <RiscvEmu/diag.h>
 #include <RiscvEmu/util/util_Bitfields.h>
 
 namespace riscv {
@@ -79,7 +80,7 @@ constexpr int GetMaxPageTableLevelCount(AddrTransMode mode) {
         case AddrTransMode::Sv39: return 3;
         case AddrTransMode::Sv48: return 4;
         case AddrTransMode::Sv57: return 5;
-        default: return 0;
+        default: diag::UnexpectedDefault("Invalid AddrTransMode\n");
     }
 }
 
