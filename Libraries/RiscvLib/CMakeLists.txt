@@ -33,6 +33,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
 # Include library modules.
 include(CpuLibrarySources)
+include(DiagLibrarySources)
 include(HwLibrarySources)
 include(IntrptLibrarySources)
 include(MemLibrarySources)
@@ -47,6 +48,10 @@ add_library(RiscvLib
     # CPU library.
     ${RISCV_CPU_LIBRARY_HEADERS}
     ${RISCV_CPU_LIBRARY_SOURCES}
+
+    # Diag Library.
+    ${RISCV_DIAG_LIBRARY_HEADERS}
+    ${RISCV_DIAG_LIBRARY_SOURCES}
 
     # HW Library.
     ${RISCV_HW_LIBRARY_HEADERS}
