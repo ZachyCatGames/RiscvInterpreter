@@ -22,7 +22,7 @@ constexpr void Assert(bool cond, const FormatString& format, Args&&... args) {
 }
 
 template<typename T>
-requires std::is_pointer_v<T>
+requires (std::is_pointer_v<T> || std::is_function_v<T> || std::is_member_function_pointer_v<T>)
 constexpr void AssertNotNull(T p, const std::source_location& location = std::source_location::current()) {
     if(p == nullptr) {
         detail::AssertWithMessageImpl(stderr, location, "p == nullptr");
@@ -30,7 +30,7 @@ constexpr void AssertNotNull(T p, const std::source_location& location = std::so
 }
 
 template<typename T>
-requires std::is_pointer_v<T>
+requires (std::is_pointer_v<T> || std::is_function_v<T> || std::is_member_function_pointer_v<T>)
 constexpr void AssertNull(T p, const std::source_location& location = std::source_location::current()) {
     if(p != nullptr) {
         detail::AssertWithMessageImpl(stderr, location, "p != nullptr");
