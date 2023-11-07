@@ -17,6 +17,11 @@ public:
      * interrupt requests.
     */
     virtual Result DisableInterrupts() = 0;
+
+    /**
+     * Returns whether an interrupt is currently pending.
+    */
+    virtual bool IsPendingInterruptAvailable() = 0;
 }; // class ITargetCtlrBridge
 
 } // namespace riscv

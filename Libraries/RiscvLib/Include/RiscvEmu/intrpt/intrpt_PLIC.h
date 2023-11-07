@@ -5,6 +5,7 @@
 #include <RiscvEmu/mem/mem_AlignedMmioDev.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 #include <queue>
+#include <source_location>
 #include <vector>
 #include <memory>
 
@@ -17,8 +18,10 @@ public:
 public:
     Result Initialize(int sourceCount, int targetCount);
 
-    Result RegisterTarget(TargetPtrT pTarget, Word id);
+    Word GetTargetCount() const noexcept;
+    Word GetSourceCount() const noexcept;
 
+    Result RegisterTarget(TargetPtrT pTarget, Word id);
     Result RegisterSource(ISource** ppSrc, Word id);
 
     Word GetPriority(int source) const noexcept;
@@ -27,7 +30,7 @@ public:
     bool GetPending(int source) const noexcept;
     void SetPending(int source, bool val) noexcept;
 
-    bool GetEnabled(int source, int target) noexcept;
+    bool GetEnabled(int source, int target) const noexcept;
     void SetEnabled(int source, int target, bool val) noexcept;
 private:
     Word ReadRegister(Word index);
@@ -58,14 +61,22 @@ private:
 private:
     struct SourceImpl;
 
-    void AddSourceToQueue(SourceImpl* pSrc);
     void CleanupQueue();
-    Word ClaimTopRequest();
-    void MarkCompletion(Word sourceId);
-    void InterruptTarget(Word targetId);
-    void InterruptAllTargets();
 
-    Word GetSourceIndex(const SourceImpl* pSrc) const noexcept;
+    void AddSourceToQueue(SourceImpl* pSrc);
+    Word ClaimTopRequest();
+    void NotifyCompletion(Word sourceId);
+
+    bool CanTargetTakeTopIRQ(Word targetId) const noexcept;
+
+    void NotifyTargetIRQAvailable(Word targetId);
+    void NotifyAllTargetsIRQAvailable();
+
+    bool TargetIdValid(Word id) const noexcept;
+    bool SourceIdValid(Word id) const noexcept;
+
+    void AssertTargetIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
+    void AssertSourceIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
 private:
     class MmioInterface : public mem::IMmioDev {
     public:
@@ -85,9 +96,13 @@ private:
 
     class TargetBridgeImpl : public ITargetCtlrBridge {
     public:
+        TargetBridgeImpl() noexcept;
+
         virtual Result EnableInterrupts() override;
 
         virtual Result DisableInterrupts() override;
+
+        virtual bool IsPendingInterruptAvailable() override;
     private:
         friend class PLIC;
         void Initialize(PLIC* pParent, Word id) noexcept;
@@ -104,10 +119,13 @@ private:
 
     struct SourceImpl : public ISource {
     public:
+        SourceImpl() noexcept;
         void Initialize(PLIC* pParent) noexcept;
         void Finalize() noexcept;
 
         bool IsInitialized() const noexcept;
+
+        Word GetId() const noexcept;
 
         virtual Result SignalInterrupt() override;
 
@@ -118,17 +136,18 @@ private:
     }; // class SourceImpl
 
     struct QueueData {
-        constexpr QueueData(SourceImpl* p, Word prio) noexcept :
-            pImpl(p), priority(prio) {}
+        QueueData(SourceImpl* p, Word prio) noexcept;
 
-        constexpr auto operator<=>(const QueueData& rhs) const noexcept { return this->priority <=> rhs.priority; }
-
-        SourceImpl* pImpl;
+        auto operator<=>(const QueueData& rhs) const noexcept;
+        
+        SourceImpl* pSrc;
         Word priority;
     }; // struct QueueData
 
     struct TargetContext {
-        TargetPtrT pTarget;
+        TargetContext() noexcept;
+
+        TargetPtrT pTarget = nullptr;
         Word priorityThreshold;
         TargetBridgeImpl bridge;
         std::vector<Word> enableBits;

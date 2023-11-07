@@ -18,32 +18,32 @@ MemoryMonitor::Context::Context(MemoryMonitor* pParent, std::size_t hartId) noex
     m_pParent(pParent), m_HartId(hartId) {}
 
 void MemoryMonitor::Context::AddReservation(Address addr) noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->AddReservation(m_HartId, addr);
 }
 
 void MemoryMonitor::Context::ClearReservation() noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->ClearReservation(m_HartId);
 }
 
 bool MemoryMonitor::Context::HasReservation() const noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->HartHasReservation(m_HartId);
 }
 
 Address MemoryMonitor::Context::GetReservedAddress() const noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->HartGetReservedAddress(m_HartId);
 }
 
 bool MemoryMonitor::Context::IsAddressReserved(Address addr) const noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->IsAddressReserved(addr);
 }
 
 bool MemoryMonitor::Context::TryRevokeAnyReservation(Address addr) noexcept {
-    diag::Assert(m_pParent != nullptr);
+    diag::AssertNotNull(m_pParent);
     return m_pParent->TryRevokeReservation(addr);
 }
 
