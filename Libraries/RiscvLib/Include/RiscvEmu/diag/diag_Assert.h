@@ -8,6 +8,36 @@
 namespace riscv {
 namespace diag {
 
+namespace detail {
+
+template<typename T>
+concept Pointer = std::is_pointer_v<T> || std::is_function_v<T> || std::is_member_function_pointer_v<T>;
+
+}
+
+#ifdef NDEBUG
+
+constexpr void Assert(bool) {}
+constexpr void Assert(bool, const std::source_location&) {}
+template<typename... Args>
+constexpr void Assert(bool, std::string_view, Args&&...) {}
+
+template<typename T>
+requires detail::Pointer<T>
+constexpr void AssertNotNull(T) {}
+template<typename T>
+requires detail::Pointer<T>
+constexpr void AssertNotNull(T, const std::source_location&) {}
+
+template<typename T>
+requires detail::Pointer<T>
+constexpr void AssertNull(T) {}
+template<typename T>
+requires detail::Pointer<T>
+constexpr void AssertNull(T, const std::source_location&) {}
+
+#else
+
 constexpr void Assert(bool cond, const std::source_location& location = std::source_location::current()) {
     if(!cond) {
         detail::AssertNoMessageImpl(stderr, location);
@@ -22,7 +52,7 @@ constexpr void Assert(bool cond, const FormatString& format, Args&&... args) {
 }
 
 template<typename T>
-requires (std::is_pointer_v<T> || std::is_function_v<T> || std::is_member_function_pointer_v<T>)
+requires detail::Pointer<T>
 constexpr void AssertNotNull(T p, const std::source_location& location = std::source_location::current()) {
     if(p == nullptr) {
         detail::AssertWithMessageImpl(stderr, location, "p == nullptr");
@@ -30,12 +60,14 @@ constexpr void AssertNotNull(T p, const std::source_location& location = std::so
 }
 
 template<typename T>
-requires (std::is_pointer_v<T> || std::is_function_v<T> || std::is_member_function_pointer_v<T>)
+requires detail::Pointer<T>
 constexpr void AssertNull(T p, const std::source_location& location = std::source_location::current()) {
     if(p != nullptr) {
         detail::AssertWithMessageImpl(stderr, location, "p != nullptr");
     }
 }
+
+#endif
 
 } // namespace diag
 } // namespace riscv
