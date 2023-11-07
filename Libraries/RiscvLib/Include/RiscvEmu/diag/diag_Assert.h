@@ -3,6 +3,7 @@
 #include <RiscvEmu/diag/detail/diag_AssertImpl.h>
 #include <source_location>
 #include <string_view>
+#include <type_traits>
 
 namespace riscv {
 namespace diag {
@@ -17,6 +18,22 @@ template<typename... Args>
 constexpr void Assert(bool cond, const FormatString& format, Args&&... args) {
     if(!cond) {
         detail::AssertWithMessageImpl(stderr, format.location, format.format, std::forward<Args...>(args)...);
+    }
+}
+
+template<typename T>
+requires std::is_pointer_v<T>
+constexpr void AssertNotNull(T p, const std::source_location& location = std::source_location::current()) {
+    if(p == nullptr) {
+        detail::AssertWithMessageImpl(stderr, location, "p == nullptr");
+    }
+}
+
+template<typename T>
+requires std::is_pointer_v<T>
+constexpr void AssertNull(T p, const std::source_location& location = std::source_location::current()) {
+    if(p != nullptr) {
+        detail::AssertWithMessageImpl(stderr, location, "p != nullptr");
     }
 }
 
