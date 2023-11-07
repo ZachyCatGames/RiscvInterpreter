@@ -17,7 +17,7 @@ constexpr void DebugLog(std::string_view, Args&&...) { }
 template<typename... Args>
 constexpr void DebugLog(const FormatString& format, Args&&... args) {
     if(!std::is_constant_evaluated()) {
-        detail::DebugPrintImpl(stdout, format.location, format.format, std::forward<Args...>(args)...);
+        detail::DebugPrintImpl(stdout, format.location, format.format, std::forward<Args>(args)...);
     }
 }
 
