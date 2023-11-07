@@ -129,6 +129,7 @@ constexpr bool TranslationModeValid(AddrTransMode mode) {
 class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32> {};
 
 Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr) {
+    diag::AssertNotNull(pMemCtlr);
     m_pMemCtlr = pMemCtlr;
     m_Mode = AddrTransMode::Bare;
     return ResultSuccess();
@@ -170,6 +171,10 @@ template<typename T>
 Result MemoryManager::ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLevel level) {
     Result res;
 
+    /* Assert that output and read func aren't null. */
+    diag::AssertNotNull(pOut);
+    diag::AssertNotNull(readFunc);
+
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
         res = this->TranslateForRead(&addr, addr, level);
@@ -188,6 +193,9 @@ template<typename T>
 Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLevel level) {
     Result res;
 
+    /* Assert that write func isn't null. */
+    diag::AssertNotNull(writeFunc);
+
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
         res = this->TranslateForWrite(&addr, addr, level);
@@ -203,6 +211,11 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
 }
 
 Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
+    /* Assert that outputs aren't null. */
+    diag::AssertNotNull(pPte);
+    diag::AssertNotNull(pPteAddr);
+    diag::AssertNotNull(pLevelFound);
+
     Result res;
     Address curPT = m_PTAddr;
     NativeWord pteVal = 0;
@@ -244,6 +257,10 @@ Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLeve
 
 Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TransChkFunc chkFunc) {
     Result res;
+
+    /* Assert that output & check func aren't null. */
+    diag::AssertNotNull(pAddrOut);
+    diag::AssertNotNull(chkFunc);
 
     /* Get PTE. */
     NativeWord pteVal = 0;
@@ -309,6 +326,9 @@ Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLev
         return ResultSuccess();
     };
 
+    /* Assert that output isn't null. */
+    diag::AssertNotNull(pOut);
+
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
 
@@ -328,6 +348,9 @@ Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLe
         return ResultSuccess();
     };
 
+    /* Assert that output isn't null. */
+    diag::AssertNotNull(pOut);
+
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
 
@@ -343,6 +366,9 @@ Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLe
 
         return ResultSuccess();
     };
+
+    /* Assert that output isn't null. */
+    diag::AssertNotNull(pOut);
 
     /* Translate address. */
     Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
@@ -393,6 +419,8 @@ Result MemoryManager::WriteDWord(DWord in, Address addr, PrivilageLevel level) {
 Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) {
     Result res;
 
+    diag::AssertNotNull(pOut);
+
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
         res = this->TranslateForFetch(&addr, addr, level);
@@ -409,6 +437,9 @@ Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) 
 
 template<typename T>
 Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
+    diag::AssertNotNull(readFunc);
+    diag::AssertNotNull(pOut);
+
     /* Translate address without permission checks. */
     Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
     if(res.IsFailure()) {
@@ -421,6 +452,8 @@ Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
 
 template<typename T>
 Result MemoryManager::MappedWriteImpl(auto writeFunc, T in, Address addr) {
+    diag::AssertNotNull(writeFunc);
+
     /* Translate address without permission checks. */
     Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
     if(res.IsFailure()) {
