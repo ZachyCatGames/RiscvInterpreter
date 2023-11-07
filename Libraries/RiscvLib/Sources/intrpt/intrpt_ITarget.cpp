@@ -15,10 +15,9 @@ bool ITarget::IsPendingInterruptAvailable() {
      * if a request is still available, since asking the controller is relatively expensive. */
     if(m_IRQNotified) {
         m_IRQNotified = m_pCtlrBridge->IsPendingInterruptAvailable();
-        return m_IRQNotified;
     }
 
-    return false;
+    return m_IRQNotified;
 }
 
 Result ITarget::EnableInterrupts() {

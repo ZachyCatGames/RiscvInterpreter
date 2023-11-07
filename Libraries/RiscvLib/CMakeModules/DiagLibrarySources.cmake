@@ -1,4 +1,6 @@
 set(RISCV_DIAG_LIBRARY_HEADERS
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag.h"
+
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_Abort.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_Assert.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_DebugLog.h"

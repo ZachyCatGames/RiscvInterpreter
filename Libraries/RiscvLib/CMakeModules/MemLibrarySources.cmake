@@ -1,4 +1,6 @@
 set(RISCV_MEM_LIBRARY_HEADERS
+    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem.h"
+
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_IoRegion.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_MemRegion.h"
     "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_RegionBase.h"
