@@ -1,5 +1,6 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
 #include <RiscvEmu/cpu/cpu_CsrFormat.h>
+#include <RiscvEmu/diag.h>
 
 namespace riscv {
 namespace cpu {
@@ -19,6 +20,10 @@ constexpr bool CanAccess(CsrId id, PrivilageLevel level) noexcept {
 Result Hart::RmwCSRImpl(NativeWord* pOut, NativeWord writeVal, RmwCSRReadFunc readFunc, RmwCSRWriteFunc writeFunc, CsrMakeValFunc makeValFunc) {
     Result res;
 
+    /* Assert output and provided functions aren't null. */
+    diag::AssertNotNull(pOut);
+    diag::AssertNotNull(readFunc);
+
     /* Read the CSR. */
     res = (*this.*readFunc)(pOut);
     if(res.IsFailure()) {
@@ -27,6 +32,9 @@ Result Hart::RmwCSRImpl(NativeWord* pOut, NativeWord writeVal, RmwCSRReadFunc re
 
     /* Modify and write back value if possible. */
     if(makeValFunc) {
+        /* Assert that we have a write function. */
+        diag::AssertNotNull(writeFunc);
+
         /* Create new value. */
         writeVal = makeValFunc(*pOut, writeVal);
 
@@ -38,6 +46,9 @@ Result Hart::RmwCSRImpl(NativeWord* pOut, NativeWord writeVal, RmwCSRReadFunc re
 }
 
 Result Hart::ReadWriteCSRImpl(CsrId id, NativeWord* pOut, NativeWord writeVal, CsrMakeValFunc makeValFunc) {
+    /* Assert output and make val func aren't null. */
+    diag::AssertNotNull(pOut);
+
     /* Make sure we can access this register from our current privilage level. */
     if(!CanAccess(id, m_CurPrivLevel)) {
         return ResultCsrPrivilageTooLow();

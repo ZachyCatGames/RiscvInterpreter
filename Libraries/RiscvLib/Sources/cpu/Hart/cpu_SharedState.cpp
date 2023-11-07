@@ -1,9 +1,13 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/diag.h>
 
 namespace riscv {
 namespace cpu {
 
 void Hart::SharedState::Initialize(std::size_t hartCount, mem::MemoryController* pMemCtlr) noexcept {
+    /* Assert memory controller isn't null. */
+    diag::AssertNotNull(pMemCtlr);
+
     m_HartCount = hartCount;
     m_pMemCtlr = pMemCtlr;
 

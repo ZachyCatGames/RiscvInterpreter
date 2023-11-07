@@ -1,9 +1,14 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/diag.h>
 
 namespace riscv {
 namespace cpu {
 
 Result Hart::Initialize(SharedState* pSharedCtx, std::size_t hartId) {
+    /* Assert shared context isn't null. */
+    diag::AssertNotNull(pSharedCtx);
+
+    /* Assign hart id. */
     m_HartId = hartId;
 
     /* Init shared context. */

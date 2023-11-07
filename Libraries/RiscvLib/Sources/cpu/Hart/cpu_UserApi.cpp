@@ -1,9 +1,11 @@
 #include <RiscvEmu/cpu/cpu_Hart.h>
+#include <RiscvEmu/diag.h>
 
 namespace riscv {
 namespace cpu {
 
 Result Hart::FetchInstAtPc(Instruction* pOut) {
+    diag::AssertNotNull(pOut);
     return this->FetchInstruction(pOut, m_PC);
 }
 
@@ -22,7 +24,7 @@ Result Hart::ExecuteInstAtPc() {
     return this->ExecuteInst(inst);
 }
 
-Result Hart::WriteCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord value) {
+Result Hart::WriteCSR(CsrId id, NativeWord value) {
     auto makeValFunc = [](NativeWord, NativeWord writeVal) {
         return writeVal;
     };
@@ -32,7 +34,7 @@ Result Hart::WriteCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord val
 
 }
 
-Result Hart::ReadCSR([[maybe_unused]] CsrId id, [[maybe_unused]] NativeWord* pOut) {
+Result Hart::ReadCSR(CsrId id, NativeWord* pOut) {
     return this->ReadWriteCSRImpl(id, pOut);
 }
 
