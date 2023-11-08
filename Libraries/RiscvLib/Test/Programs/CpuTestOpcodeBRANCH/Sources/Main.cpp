@@ -12,8 +12,8 @@ namespace {
 
 class TestInstBRANCH : public HartSingleInstTestBase<TestInstBRANCH> {
 public:
-    constexpr TestInstBRANCH(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rs1, RegPairT rs2, NativeWord initialPC, Word imm, bool branchExpected) :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeBTypeInstruction(op, f3, GetPairId(rs1), GetPairId(rs2), imm)), name),
+    constexpr TestInstBRANCH(std::string_view name, cpu::Opcode op, cpu::Function func, RegPairT rs1, RegPairT rs2, NativeWord initialPC, Word imm, bool branchExpected) :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeBTypeInstruction(op, func, GetPairId(rs1), GetPairId(rs2), imm)), name),
         m_InitialRs1(rs1),
         m_InitialRs2(rs2),
         m_InitialPC(initialPC),
@@ -63,7 +63,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BEQ_NonEq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BEQ,
+            cpu::Function::BEQ,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -75,7 +75,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BEQ_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BEQ,
+            cpu::Function::BEQ,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -87,7 +87,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BNE_NonEq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BNE,
+            cpu::Function::BNE,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -99,7 +99,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BNE_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BNE,
+            cpu::Function::BNE,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -111,7 +111,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -123,7 +123,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_PosRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, 10 },
             { 2, 5 },
             0,
@@ -135,7 +135,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_PosRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -147,7 +147,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_NegRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, -5 },
             { 2, -10 },
             0,
@@ -159,7 +159,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_NegRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, -10 },
             { 2, -5 },
             0,
@@ -171,7 +171,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, 10 },
             { 2, -10 },
             0,
@@ -183,7 +183,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLT_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLT,
+            cpu::Function::BLT,
             { 1, -10 },
             { 2, 10 },
             0,
@@ -195,7 +195,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -207,7 +207,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_PosRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, 10 },
             { 2, 5 },
             0,
@@ -219,7 +219,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_PosRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -231,7 +231,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_NegRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, -5 },
             { 2, -10 },
             0,
@@ -243,7 +243,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_NegRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, -10 },
             { 2, -5 },
             0,
@@ -255,7 +255,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, 10 },
             { 2, -10 },
             0,
@@ -267,7 +267,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGE_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGE,
+            cpu::Function::BGE,
             { 1, -10 },
             { 2, 10 },
             0,
@@ -283,7 +283,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -295,7 +295,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_PosRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, 10 },
             { 2, 5 },
             0,
@@ -307,7 +307,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_PosRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -319,7 +319,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_NegRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, -5 },
             { 2, -10 },
             0,
@@ -331,7 +331,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_NegRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, -10 },
             { 2, -5 },
             0,
@@ -343,7 +343,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, 10 },
             { 2, -10 },
             0,
@@ -355,7 +355,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BLTU_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BLTU,
+            cpu::Function::BLTU,
             { 1, -10 },
             { 2, 10 },
             0,
@@ -367,7 +367,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_Eq",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, 5 },
             { 2, 5 },
             0,
@@ -379,7 +379,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_PosRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, 10 },
             { 2, 5 },
             0,
@@ -391,7 +391,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_PosRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, 5 },
             { 2, 10 },
             0,
@@ -403,7 +403,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_NegRs1Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, -5 },
             { 2, -10 },
             0,
@@ -415,7 +415,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_NegRs2Greater",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, -10 },
             { 2, -5 },
             0,
@@ -427,7 +427,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_PosRs1NegRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, 10 },
             { 2, -10 },
             0,
@@ -439,7 +439,7 @@ constexpr TestFramework g_TestRunner {
         TestInstBRANCH{
             "BGEU_NegRs1PosRs2",
             cpu::Opcode::BRANCH,
-            cpu::Funct3::BGEU,
+            cpu::Function::BGEU,
             { 1, -10 },
             { 2, 10 },
             0,

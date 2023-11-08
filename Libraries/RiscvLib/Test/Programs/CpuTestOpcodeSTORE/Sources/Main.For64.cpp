@@ -13,7 +13,7 @@ constexpr TestFramework g_TestRunner{
         TestInstSTORE{
             "SD_ZeroImm",
             cpu::Opcode::STORE,
-            cpu::Funct3::SD,
+            cpu::Function::SD,
             { 1, HartTestSystem::MemoryAddress },
             { 15, 0xAABBCCDDEEFF1122 },
             0,
@@ -24,7 +24,7 @@ constexpr TestFramework g_TestRunner{
         TestInstSTORE{
             "SD_PosImm",
             cpu::Opcode::STORE,
-            cpu::Funct3::SD,
+            cpu::Function::SD,
             { 1, HartTestSystem::MemoryAddress },
             { 15, 0xAABBCCDDEEFF1122 },
             0x100,
@@ -35,7 +35,7 @@ constexpr TestFramework g_TestRunner{
         TestInstSTORE{
             "SD_NegImm",
             cpu::Opcode::STORE,
-            cpu::Funct3::SD,
+            cpu::Function::SD,
             { 1, HartTestSystem::MemoryAddress + 0x100 },
             { 15, 0xAABBCCDDEEFF1122 },
             static_cast<Word>(-0x100),

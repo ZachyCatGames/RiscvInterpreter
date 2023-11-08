@@ -17,7 +17,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SLLI_UpperImm",
             cpu::Opcode::OP_IMM,
-            cpu::Funct3::SLLI,
+            cpu::Function::SLLI,
             { 1, 1ull << 32 },
             { 15, 1 },
             32
@@ -27,7 +27,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRLI_UpperImm",
             cpu::Opcode::OP_IMM,
-            cpu::Funct3::SRLI,
+            cpu::Function::SRLI,
             { 1, (1ull << 48) >> 32 },
             { 15, (1ull << 48) },
             32
@@ -37,7 +37,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRAI_UpperImm",
             cpu::Opcode::OP_IMM,
-            cpu::Funct3::SRLI,
+            cpu::Function::SRLI,
             { 1, (1ull << 48) >> 32 },
             { 15, (1ull << 48) },
             32 | (1 << 10)

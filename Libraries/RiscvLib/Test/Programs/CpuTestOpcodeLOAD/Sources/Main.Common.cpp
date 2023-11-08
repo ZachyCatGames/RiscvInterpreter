@@ -15,7 +15,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LB_ZeroImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LB,
+            cpu::Function::LB,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -26,7 +26,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LB_PosImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LB,
+            cpu::Function::LB,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress },
             0x100,
@@ -37,7 +37,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LB_NegImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LB,
+            cpu::Function::LB,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
@@ -48,7 +48,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LB_ZeroImmNegMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LB,
+            cpu::Function::LB,
             { 1, -69 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -59,7 +59,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LH_ZeroImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LH,
+            cpu::Function::LH,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -70,7 +70,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LH_PosImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LH,
+            cpu::Function::LH,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress },
             0x100,
@@ -81,7 +81,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LH_NegImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LH,
+            cpu::Function::LH,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
@@ -92,7 +92,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LH_ZeroImmNegMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LH,
+            cpu::Function::LH,
             { 1, -69 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -103,7 +103,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LW_ZeroImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LW,
+            cpu::Function::LW,
             { 1, 0x11223344 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -114,7 +114,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LW_PosImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LW,
+            cpu::Function::LW,
             { 1, 0x11223344 },
             { 15, HartTestSystem::MemoryAddress },
             0x100,
@@ -125,7 +125,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LW_NegImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LW,
+            cpu::Function::LW,
             { 1, 0x11223344 },
             { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
@@ -136,7 +136,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LW_ZeroImmNegMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LW,
+            cpu::Function::LW,
             { 1, -69 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -147,7 +147,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LBU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LBU,
+            cpu::Function::LBU,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -158,7 +158,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LBU_PosImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LBU,
+            cpu::Function::LBU,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress },
             0x100,
@@ -169,7 +169,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LBU_NegImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LBU,
+            cpu::Function::LBU,
             { 1, 0x11 },
             { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
@@ -180,7 +180,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LBU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LBU,
+            cpu::Function::LBU,
             { 1, 0x80 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -191,7 +191,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LHU_ZeroImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LHU,
+            cpu::Function::LHU,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress },
             0,
@@ -202,7 +202,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LHU_PosImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LHU,
+            cpu::Function::LHU,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress },
             0x100,
@@ -213,7 +213,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LHU_NegImmPosMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LHU,
+            cpu::Function::LHU,
             { 1, 0x1122 },
             { 15, HartTestSystem::MemoryAddress + 0x100 },
             static_cast<Word>(-0x100),
@@ -224,7 +224,7 @@ constexpr TestFramework g_TestRunner(
         TestInstLOAD{
             "LHU_ZeroImmNegMem",
             cpu::Opcode::LOAD,
-            cpu::Funct3::LHU,
+            cpu::Function::LHU,
             { 1, 0x8000 },
             { 15, HartTestSystem::MemoryAddress },
             0,

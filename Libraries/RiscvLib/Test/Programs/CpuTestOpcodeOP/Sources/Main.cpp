@@ -17,8 +17,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_ZeroRs1ZeroRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, 0 },
             { 1, 0 },
             { 2, 0 }
@@ -28,8 +27,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_PosRs1PosRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, 50 },
             { 1, 30 },
             { 2, 20 }
@@ -39,8 +37,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_NegRs1NegRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, -50 },
             { 1, -30 },
             { 2, -20 },
@@ -50,8 +47,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_PosRs1NegRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, 0 },
             { 1, 30 },
             { 2, -30 },
@@ -61,8 +57,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_NegRs1PosRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, -10 },
             { 1, -30 },
             { 2, 20 }
@@ -72,8 +67,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_Overflow",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, 0 },
             { 1, std::numeric_limits<NativeWord>::max() },
             { 2, 1 },
@@ -83,8 +77,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "ADD_Underflow",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::ADD,
+            cpu::Function::ADD,
             { 15, std::numeric_limits<NativeWord>::max() },
             { 1, 0 },
             { 2, -1 },
@@ -94,8 +87,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_ZeroRs1ZeroRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, 0 },
             { 1, 0 },
             { 2, 0 }
@@ -105,8 +97,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_PosRs1PosRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, 10 },
             { 1, 30 },
             { 2, 20 }
@@ -116,8 +107,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_NegRs1NegRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, -10 },
             { 1, -30 },
             { 2, -20 },
@@ -127,8 +117,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_PosRs1NegRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, 60 },
             { 1, 30 },
             { 2, -30 },
@@ -138,8 +127,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_NegRs1PosRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, -50 },
             { 1, -30 },
             { 2, 20 }
@@ -149,8 +137,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_Overflow",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, 0 },
             { 1, std::numeric_limits<NativeWord>::max() },
             { 2, -1 },
@@ -160,8 +147,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SUB_Underflow",
             cpu::Opcode::OP,
-            cpu::Funct3::ADD,
-            cpu::Funct7::SUB,
+            cpu::Function::SUB,
             { 15, std::numeric_limits<NativeWord>::max() },
             { 1, 0 },
             { 2, 1 },
@@ -171,8 +157,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLL_ZeroRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLL,
-            cpu::Funct7::Zero,
+            cpu::Function::SLL,
             { 15, 50000 },
             { 1, 50000 },
             { 2, 0 }
@@ -182,8 +167,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLL_PosRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLL,
-            cpu::Funct7::Zero,
+            cpu::Function::SLL,
             { 15, 50000 << 8 },
             { 1, 50000 },
             { 2, 8 }
@@ -193,8 +177,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLL_NegRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLL,
-            cpu::Funct7::Zero,
+            cpu::Function::SLL,
             { 15, static_cast<NativeWord>(-50000) << 8 },
             { 1, -50000 },
             { 2, 8 }
@@ -204,8 +187,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_PosEq",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 0 },
             { 1, 20 },
             { 2, 20 },
@@ -215,8 +197,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_NegEq",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 0 },
             { 1, -20 },
             { 2, -20 }
@@ -226,8 +207,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_PosGreaterRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 1 },
             { 1, 20 },
             { 2, 40 }
@@ -237,8 +217,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_NegGreaterRs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 1 },
             { 1, -40 },
             { 2, -20 }
@@ -248,8 +227,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_NegRs1PosRs2Greaterrs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 1 },
             { 1, static_cast<NativeWord>(-20) },
             { 2, 20 }
@@ -259,8 +237,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_PosGreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 0 },
             { 1, 40 },
             { 2, 20 }
@@ -270,8 +247,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_NegGreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 0 },
             { 1, -20 },
             { 2, -40 },
@@ -281,8 +257,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLT_PosRs1NegRs2GreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLT,
-            cpu::Funct7::Zero,
+            cpu::Function::SLT,
             { 15, 0 },
             { 1, 20 },
             { 2, -20 }
@@ -292,8 +267,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_PosEq",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 0 },
             { 1, 20 },
             { 2, 20 }
@@ -303,8 +277,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_NegEq",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 0 },
             { 1, -20 },
             { 2, -20 }
@@ -314,8 +287,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_PosGreaterrs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 1 },
             { 1, 20 },
             { 2, 40 }
@@ -325,8 +297,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_NegGreaterrs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 1 },
             { 1, -40 },
             { 2, -20 }
@@ -336,8 +307,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_NegRs1PosRs2Greaterrs2",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 0 },
             { 1, -20 },
             { 2, 20 }
@@ -347,8 +317,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_PosGreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 0 },
             { 1, 40 },
             { 2, 20 }
@@ -358,8 +327,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_NegGreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 0 },
             { 1, -20 },
             { 2, -40 }
@@ -369,8 +337,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SLTU_PosRs1NegRs2GreaterRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SLTU,
-            cpu::Funct7::Zero,
+            cpu::Function::SLTU,
             { 15, 1 },
             { 1, 20 },
             { 2, -20 }
@@ -380,8 +347,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "XOR_ZeroImm",
             cpu::Opcode::OP,
-            cpu::Funct3::XOR,
-            cpu::Funct7::Zero,
+            cpu::Function::XOR,
             { 15, 0xAABBCCDD },
             { 1, 0xAABBCCDD },
             { 2, 0 }
@@ -391,8 +357,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "XOR_PosImm",
             cpu::Opcode::OP,
-            cpu::Funct3::XOR,
-            cpu::Funct7::Zero,
+            cpu::Function::XOR,
             { 15, 0xAA ^ 0x77 },
             { 1, 0xAA },
             { 2, 0x77 }
@@ -402,8 +367,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "XOR_NegImm",
             cpu::Opcode::OP,
-            cpu::Funct3::XOR,
-            cpu::Funct7::Zero,
+            cpu::Function::XOR,
             { 15, 0xAABB ^ -5 },
             { 1, 0xAABB },
             { 2, -5 }
@@ -413,8 +377,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRL_ZeroImm",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRL,
+            cpu::Function::SRL,
             { 15, 50000 },
             { 1, 50000 },
             { 2, 0 }
@@ -424,8 +387,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRL_PosRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRL,
+            cpu::Function::SRL,
             { 15, 50000 >> 8 },
             { 1, 50000 },
             { 2, 8 }
@@ -435,8 +397,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRL_NegRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRL,
+            cpu::Function::SRL,
             { 15, static_cast<NativeWord>(-50000) >> 8 },
             { 1, -50000 },
             { 2, 8 }
@@ -446,8 +407,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRL_Truncate",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRL,
+            cpu::Function::SRL,
             { 15, 50000 >> 8 },
             { 1, 50000 },
             { 2, 8 | (1 << 8) }
@@ -457,8 +417,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRA_ZeroImm",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRA,
+            cpu::Function::SRA,
             { 15, -50000 },
             { 1, -50000 },
             { 2, 0 }
@@ -468,8 +427,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRA_PosRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRA,
+            cpu::Function::SRA,
             { 15, 50000 >> 8 },
             { 1, 50000 },
             { 2, 8 }
@@ -479,8 +437,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRA_NegRs1",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRA,
+            cpu::Function::SRA,
             { 15, -50000 >> 8 },
             { 1, -50000 },
             { 2, 8 }
@@ -490,8 +447,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "SRA_Truncate",
             cpu::Opcode::OP,
-            cpu::Funct3::SRL,
-            cpu::Funct7::SRA,
+            cpu::Function::SRA,
             { 15, 50000 >> 8 },
             { 1, 50000 },
             { 2, 8 | (1 << 8) }
@@ -501,8 +457,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "OR_ZeroImm",
             cpu::Opcode::OP,
-            cpu::Funct3::OR,
-            cpu::Funct7::Zero,
+            cpu::Function::OR,
             { 15, 50000 },
             { 1, 50000 },
             { 2, 0 }
@@ -512,8 +467,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "OR_PosImm",
             cpu::Opcode::OP,
-            cpu::Funct3::OR,
-            cpu::Funct7::Zero,
+            cpu::Function::OR,
             { 15, 50000 | 0x99 },
             { 1, 50000 },
             { 2, 0x99 }
@@ -523,8 +477,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "OR_NegImm",
             cpu::Opcode::OP,
-            cpu::Funct3::OR,
-            cpu::Funct7::Zero,
+            cpu::Function::OR,
             { 15, 50000 | -20 },
             { 1, 50000 },
             { 2, -20 }
@@ -534,8 +487,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "AND_ZeroImm",
             cpu::Opcode::OP,
-            cpu::Funct3::AND,
-            cpu::Funct7::Zero,
+            cpu::Function::AND,
             { 15, 50000 & 0 },
             { 1, 50000 },
             { 2, 0 }
@@ -545,8 +497,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "AND_PosImm",
             cpu::Opcode::OP,
-            cpu::Funct3::AND,
-            cpu::Funct7::Zero,
+            cpu::Function::AND,
             { 15, 50000 & 0x99 },
             { 1, 50000 },
             { 2, 0x99 }
@@ -556,8 +507,7 @@ constexpr TestFramework g_TestRunner {
         HartRTypeInstTest{
             "AND_NegImm",
             cpu::Opcode::OP,
-            cpu::Funct3::AND,
-            cpu::Funct7::Zero,
+            cpu::Function::AND,
             { 15, 50000 & -20 },
             { 1, 50000 },
             { 2, -20 }

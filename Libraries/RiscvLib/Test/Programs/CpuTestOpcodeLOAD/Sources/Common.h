@@ -9,8 +9,8 @@ namespace test {
 class TestInstLOAD : public HartSingleInstTestBase<TestInstLOAD> {
 public:
     using AddrPairT = std::pair<Address, NativeWord>;
-    constexpr TestInstLOAD(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name),
+    constexpr TestInstLOAD(std::string_view name, cpu::Opcode op, cpu::Function func, RegPairT rd, RegPairT rs1, Word imm, AddrPairT memVal) :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, func, GetPairId(rd), GetPairId(rs1), imm)), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_MemVal(memVal) {}

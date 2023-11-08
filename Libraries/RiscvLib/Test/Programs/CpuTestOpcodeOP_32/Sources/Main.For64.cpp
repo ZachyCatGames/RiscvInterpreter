@@ -17,8 +17,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_ZeroRs1ZeroRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, 0 },
             { 1, 0 },
             { 2, 0 }
@@ -28,8 +27,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_PosRs1PosRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, 50 },
             { 1, 30 },
             { 2, 20 }
@@ -39,8 +37,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_NegRs1NegRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, -50 },
             { 1, -30 },
             { 2, -20 },
@@ -50,8 +47,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_PosRs1NegRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, 0 },
             { 1, 30 },
             { 2, -30 },
@@ -61,8 +57,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_NegRs1PosRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, -10 },
             { 1, -30 },
             { 2, 20 }
@@ -72,8 +67,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_Overflow",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, 0 },
             { 1, std::numeric_limits<NativeWord>::max() },
             { 2, 1 },
@@ -83,8 +77,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_Underflow",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, std::numeric_limits<NativeWord>::max() },
             { 1, 0 },
             { 2, -1 },
@@ -94,8 +87,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "ADDW_IgnoreUpper",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::ADDW,
+            cpu::Function::ADDW,
             { 15, 5 },
             { 1, (1ull << 48) },
             { 2, 5 }
@@ -105,8 +97,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_ZeroRs1ZeroRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, 0 },
             { 1, 0 },
             { 2, 0 }
@@ -116,8 +107,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_PosRs1PosRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, 10 },
             { 1, 30 },
             { 2, 20 }
@@ -127,8 +117,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_NegRs1NegRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, -10 },
             { 1, -30 },
             { 2, -20 },
@@ -138,8 +127,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_PosRs1NegRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, 60 },
             { 1, 30 },
             { 2, -30 },
@@ -149,8 +137,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_NegRs1PosRs2",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, -50 },
             { 1, -30 },
             { 2, 20 }
@@ -160,8 +147,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_Overflow",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, 0 },
             { 1, std::numeric_limits<NativeWord>::max() },
             { 2, -1 },
@@ -171,8 +157,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_Underflow",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, std::numeric_limits<NativeWord>::max() },
             { 1, 0 },
             { 2, 1 },
@@ -182,8 +167,7 @@ constexpr TestFramework g_TestRunner{
         HartRTypeInstTest{
             "SUBW_IgnoreUpper",
             cpu::Opcode::OP_32,
-            cpu::Funct3::ADDW,
-            cpu::Funct7::SUBW,
+            cpu::Function::SUBW,
             { 15, 5 },
             { 1, (1ull << 48) },
             { 2, -5 }

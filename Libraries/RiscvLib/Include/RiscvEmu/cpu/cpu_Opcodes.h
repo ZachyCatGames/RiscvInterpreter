@@ -53,96 +53,111 @@ enum class Opcode {
     Max = 0b1111111
 }; // enum class Opcode
 
-constexpr int CreateFunction3(int f3) noexcept { return f3; }
+namespace detail {
+    constexpr int CreateFunctionImpl3(int f3) noexcept { return f3; }
 
-constexpr int CreateFunction37(int f3, int f7) noexcept { return f3 | (f7 << 3); }
+    constexpr int CreateFunctionImpl37(int f3, int f7) noexcept { return f3 | (f7 << 3); }
+} // namespace detail
 
 enum class Function {
+    Min = 0,
+    Max = detail::CreateFunctionImpl37(0b111, 0b1111111),
+
     /* Opcode LOAD. */
-    LB  = CreateFunction3(0b000),
-    LH  = CreateFunction3(0b001),
-    LW  = CreateFunction3(0b010),
-    LD  = CreateFunction3(0b011),
-    LBU = CreateFunction3(0b100),
-    LHU = CreateFunction3(0b101),
-    LWU = CreateFunction3(0b110),
+    LB  = detail::CreateFunctionImpl3(0b000),
+    LH  = detail::CreateFunctionImpl3(0b001),
+    LW  = detail::CreateFunctionImpl3(0b010),
+    LD  = detail::CreateFunctionImpl3(0b011),
+    LBU = detail::CreateFunctionImpl3(0b100),
+    LHU = detail::CreateFunctionImpl3(0b101),
+    LWU = detail::CreateFunctionImpl3(0b110),
 
     /* Opcode MISC_MEM. */
-    FENCE  = CreateFunction3(0b000),
-    FENCEI = CreateFunction3(0b001),
+    FENCE  = detail::CreateFunctionImpl3(0b000),
+    FENCEI = detail::CreateFunctionImpl3(0b001),
 
     /* Opcode OP_IMM. */
-    ADDI  = CreateFunction3(0b000),
-    SLLI  = CreateFunction3(0b001),
-    SLTI  = CreateFunction3(0b010),
-    SLTIU = CreateFunction3(0b011),
-    XORI  = CreateFunction3(0b100),
-    SRLI  = CreateFunction3(0b101),
-    ORI   = CreateFunction3(0b110),
-    ANDI  = CreateFunction3(0b111),
+    ADDI  = detail::CreateFunctionImpl3(0b000),
+    SLLI  = detail::CreateFunctionImpl3(0b001),
+    SLTI  = detail::CreateFunctionImpl3(0b010),
+    SLTIU = detail::CreateFunctionImpl3(0b011),
+    XORI  = detail::CreateFunctionImpl3(0b100),
+    SRLI  = detail::CreateFunctionImpl3(0b101),
+    ORI   = detail::CreateFunctionImpl3(0b110),
+    ANDI  = detail::CreateFunctionImpl3(0b111),
 
     /* Opcode OP_IMM_32. */
-    ADDIW = CreateFunction3(0b000),
-    SLLIW = CreateFunction3(0b001),
-    SRLIW = CreateFunction3(0b101),
+    ADDIW = detail::CreateFunctionImpl3(0b000),
+    SLLIW = detail::CreateFunctionImpl3(0b001),
+    SRLIW = detail::CreateFunctionImpl3(0b101),
 
     /* Opcode STORE. */
-    SB = CreateFunction3(0b000),
-    SH = CreateFunction3(0b001),
-    SW = CreateFunction3(0b010),
-    SD = CreateFunction3(0b011),
+    SB = detail::CreateFunctionImpl3(0b000),
+    SH = detail::CreateFunctionImpl3(0b001),
+    SW = detail::CreateFunctionImpl3(0b010),
+    SD = detail::CreateFunctionImpl3(0b011),
 
     /* Opcode OP. */
-    ADD    = CreateFunction37(0b000, 0b0000000),
-    SUB    = CreateFunction37(0b000, 0b0100000),
-    MUL    = CreateFunction37(0b000, 0b0000001),
-    SLL    = CreateFunction37(0b001, 0b0000000),
-    MULH   = CreateFunction37(0b001, 0b0000001),
-    SLT    = CreateFunction37(0b010, 0b0000000),
-    MULHSU = CreateFunction37(0b010, 0b0000001),
-    SLTU   = CreateFunction37(0b011, 0b0000000),
-    MULHU  = CreateFunction37(0b011, 0b0000001),
-    XOR    = CreateFunction37(0b100, 0b0000000),
-    DIV    = CreateFunction37(0b100, 0b0000001),
-    SRL    = CreateFunction37(0b101, 0b0000000),
-    SRA    = CreateFunction37(0b101, 0b0100000),
-    DIVU   = CreateFunction37(0b101, 0b0000001),
-    OR     = CreateFunction37(0b110, 0b0000000),
-    REM    = CreateFunction37(0b110, 0b0000001),
-    AND    = CreateFunction37(0b111, 0b0000000),
-    REMU   = CreateFunction37(0b111, 0b0000001),
+    ADD    = detail::CreateFunctionImpl37(0b000, 0b0000000),
+    SUB    = detail::CreateFunctionImpl37(0b000, 0b0100000),
+    MUL    = detail::CreateFunctionImpl37(0b000, 0b0000001),
+    SLL    = detail::CreateFunctionImpl37(0b001, 0b0000000),
+    MULH   = detail::CreateFunctionImpl37(0b001, 0b0000001),
+    SLT    = detail::CreateFunctionImpl37(0b010, 0b0000000),
+    MULHSU = detail::CreateFunctionImpl37(0b010, 0b0000001),
+    SLTU   = detail::CreateFunctionImpl37(0b011, 0b0000000),
+    MULHU  = detail::CreateFunctionImpl37(0b011, 0b0000001),
+    XOR    = detail::CreateFunctionImpl37(0b100, 0b0000000),
+    DIV    = detail::CreateFunctionImpl37(0b100, 0b0000001),
+    SRL    = detail::CreateFunctionImpl37(0b101, 0b0000000),
+    SRA    = detail::CreateFunctionImpl37(0b101, 0b0100000),
+    DIVU   = detail::CreateFunctionImpl37(0b101, 0b0000001),
+    OR     = detail::CreateFunctionImpl37(0b110, 0b0000000),
+    REM    = detail::CreateFunctionImpl37(0b110, 0b0000001),
+    AND    = detail::CreateFunctionImpl37(0b111, 0b0000000),
+    REMU   = detail::CreateFunctionImpl37(0b111, 0b0000001),
 
     /* Opcode OP_32. */
-    ADDW  = CreateFunction37(0b000, 0b0000000),
-    SUBW  = CreateFunction37(0b000, 0b0100000),
-    MULW  = CreateFunction37(0b000, 0b0000001),
-    SLLW  = CreateFunction37(0b001, 0b0000000),
-    DIVW  = CreateFunction37(0b100, 0b0000001),
-    SRLW  = CreateFunction37(0b101, 0b0000000),
-    SRAW  = CreateFunction37(0b101, 0b0100000),
-    DIVUW = CreateFunction37(0b101, 0b0000001),
-    REMW  = CreateFunction37(0b110, 0b0000001),
-    REMUW = CreateFunction37(0b111, 0b0000001),
+    ADDW  = detail::CreateFunctionImpl37(0b000, 0b0000000),
+    SUBW  = detail::CreateFunctionImpl37(0b000, 0b0100000),
+    MULW  = detail::CreateFunctionImpl37(0b000, 0b0000001),
+    SLLW  = detail::CreateFunctionImpl37(0b001, 0b0000000),
+    DIVW  = detail::CreateFunctionImpl37(0b100, 0b0000001),
+    SRLW  = detail::CreateFunctionImpl37(0b101, 0b0000000),
+    SRAW  = detail::CreateFunctionImpl37(0b101, 0b0100000),
+    DIVUW = detail::CreateFunctionImpl37(0b101, 0b0000001),
+    REMW  = detail::CreateFunctionImpl37(0b110, 0b0000001),
+    REMUW = detail::CreateFunctionImpl37(0b111, 0b0000001),
 
     /* Opcode BRANCH. */
-    BEQ  = CreateFunction3(0b000),
-    BNE  = CreateFunction3(0b001),
-    BLT  = CreateFunction3(0b100),
-    BGE  = CreateFunction3(0b101),
-    BLTU = CreateFunction3(0b110),
-    BGEU = CreateFunction3(0b111),
+    BEQ  = detail::CreateFunctionImpl3(0b000),
+    BNE  = detail::CreateFunctionImpl3(0b001),
+    BLT  = detail::CreateFunctionImpl3(0b100),
+    BGE  = detail::CreateFunctionImpl3(0b101),
+    BLTU = detail::CreateFunctionImpl3(0b110),
+    BGEU = detail::CreateFunctionImpl3(0b111),
 
     /* Opcode JALR. */
-    JALR = CreateFunction3(0b000),
+    JALR = detail::CreateFunctionImpl3(0b000),
 
     /* Opcode SYSTEM. */
-    CSRRW = CreateFunction3(0b001),
-    CSRRS = CreateFunction3(0b010),
-    CSRRC = CreateFunction3(0b011),
-    CSRRWI = CreateFunction3(0b101),
-    CSRRSI = CreateFunction3(0b110),
-    CSRRCI = CreateFunction3(0b111),
+    CSRRW = detail::CreateFunctionImpl3(0b001),
+    CSRRS = detail::CreateFunctionImpl3(0b010),
+    CSRRC = detail::CreateFunctionImpl3(0b011),
+    CSRRWI = detail::CreateFunctionImpl3(0b101),
+    CSRRSI = detail::CreateFunctionImpl3(0b110),
+    CSRRCI = detail::CreateFunctionImpl3(0b111),
 };
+
+constexpr Function CreateFunction3(int f3) noexcept { return static_cast<Function>(detail::CreateFunctionImpl3(f3)); }
+
+constexpr Function CreateFunction37(int f3, int f7) noexcept { return static_cast<Function>(detail::CreateFunctionImpl37(f3, f7)); }
+
+constexpr int GetFunction3(int func) noexcept { return func & 0x7; }
+constexpr int GetFunction3(Function func) noexcept { return GetFunction3(static_cast<int>(func)); }
+
+constexpr int GetFunction7(int func) noexcept { return func >> 3; }
+constexpr int GetFunction7(Function func) noexcept { return GetFunction7(static_cast<int>(func)); }
 
 enum class Funct3 {
     /* Lowest possible Funct3 value. */

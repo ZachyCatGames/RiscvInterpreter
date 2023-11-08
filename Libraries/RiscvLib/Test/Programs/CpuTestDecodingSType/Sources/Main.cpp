@@ -13,7 +13,7 @@ constexpr int TestFieldOpcode() noexcept {
     for(int i = static_cast<int>(cpu::Opcode::Min); i < static_cast<int>(cpu::Opcode::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::STypeInstruction(cpu::EncodeSTypeInstruction(static_cast<cpu::Opcode>(i), 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
@@ -28,16 +28,16 @@ constexpr int TestFieldOpcode() noexcept {
 }
 
 constexpr int TestFieldFunct3() noexcept {
-    for(int i = static_cast<int>(cpu::Funct3::Min); i < static_cast<int>(cpu::Funct3::Max); i++) {
+    for(int i = cpu::GetFunction3(cpu::Function::Min); i < cpu::GetFunction3(cpu::Function::Min); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::STypeInstruction(cpu::EncodeSTypeInstruction(cpu::Opcode::Max, 
-                                                                      static_cast<cpu::Funct3>(i), 
+                                                                      cpu::CreateFunction3(i), 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
 
         /* Test that rd is what we expect. */
-        if(static_cast<int>(inst.funct3()) != i) {
+        if(inst.funct3() != i) {
             return i;
         }
     }
@@ -49,7 +49,7 @@ constexpr int TestFieldRs1() noexcept {
     for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::STypeInstruction(cpu::EncodeSTypeInstruction(cpu::Opcode::Max, 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       i, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
@@ -67,7 +67,7 @@ constexpr int TestFieldRs2() noexcept {
     for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::STypeInstruction(cpu::EncodeSTypeInstruction(cpu::Opcode::Max, 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       cpu::InstMaxRegister, 
                                                                       i, 
                                                                       std::numeric_limits<Word>::max()));
@@ -84,7 +84,7 @@ constexpr int TestFieldRs2() noexcept {
 constexpr int TestFieldImm() noexcept {
     for(int i = 0; i < 12; i++) {
         auto inst = cpu::STypeInstruction(cpu::EncodeSTypeInstruction(cpu::Opcode::Max,
-                                                                      cpu::Funct3::Max,
+                                                                      cpu::Function::Max,
                                                                       cpu::InstMaxRegister,
                                                                       cpu::InstMaxRegister,
                                                                       1u << i));

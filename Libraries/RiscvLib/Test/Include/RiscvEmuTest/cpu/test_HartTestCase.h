@@ -10,8 +10,8 @@ namespace test {
 
 class HartRTypeInstTest : public HartSingleInstTestBase<HartRTypeInstTest> {
 public:
-    constexpr HartRTypeInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, cpu::Funct7 f7, RegPairT rd, RegPairT rs1, RegPairT rs2) noexcept :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeRTypeInstruction(op, f3, f7, GetPairId(rd), GetPairId(rs1), GetPairId(rs2))), name),
+    constexpr HartRTypeInstTest(std::string_view name, cpu::Opcode op, cpu::Function func, RegPairT rd, RegPairT rs1, RegPairT rs2) noexcept :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeRTypeInstruction(op, func, GetPairId(rd), GetPairId(rs1), GetPairId(rs2))), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_InitialRs2(rs2) {}
@@ -27,8 +27,8 @@ private:
 
 class HartITypeInstTest : public HartSingleInstTestBase<HartITypeInstTest> {
 public:
-    constexpr HartITypeInstTest(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm) noexcept :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name),
+    constexpr HartITypeInstTest(std::string_view name, cpu::Opcode op, cpu::Function func, RegPairT rd, RegPairT rs1, Word imm) noexcept :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, func, GetPairId(rd), GetPairId(rs1), imm)), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1) {}
 private:

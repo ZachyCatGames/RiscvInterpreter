@@ -13,7 +13,7 @@ constexpr int TestFieldOpcode() noexcept {
     for(int i = static_cast<int>(cpu::Opcode::Min); i < static_cast<int>(cpu::Opcode::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(static_cast<cpu::Opcode>(i), 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
@@ -31,7 +31,7 @@ constexpr int TestFieldFunct3() noexcept {
     for(int i = static_cast<int>(cpu::Funct3::Min); i < static_cast<int>(cpu::Funct3::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(cpu::Opcode::Max, 
-                                                                      static_cast<cpu::Funct3>(i), 
+                                                                      cpu::CreateFunction3(i), 
                                                                       cpu::InstMaxRegister, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
@@ -49,7 +49,7 @@ constexpr int TestFieldRd() noexcept {
     for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(cpu::Opcode::Max, 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       i, 
                                                                       cpu::InstMaxRegister, 
                                                                       std::numeric_limits<Word>::max()));
@@ -67,7 +67,7 @@ constexpr int TestFieldRs1() noexcept {
     for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(cpu::Opcode::Max, 
-                                                                      cpu::Funct3::Max, 
+                                                                      cpu::Function::Max, 
                                                                       cpu::InstMaxRegister, 
                                                                       i, 
                                                                       std::numeric_limits<Word>::max()));
@@ -84,7 +84,7 @@ constexpr int TestFieldRs1() noexcept {
 constexpr int TestFieldImm() noexcept {
     for(int i = 0; i < 12; i++) {
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(cpu::Opcode::Max,
-                                                                      cpu::Funct3::Max,
+                                                                      cpu::Function::Max,
                                                                       cpu::InstMaxRegister,
                                                                       cpu::InstMaxRegister,
                                                                       1u << i));

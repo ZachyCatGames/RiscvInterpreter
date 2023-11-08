@@ -17,7 +17,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, 0x100 },
             { 15, 0x100 },
             0
@@ -27,7 +27,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_PosImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, 120 },
             { 15, 50 },
             70
@@ -37,7 +37,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_NegImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, 30 },
             { 15, 50 },
             static_cast<Word>(-20)
@@ -47,7 +47,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_NegRs1NegImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, -50 },
             { 15, -30 },
             static_cast<Word>(-20)
@@ -57,7 +57,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_Overflow",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, 0 },
             { 15, std::numeric_limits<Word>::max() },
             1
@@ -67,7 +67,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_Underflow",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, std::numeric_limits<NativeWord>::max() },
             { 15, 0 },
             static_cast<Word>(-1)
@@ -77,7 +77,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "ADDIW_IgnoreUpper",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::ADDIW,
+            cpu::Function::ADDIW,
             { 1, 5 },
             { 15, (1ull << 48) },
             5
@@ -87,7 +87,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SLLIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SLLIW,
+            cpu::Function::SLLIW,
             { 1, 50000 },
             { 15, 50000 },
             0
@@ -97,7 +97,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SLLIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SLLIW,
+            cpu::Function::SLLIW,
             { 1, 50000 << 8 },
             { 15, 50000 },
             8
@@ -107,7 +107,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SLLIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SLLIW,
+            cpu::Function::SLLIW,
             { 1, -50000 << 8 },
             { 15, -50000 },
             8
@@ -117,7 +117,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SLLIW_SignExt",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SLLIW,
+            cpu::Function::SLLIW,
             { 1, std::numeric_limits<NativeWord>::max() << 8 },
             { 15, 0xFFFFFFFF },
             8
@@ -127,7 +127,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRLIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, 50000 },
             { 15, 50000 },
             0
@@ -137,7 +137,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRLIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, 50000 >> 8 },
             { 15, 50000 },
             8
@@ -147,7 +147,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRLIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, static_cast<Word>(-50000) >> 8 },
             { 15, -50000 },
             8
@@ -157,7 +157,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRLIW_SignExt",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, std::numeric_limits<NativeWord>::max() << 8 },
             { 15, 0xFFFFFF00 },
             0
@@ -167,7 +167,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRAIW_ZeroImm",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, -50000 },
             { 15, -50000 },
             (1 << 10u)
@@ -177,7 +177,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRAIW_PosRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, 50000 >> 8 },
             { 15, 50000 },
             8 | (1 << 10u)
@@ -187,7 +187,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRAIW_NegRs1",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, -50000 >> 8 },
             { 15, -50000 },
             8 | (1 << 10u)
@@ -197,7 +197,7 @@ constexpr TestFramework g_TestRunner {
         HartITypeInstTest{
             "SRAIW_SignExt",
             cpu::Opcode::OP_IMM_32,
-            cpu::Funct3::SRLIW,
+            cpu::Function::SRLIW,
             { 1, std::numeric_limits<NativeWord>::max() << 8 },
             { 15, 0xFFFFFF00 },
             0 | (1 << 10u)

@@ -10,8 +10,8 @@ namespace {
 
 class TestInstJALR : public HartSingleInstTestBase<TestInstJALR> {
 public:
-    constexpr TestInstJALR(std::string_view name, cpu::Opcode op, cpu::Funct3 f3, RegPairT rd, RegPairT rs1, Word imm, NativeWord initialPC, NativeWord expectedPC) :
-        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, f3, GetPairId(rd), GetPairId(rs1), imm)), name),
+    constexpr TestInstJALR(std::string_view name, cpu::Opcode op, cpu::Function func, RegPairT rd, RegPairT rs1, Word imm, NativeWord initialPC, NativeWord expectedPC) :
+        HartSingleInstTestBase(cpu::Instruction(cpu::EncodeITypeInstruction(op, func, GetPairId(rd), GetPairId(rs1), imm)), name),
         m_ExpectedRd(rd),
         m_InitialRs1(rs1),
         m_InitialPC(initialPC),
@@ -52,7 +52,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_NoImm",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0x2004 },
             { 15, 0x1000 },
             0,
@@ -64,7 +64,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_PosImm",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0x2004 },
             { 15, 0x1000 },
             0x100,
@@ -76,7 +76,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_NegImm",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0x2004 },
             { 15, 0x1000 },
             static_cast<Word>(-0x100),
@@ -88,7 +88,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_Overflow",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0x2004 },
             { 15, std::numeric_limits<NativeWord>::max() - 7 },
             8,
@@ -100,7 +100,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_Underflow",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0x2004 },
             { 15, 0 },
             static_cast<Word>(-4),
@@ -112,7 +112,7 @@ constexpr TestFramework g_TestRunner{
         TestInstJALR{
             "JALR_OverflowRd",
             cpu::Opcode::JALR,
-            cpu::Funct3::JALR,
+            cpu::Function::JALR,
             { 1, 0 },
             { 15, std::numeric_limits<NativeWord>::max() - 3 },
             static_cast<Word>(-0x100),
