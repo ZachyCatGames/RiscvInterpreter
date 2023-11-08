@@ -28,7 +28,7 @@ constexpr int TestFieldOpcode() noexcept {
 }
 
 constexpr int TestFieldFunct3() noexcept {
-    for(int i = static_cast<int>(cpu::Funct3::Min); i < static_cast<int>(cpu::Funct3::Max); i++) {
+    for(int i = cpu::GetFunction3(cpu::Function::Min); i < cpu::GetFunction3(cpu::Function::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::ITypeInstruction(cpu::EncodeITypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::CreateFunction3(i), 

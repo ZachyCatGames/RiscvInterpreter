@@ -46,7 +46,7 @@ constexpr int TestFieldFunct3() noexcept {
 }
 
 constexpr int TestFieldFunct7() noexcept {
-    for(int i = static_cast<Word>(cpu::Funct7::Min); i < cpu::GetFunction7(cpu::Function::Max); i++) {
+    for(int i = cpu::GetFunction7(cpu::Function::Min); i < cpu::GetFunction7(cpu::Function::Max); i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::RTypeInstruction(cpu::EncodeRTypeInstruction(cpu::Opcode::Max, 
                                                                       cpu::CreateFunction37(0b111, i),
