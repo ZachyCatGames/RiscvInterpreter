@@ -41,7 +41,9 @@ class SBTypeBase : public Instruction {
 public:
     using Instruction::Instruction;
 
-    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr Function function() const noexcept { return static_cast<Function>(this->funct3()); }
+
+    constexpr int funct3() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 12, 3)); }
     constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
     constexpr int rs2() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 20, 5)); }
 };
@@ -59,19 +61,23 @@ class RTypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
+    constexpr Function function() const noexcept { return static_cast<Function>(static_cast<int>(this->funct3()) | (static_cast<int>(this->funct7()) << 3)); }
+
     constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5)); }
-    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr int funct3() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 12, 3)); }
     constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
     constexpr int rs2() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 20, 5)); }
-    constexpr Funct7 funct7() const noexcept { return static_cast<Funct7>(util::ExtractBitfield(this->Get(), 25, 7)); }
+    constexpr int funct7() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 25, 7)); }
 };
 
 class ITypeInstruction : public Instruction {
 public:
     using Instruction::Instruction;
 
+    constexpr Function function() const noexcept { return static_cast<Function>(this->funct3()); }
+
     constexpr int rd() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 7, 5 )); }
-    constexpr Funct3 funct3() const noexcept { return static_cast<Funct3>(util::ExtractBitfield(this->Get(), 12, 3)); }
+    constexpr int funct3() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 12, 3)); }
     constexpr int rs1() const noexcept { return static_cast<int>(util::ExtractBitfield(this->Get(), 15, 5)); }
     constexpr NativeWord imm() const noexcept { return util::ExtractBitfield(this->Get(), 20, 12); }
     constexpr NativeWord imm_ext() const noexcept { return util::SignExtend(static_cast<NativeWord>(this->imm()), 12, NativeWordBitLen); }

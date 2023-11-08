@@ -112,23 +112,23 @@ private:
     }
 
     constexpr Result ParseLOAD(ITypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::LB:
+        switch(inst.function()) {
+        case Function::LB:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLB);
-        case Funct3::LH:
+        case Function::LH:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLH);
-        case Funct3::LW:
+        case Function::LW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLW);
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::LD:
+        case Function::LD:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLD);
 #endif // RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::LBU:
+        case Function::LBU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLBU);
-        case Funct3::LHU:
+        case Function::LHU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLHU);
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::LWU:
+        case Function::LWU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstLWU);
 #endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
@@ -139,10 +139,10 @@ private:
     }
 
     constexpr Result ParseMISC_MEM(ITypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::FENCE:
+        switch(inst.function()) {
+        case Function::FENCE:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstFENCE);
-        case Funct3::FENCEI:
+        case Function::FENCEI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstFENCEI);
         default:
             break;
@@ -152,23 +152,23 @@ private:
     }
 
     constexpr Result ParseOP_IMM(ITypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::ADDI:
+        switch(inst.function()) {
+        case Function::ADDI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstADDI);
-        case Funct3::SLLI: {
+        case Function::SLLI: {
             /* SLLI requires that all upper bits are 0. */
             if(inst.imm() > NativeWordBitLen - 1) {
                 break;
             }
             return this->CallStandardITypeExt(inst, &Derived::ParseInstSLLI);
         }
-        case Funct3::SLTI:
+        case Function::SLTI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstSLTI);
-        case Funct3::SLTIU:
+        case Function::SLTIU:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstSLTIU);
-        case Funct3::XORI:
+        case Function::XORI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstXORI);
-        case Funct3::SRLI: {
+        case Function::SRLI: {
             auto imm = inst.imm();
             auto shamt = imm & ShiftAmtMask;
 
@@ -187,9 +187,9 @@ private:
             /* Otherwise parse as SRLI. */
             return GetDerived()->ParseInstSRLI(CreateOutReg(inst.rd()), CreateInReg(inst.rs1()), CreateImmediate(shamt));
         }
-        case Funct3::ORI:
+        case Function::ORI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstORI);
-        case Funct3::ANDI:
+        case Function::ANDI:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstANDI);
         default:
             break;
@@ -199,13 +199,13 @@ private:
     }
 
     constexpr Result ParseOP_IMM_32(ITypeInstruction inst) {
-        switch(inst.funct3()) {
+        switch(inst.function()) {
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::ADDIW:
+        case Function::ADDIW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstADDIW);
-        case Funct3::SLLIW:
+        case Function::SLLIW:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstSLLIW);
-        case Funct3::SRLIW: {
+        case Function::SRLIW: {
             auto imm = inst.imm();
             auto shamt = imm & ShiftAmtMaskFor32;
 
@@ -233,15 +233,15 @@ private:
     }
 
     constexpr Result ParseSTORE(STypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::SB:
+        switch(inst.function()) {
+        case Function::SB:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSB);
-        case Funct3::SH:
+        case Function::SH:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSH);
-        case Funct3::SW:
+        case Function::SW:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSW);
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::SD:
+        case Function::SD:
             return this->CallStandardSTypeExt(inst, &Derived::ParseInstSD);
 #endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
@@ -252,99 +252,43 @@ private:
     }
 
     constexpr Result ParseOP(RTypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::ADD: {
-            switch(inst.funct7()) {
-            case Funct7::ADD:
-                return this->CallStandardRType(inst, &Derived::ParseInstADD);
-            case Funct7::SUB:
-                return this->CallStandardRType(inst, &Derived::ParseInstSUB);
-            case Funct7::MUL:
-                return this->CallStandardRType(inst, &Derived::ParseInstMUL);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::SLL: {
-            switch(inst.funct7()) {
-            case Funct7::SLL:
-                return this->CallStandardRType(inst, &Derived::ParseInstSLL);
-            case Funct7::MULH:
-                return this->CallStandardRType(inst, &Derived::ParseInstMULH);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::SLT: {
-            switch(inst.funct7()) {
-            case Funct7::SLT:
-                return this->CallStandardRType(inst, &Derived::ParseInstSLT);
-            case Funct7::MULHSU:
-                return this->CallStandardRType(inst, &Derived::ParseInstMULHSU);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::SLTU: {
-            switch(inst.funct7()) {
-            case Funct7::SLTU:
-                return this->CallStandardRType(inst, &Derived::ParseInstSLTU);
-            case Funct7::MULHU:
-                return this->CallStandardRType(inst, &Derived::ParseInstMULHU);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::XOR: {
-            switch(inst.funct7()) {
-            case Funct7::XOR:
-                return this->CallStandardRType(inst, &Derived::ParseInstXOR);
-            case Funct7::DIV:
-                return this->CallStandardRType(inst, &Derived::ParseInstDIV);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::SRL: {
-            switch(inst.funct7()) {
-            case Funct7::SRL:
-                return this->CallStandardRType(inst, &Derived::ParseInstSRL);
-            case Funct7::SRA:
-                return this->CallStandardRType(inst, &Derived::ParseInstSRA);
-            case Funct7::DIVU:
-                return this->CallStandardRType(inst, &Derived::ParseInstDIVU);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::OR: {
-            switch(inst.funct7()) {
-            case Funct7::OR:
-                return this->CallStandardRType(inst, &Derived::ParseInstOR);
-            case Funct7::REM:
-                return this->CallStandardRType(inst, &Derived::ParseInstREM);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::AND: {
-            switch(inst.funct7()) {
-            case Funct7::AND:
-                return this->CallStandardRType(inst, &Derived::ParseInstAND);
-            case Funct7::REMU:
-                return this->CallStandardRType(inst, &Derived::ParseInstREMU);
-            default:
-                break;
-            }
-            break;
-        }
+        switch(inst.function()) {
+        case Function::ADD:
+            return this->CallStandardRType(inst, &Derived::ParseInstADD);
+        case Function::SUB:
+            return this->CallStandardRType(inst, &Derived::ParseInstSUB);
+        case Function::MUL:
+            return this->CallStandardRType(inst, &Derived::ParseInstMUL);
+        case Function::SLL:
+            return this->CallStandardRType(inst, &Derived::ParseInstSLL);
+        case Function::MULH:
+            return this->CallStandardRType(inst, &Derived::ParseInstMULH);
+        case Function::SLT:
+            return this->CallStandardRType(inst, &Derived::ParseInstSLT);
+        case Function::MULHSU:
+            return this->CallStandardRType(inst, &Derived::ParseInstMULHSU);
+        case Function::SLTU:
+            return this->CallStandardRType(inst, &Derived::ParseInstSLTU);
+        case Function::MULHU:
+            return this->CallStandardRType(inst, &Derived::ParseInstMULHU);
+        case Function::XOR:
+            return this->CallStandardRType(inst, &Derived::ParseInstXOR);
+        case Function::DIV:
+            return this->CallStandardRType(inst, &Derived::ParseInstDIV);
+        case Function::SRL:
+            return this->CallStandardRType(inst, &Derived::ParseInstSRL);
+        case Function::SRA:
+            return this->CallStandardRType(inst, &Derived::ParseInstSRA);
+        case Function::DIVU:
+            return this->CallStandardRType(inst, &Derived::ParseInstDIVU);
+        case Function::OR:
+            return this->CallStandardRType(inst, &Derived::ParseInstOR);
+        case Function::REM:
+            return this->CallStandardRType(inst, &Derived::ParseInstREM);
+        case Function::AND:
+            return this->CallStandardRType(inst, &Derived::ParseInstAND);
+        case Function::REMU:
+            return this->CallStandardRType(inst, &Derived::ParseInstREMU);
         default:
             break;
         }
@@ -353,41 +297,27 @@ private:
     }
 
     constexpr Result ParseOP_32(RTypeInstruction inst) {
-        switch(inst.funct3()) {
+        switch(inst.function()) {
 #ifdef RISCV_CFG_CPU_ENABLE_RV64
-        case Funct3::ADDW: {
-            switch(inst.funct7()) {
-            case Funct7::ADDW:
-                return this->CallStandardRType(inst, &Derived::ParseInstADDW);
-            case Funct7::SUBW:
-                return this->CallStandardRType(inst, &Derived::ParseInstSUBW);
-            case Funct7::MULW:
-                return this->CallStandardRType(inst, &Derived::ParseInstMULW);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::SLLW:
+        case Function::ADDW:
+            return this->CallStandardRType(inst, &Derived::ParseInstADDW);
+        case Function::SUBW:
+            return this->CallStandardRType(inst, &Derived::ParseInstSUBW);
+        case Function::MULW:
+            return this->CallStandardRType(inst, &Derived::ParseInstMULW);
+        case Function::SLLW:
             return this->CallStandardRType(inst, &Derived::ParseInstSLLW);
-        case Funct3::DIVW:
+        case Function::DIVW:
             return this->CallStandardRType(inst, &Derived::ParseInstDIVW);
-        case Funct3::SRLW: {
-            switch(inst.funct7()) {
-            case Funct7::SRLW:
-                return this->CallStandardRType(inst, &Derived::ParseInstSRLW);
-            case Funct7::SRAW:
-                return this->CallStandardRType(inst, &Derived::ParseInstSRAW);
-            case Funct7::DIVUW:
-                return this->CallStandardRType(inst, &Derived::ParseInstDIVUW);
-            default:
-                break;
-            }
-            break;
-        }
-        case Funct3::REMW:
+        case Function::SRLW:
+            return this->CallStandardRType(inst, &Derived::ParseInstSRLW);
+        case Function::SRAW:
+            return this->CallStandardRType(inst, &Derived::ParseInstSRAW);
+        case Function::DIVUW:
+            return this->CallStandardRType(inst, &Derived::ParseInstDIVUW);
+        case Function::REMW:
             return this->CallStandardRType(inst, &Derived::ParseInstREMW);
-        case Funct3::REMUW:
+        case Function::REMUW:
             return this->CallStandardRType(inst, &Derived::ParseInstREMUW);
 #endif // RISCV_CFG_CPU_ENABLE_RV64
         default:
@@ -398,18 +328,18 @@ private:
     }
 
     constexpr Result ParseBRANCH(BTypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::BEQ:
+        switch(inst.function()) {
+        case Function::BEQ:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBEQ);
-        case Funct3::BNE:
+        case Function::BNE:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBNE);
-        case Funct3::BLT:
+        case Function::BLT:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBLT);
-        case Funct3::BGE:
+        case Function::BGE:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBGE);
-        case Funct3::BLTU:
+        case Function::BLTU:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBLTU);
-        case Funct3::BGEU:
+        case Function::BGEU:
             return this->CallStandardBTypeExt(inst, &Derived::ParseInstBGEU);
         default:
             break;
@@ -419,8 +349,8 @@ private:
     }
 
     constexpr Result ParseJALR(ITypeInstruction inst) {
-        switch(inst.funct3()) {
-        case Funct3::JALR:
+        switch(inst.function()) {
+        case Function::JALR:
             return this->CallStandardITypeExt(inst, &Derived::ParseInstJALR);
         default:
             break;
@@ -438,18 +368,18 @@ private:
             return (*this->GetDerived().*func)(CreateOutReg(inst.rd()), CreateImmediate(static_cast<Word>(inst.rs1())), CreateImmediate(inst.imm()));
         };
 
-        switch(inst.funct3()) {
-        case Funct3::CSRRW:
+        switch(inst.function()) {
+        case Function::CSRRW:
             return this->CallStandardIType(inst, &Derived::ParseInstCSRRW);
-        case Funct3::CSRRS:
+        case Function::CSRRS:
             return callCsrWithRs1Val(inst, &Derived::ParseInstCSRRS);
-        case Funct3::CSRRC:
+        case Function::CSRRC:
             return callCsrWithRs1Val(inst, &Derived::ParseInstCSRRC);
-        case Funct3::CSRRWI:
+        case Function::CSRRWI:
             return callCsrImm(inst, &Derived::ParseInstCSRRWI);
-        case Funct3::CSRRSI:
+        case Function::CSRRSI:
             return callCsrImm(inst, &Derived::ParseInstCSRRSI);
-        case Funct3::CSRRCI:
+        case Function::CSRRCI:
             return callCsrImm(inst, &Derived::ParseInstCSRRCI);
         default:
             break;
