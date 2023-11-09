@@ -87,6 +87,7 @@
         "ios": "cpp",
         "locale": "cpp",
         "ranges": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "shared_mutex": "cpp"
     }
 }

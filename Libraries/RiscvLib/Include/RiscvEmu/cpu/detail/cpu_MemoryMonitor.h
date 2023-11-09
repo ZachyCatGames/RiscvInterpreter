@@ -18,9 +18,11 @@ public:
         void ReleaseReservation() noexcept;
 
         void AquireSharedAccess(Address addr);
+        bool TryAquireSharedAccess(Address addr);
         void ReleaseSharedAccess();
 
         void AquireExclusiveAccess(Address addr);
+        bool TryAquireExclusiveAccess(Address addr);
         void ReleaseExclusiveAccess();
 
         bool HasReservation() const noexcept;
@@ -39,18 +41,25 @@ public:
     }; // class Context
 public:
     MemoryMonitor() = default;
+    MemoryMonitor(const MemoryMonitor&) = delete;
+    MemoryMonitor(MemoryMonitor&&) = delete;
 
     void Initialize(Word hartCount);
+    void Finalize();
 
     Context GetContext(Word hartId) noexcept;
 private:
     void AquireReservation(Word hartIndex, Address addr) noexcept;
     void ReleaseReservation(Word hartIndex) noexcept;
 
+    void AquireSharedAccessImpl(Word hartIndex, Address addr);
     void AquireSharedAccess(Word hartIndex, Address addr);
+    bool TryAquireSharedAccess(Word hartIndex, Address addr);
     void ReleaseSharedAccess(Word hartIndex);
 
+    void AquireExclusiveAccessImpl(Word hartIndex, Address addr);
     void AquireExclusiveAccess(Word hartIndex, Address addr);
+    bool TryAquireExclusiveAccess(Word hartIndex, Address addr);
     void ReleaseExclusiveAccess(Word hartIndex);
 
     bool HartHasReservation(Word hartId) const noexcept;

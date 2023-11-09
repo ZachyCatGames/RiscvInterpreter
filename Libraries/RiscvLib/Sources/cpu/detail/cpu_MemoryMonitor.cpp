@@ -20,22 +20,42 @@ MemoryMonitor::Context::Context(MemoryMonitor* pParent, Word hartId) noexcept :
 
 void MemoryMonitor::Context::AquireReservation(Address addr) noexcept {
     diag::AssertNotNull(m_pParent);
-    return m_pParent->AquireReservation(m_HartId, addr);
+    m_pParent->AquireReservation(m_HartId, addr);
 }
 
 void MemoryMonitor::Context::ReleaseReservation() noexcept {
     diag::AssertNotNull(m_pParent);
-    return m_pParent->ReleaseReservation(m_HartId);
+    m_pParent->ReleaseReservation(m_HartId);
 }
 
 void MemoryMonitor::Context::AquireSharedAccess(Address addr) {
     diag::AssertNotNull(m_pParent);
-    return m_pParent->AquireSharedAccess(m_HartId, addr);
+    m_pParent->AquireSharedAccess(m_HartId, addr);
+}
+
+bool MemoryMonitor::Context::TryAquireSharedAccess(Address addr) {
+    diag::AssertNotNull(m_pParent);
+    return m_pParent->TryAquireSharedAccess(m_HartId, addr);
 }
 
 void MemoryMonitor::Context::ReleaseSharedAccess() {
     diag::AssertNotNull(m_pParent);
-    return m_pParent->ReleaseSharedAccess(m_HartId);
+    m_pParent->ReleaseSharedAccess(m_HartId);
+}
+
+void MemoryMonitor::Context::AquireExclusiveAccess(Address addr) {
+    diag::AssertNotNull(m_pParent);
+    m_pParent->AquireExclusiveAccess(m_HartId, addr);
+}
+
+bool MemoryMonitor::Context::TryAquireExclusiveAccess(Address addr) {
+    diag::AssertNotNull(m_pParent);
+    return m_pParent->TryAquireExclusiveAccess(m_HartId, addr);
+}
+
+void MemoryMonitor::Context::ReleaseExclusiveAccess() {
+    diag::AssertNotNull(m_pParent);
+    return m_pParent->ReleaseExclusiveAccess(m_HartId);
 }
 
 bool MemoryMonitor::Context::HasReservation() const noexcept {
@@ -72,6 +92,13 @@ void MemoryMonitor::Initialize(Word hartCount) {
     m_ExclEntries   = std::make_unique<ExclAccessEntry[]>(hartCount);
 }
 
+void MemoryMonitor::Finalize() {
+    m_HartCount = 0;
+    m_ReservEntries.reset();
+    m_SharedEntries.reset();
+    m_ExclEntries.reset();
+}
+
 MemoryMonitor::Context MemoryMonitor::GetContext(Word hartId) noexcept { return Context(this, hartId); }
 
 void MemoryMonitor::AquireReservation(Word hartId, Address addr) noexcept {
@@ -102,6 +129,17 @@ void MemoryMonitor::ReleaseReservation(Word hartId) noexcept {
         entry.active = false;
         m_ReserveCount--;
     }
+}
+
+void MemoryMonitor::AquireSharedAccessImpl(Word hartIndex, Address addr) {
+    /* Assert this hart doesn't already have an active shared access reservation. */
+    auto& entry = m_SharedEntries[hartIndex];
+    diag::Assert(!entry.active, "Hart already has active shared access reservation!\n");
+
+    /* Add shared access reservation. */
+    entry.active = true;
+    entry.addr = addr;
+    m_SharedAccessCount++;
 }
 
 void MemoryMonitor::AquireSharedAccess(Word hartIndex, Address addr) {
@@ -144,14 +182,34 @@ void MemoryMonitor::AquireSharedAccess(Word hartIndex, Address addr) {
     /* Release exclusive access mutex. */
     exclLock.unlock();
 
-    /* Assert this hart doesn't already have an active shared access reservation. */
-    auto& entry = m_SharedEntries[hartIndex];
-    diag::Assert(!entry.active, "Hart already has active shared access reservation!\n");
+    /* Aquire shared access reservation. */
+    this->AquireSharedAccessImpl(hartIndex, addr);
+}
 
-    /* Add shared access reservation. */
-    entry.active = true;
-    entry.addr = addr;
-    m_SharedAccessCount++;
+bool MemoryMonitor::TryAquireSharedAccess(Word hartIndex, Address addr) {
+    diag::Assert(hartIndex < m_HartCount);
+
+    std::unique_lock exclLock(m_ExclAccessMutex);
+
+    /* If we have any active exclusive access reservations, check if addr is in one of them. */
+    if(m_ExclAccessCount) {
+        for(auto& entry : std::span(m_ExclEntries.get(), m_HartCount)) {
+            if(entry.active && entry.addr == addr) {
+                return false;
+            }
+        }
+    }
+
+    /* Aquire shared access mutex. */
+    std::scoped_lock sharedLock(m_SharedAccessMutex);
+
+    /* Release exclusive access mutex. */
+    exclLock.unlock();
+
+    /* Aquire shared access reservation. */
+    this->AquireSharedAccessImpl(hartIndex, addr);
+
+    return true;
 }
 
 void MemoryMonitor::ReleaseSharedAccess(Word hartIndex) {
@@ -172,6 +230,17 @@ void MemoryMonitor::ReleaseSharedAccess(Word hartIndex) {
 
     /* Signal anyone waiting on us. */
     entry.cv.notify_one();
+}
+
+void MemoryMonitor::AquireExclusiveAccessImpl(Word hartIndex, Address addr) {
+    /* Assert this hart doesn't already have an active exclusive access reservation. */
+    auto& entry = m_ExclEntries[hartIndex];
+    diag::Assert(!entry.active, "Hart already has active exclusive access reservation!\n");
+
+    /* Add exclusive access reservation. */
+    entry.active = true;
+    entry.addr = addr;
+    m_ExclAccessCount++;
 }
 
 void MemoryMonitor::AquireExclusiveAccess(Word hartIndex, Address addr) {
@@ -212,14 +281,30 @@ void MemoryMonitor::AquireExclusiveAccess(Word hartIndex, Address addr) {
         }
     }
 
-    /* Assert this hart doesn't already have an active exclusive access reservation. */
-    auto& entry = m_ExclEntries[hartIndex];
-    diag::Assert(!entry.active, "Hart already has active exclusive access reservation!\n");
+    /* Add exclusive access reservation. */
+    this->AquireExclusiveAccessImpl(hartIndex, addr);
+}
+
+bool MemoryMonitor::TryAquireExclusiveAccess(Word hartIndex, Address addr) {
+    diag::Assert(hartIndex < m_HartCount);
+
+    /* Aquire both locks. */
+    std::unique_lock exclLock(m_ExclAccessMutex);
+    std::unique_lock sharedLock(m_SharedAccessMutex);
+
+    /* If we have any shared access reservations, check if addr is in one of them. */
+    while(m_SharedAccessCount) {
+        for(auto& entry : std::span(m_SharedEntries.get(), m_HartCount)) {
+            if(entry.active && entry.addr == addr) {
+                return false;
+            }
+        }
+    }
 
     /* Add exclusive access reservation. */
-    entry.active = true;
-    entry.addr = addr;
-    m_ExclAccessCount++;
+    this->AquireExclusiveAccessImpl(hartIndex, addr);
+
+    return true;
 }
 
 void MemoryMonitor::ReleaseExclusiveAccess(Word hartIndex) {
