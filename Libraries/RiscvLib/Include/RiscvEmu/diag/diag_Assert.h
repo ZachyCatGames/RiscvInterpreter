@@ -14,7 +14,7 @@ namespace diag {
 constexpr void Assert(bool) {}
 constexpr void Assert(bool, const std::source_location&) {}
 template<typename... Args>
-constexpr void Assert(bool, std::string_view, Args&&...) {}
+constexpr void Assert(bool, const diag::FormatString&, Args&&...) {}
 
 template<typename T>
 constexpr void AssertNotNull(T) {}
