@@ -91,13 +91,13 @@ public:
     constexpr Result WriteHWordImpl(HWord in, Address addr) {
         if constexpr(std::endian::native == std::endian::little) {
             /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = in >> 0 & 0xFF;
-            m_pMem[addr + 1] = in >> 8 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >> 0u & 0xFFu);
+            m_pMem[addr + 1] = static_cast<Byte>(in >> 8u & 0xFFu);
         }
         else /* if constexpr(std::endian::native == std::endian::big) */ {
             /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = in >> 8 & 0xFF;
-            m_pMem[addr + 1] = in >> 0 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >> 8 & 0xFF);
+            m_pMem[addr + 1] = static_cast<Byte>(in >> 0 & 0xFF);
         }
         return ResultSuccess();
     }
@@ -105,17 +105,17 @@ public:
     constexpr Result WriteWordImpl(Word in, Address addr) {
         if constexpr(std::endian::native == std::endian::little) {
             /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = in >>  0 & 0xFF;
-            m_pMem[addr + 1] = in >>  8 & 0xFF;
-            m_pMem[addr + 2] = in >> 16 & 0xFF;
-            m_pMem[addr + 3] = in >> 24 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >>  0 & 0xFF);
+            m_pMem[addr + 1] = static_cast<Byte>(in >>  8 & 0xFF);
+            m_pMem[addr + 2] = static_cast<Byte>(in >> 16 & 0xFF);
+            m_pMem[addr + 3] = static_cast<Byte>(in >> 24 & 0xFF);
         }
         else /* if constexpr(std::endian::native == std::endian::big) */ {
             /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = in >> 24 & 0xFF;
-            m_pMem[addr + 1] = in >> 16 & 0xFF;
-            m_pMem[addr + 2] = in >>  8 & 0xFF;
-            m_pMem[addr + 3] = in >>  0 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >> 24 & 0xFF);
+            m_pMem[addr + 1] = static_cast<Byte>(in >> 16 & 0xFF);
+            m_pMem[addr + 2] = static_cast<Byte>(in >>  8 & 0xFF);
+            m_pMem[addr + 3] = static_cast<Byte>(in >>  0 & 0xFF);
         }
         return ResultSuccess();
     }
@@ -123,25 +123,25 @@ public:
     constexpr Result WriteDWordImpl(DWord in, Address addr) {
         if constexpr(std::endian::native == std::endian::little) {
             /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = in >>  0 & 0xFF;
-            m_pMem[addr + 1] = in >>  8 & 0xFF;
-            m_pMem[addr + 2] = in >> 16 & 0xFF;
-            m_pMem[addr + 3] = in >> 24 & 0xFF;
-            m_pMem[addr + 4] = in >> 32 & 0xFF;
-            m_pMem[addr + 5] = in >> 40 & 0xFF;
-            m_pMem[addr + 6] = in >> 48 & 0xFF;
-            m_pMem[addr + 7] = in >> 56 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >>  0 & 0xFF);
+            m_pMem[addr + 1] = static_cast<Byte>(in >>  8 & 0xFF);
+            m_pMem[addr + 2] = static_cast<Byte>(in >> 16 & 0xFF);
+            m_pMem[addr + 3] = static_cast<Byte>(in >> 24 & 0xFF);
+            m_pMem[addr + 4] = static_cast<Byte>(in >> 32 & 0xFF);
+            m_pMem[addr + 5] = static_cast<Byte>(in >> 40 & 0xFF);
+            m_pMem[addr + 6] = static_cast<Byte>(in >> 48 & 0xFF);
+            m_pMem[addr + 7] = static_cast<Byte>(in >> 56 & 0xFF);
         }
         else /* if constexpr(std::endian::native == std::endian::big) */ {
             /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = in >> 56 & 0xFF;
-            m_pMem[addr + 1] = in >> 48 & 0xFF;
-            m_pMem[addr + 2] = in >> 40 & 0xFF;
-            m_pMem[addr + 3] = in >> 32 & 0xFF;
-            m_pMem[addr + 4] = in >> 24 & 0xFF;
-            m_pMem[addr + 5] = in >> 16 & 0xFF;
-            m_pMem[addr + 6] = in >>  8 & 0xFF;
-            m_pMem[addr + 7] = in >>  0 & 0xFF;
+            m_pMem[addr + 0] = static_cast<Byte>(in >> 56 & 0xFF);
+            m_pMem[addr + 1] = static_cast<Byte>(in >> 48 & 0xFF);
+            m_pMem[addr + 2] = static_cast<Byte>(in >> 40 & 0xFF);
+            m_pMem[addr + 3] = static_cast<Byte>(in >> 32 & 0xFF);
+            m_pMem[addr + 4] = static_cast<Byte>(in >> 24 & 0xFF);
+            m_pMem[addr + 5] = static_cast<Byte>(in >> 16 & 0xFF);
+            m_pMem[addr + 6] = static_cast<Byte>(in >>  8 & 0xFF);
+            m_pMem[addr + 7] = static_cast<Byte>(in >>  0 & 0xFF);
         }
         return ResultSuccess();
     }
