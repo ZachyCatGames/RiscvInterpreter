@@ -1,21 +1,27 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
-#include <vector>
+#include <condition_variable>
+#include <memory>
+#include <mutex>
 
 namespace riscv {
 namespace cpu {
 namespace detail {
 
 class MemoryMonitor {
-private:
-    struct Entry;
 public:
     class Context {
     public:
         Context() noexcept;
 
-        void AddReservation(Address addr) noexcept;
-        void ClearReservation() noexcept;
+        void AquireReservation(Address addr) noexcept;
+        void ReleaseReservation() noexcept;
+
+        void AquireSharedAccess(Address addr);
+        void ReleaseSharedAccess();
+
+        void AquireExclusiveAccess(Address addr);
+        void ReleaseExclusiveAccess();
 
         bool HasReservation() const noexcept;
         Address GetReservedAddress() const noexcept;
@@ -26,35 +32,66 @@ public:
         bool TryRevokeAnyReservation(Address addr) noexcept;
     private:
         friend class MemoryMonitor;
-        Context(MemoryMonitor* pParent, std::size_t hartId) noexcept;
+        Context(MemoryMonitor* pParent, Word hartId) noexcept;
     private:
         MemoryMonitor* m_pParent;
-        std::size_t m_HartId;
+        Word m_HartId;
     }; // class Context
 public:
     MemoryMonitor() = default;
 
-    void Initialize(std::size_t hartCount);
+    void Initialize(Word hartCount);
 
-    Context GetContext(std::size_t hartId) noexcept;
+    Context GetContext(Word hartId) noexcept;
 private:
-    void AddReservation(std::size_t hartIndex, Address addr) noexcept;
-    void ClearReservation(std::size_t hartIndex) noexcept;
+    void AquireReservation(Word hartIndex, Address addr) noexcept;
+    void ReleaseReservation(Word hartIndex) noexcept;
 
-    bool HartHasReservation(std::size_t hartId) const noexcept;
-    Address HartGetReservedAddress(std::size_t hartId) const noexcept;
+    void AquireSharedAccess(Word hartIndex, Address addr);
+    void ReleaseSharedAccess(Word hartIndex);
+
+    void AquireExclusiveAccess(Word hartIndex, Address addr);
+    void ReleaseExclusiveAccess(Word hartIndex);
+
+    bool HartHasReservation(Word hartId) const noexcept;
+    Address HartGetReservedAddress(Word hartId) const noexcept;
 
     bool IsAddressReserved(Address addr) const noexcept;
 
     bool TryRevokeReservation(Address addr) noexcept;
 private:
-    struct Entry {
+    struct ReservationEntry {
         bool active;
         Address addr;
     }; // struct Entry
 
-    std::size_t m_ActiveCount;
-    std::vector<Entry> m_Entries;
+    struct SharedAccessEntry {
+        bool active;
+        Address addr;
+        std::mutex mutex;
+        std::condition_variable cv;
+    }; // struct SharedAccessEntry
+
+    struct ExclAccessEntry {
+        bool active;
+        Address addr;
+        std::mutex mutex;
+        std::condition_variable cv;
+    }; // struct ExclAccessEntry
+
+    std::mutex m_ExclAccessMutex;
+    std::mutex m_SharedAccessMutex;
+
+    Word m_HartCount;
+
+    std::size_t m_ReserveCount;
+    std::unique_ptr<ReservationEntry[]> m_ReservEntries;
+
+    std::size_t m_SharedAccessCount;
+    std::unique_ptr<SharedAccessEntry[]> m_SharedEntries;
+
+    std::atomic<std::size_t> m_ExclAccessCount;
+    std::unique_ptr<ExclAccessEntry[]> m_ExclEntries;
 }; // class MemoryMonitor
 
 } // namespace detail
