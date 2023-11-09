@@ -4,7 +4,7 @@
 namespace riscv {
 namespace cpu {
 
-void Hart::SharedState::Initialize(std::size_t hartCount, mem::MemoryController* pMemCtlr) noexcept {
+void Hart::SharedState::Initialize(Word hartCount, mem::MemoryController* pMemCtlr) noexcept {
     /* Assert memory controller isn't null. */
     diag::AssertNotNull(pMemCtlr);
 

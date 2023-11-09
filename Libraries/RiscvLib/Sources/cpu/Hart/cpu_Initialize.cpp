@@ -4,7 +4,7 @@
 namespace riscv {
 namespace cpu {
 
-Result Hart::Initialize(SharedState* pSharedCtx, std::size_t hartId) {
+Result Hart::Initialize(SharedState* pSharedCtx, Word hartId) {
     /* Assert shared context isn't null. */
     diag::AssertNotNull(pSharedCtx);
 

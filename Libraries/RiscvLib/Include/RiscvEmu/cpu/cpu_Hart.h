@@ -19,19 +19,19 @@ class Hart {
 public:
     class SharedState {
     public:
-        void Initialize(std::size_t hartCount, mem::MemoryController* pMemCtlr) noexcept;
+        void Initialize(Word hartCount, mem::MemoryController* pMemCtlr) noexcept;
 
         mem::MemoryController* GetMemController() noexcept;
 
         detail::MemoryMonitor* GetMemMonitor() noexcept;
     private:
-        std::size_t m_HartCount;
+        Word m_HartCount;
         mem::MemoryController* m_pMemCtlr;
         detail::MemoryMonitor m_MemMonitor;
     }; // SharedState
 public:
     /** Initialize the Hart. */
-    Result Initialize(SharedState* pSharedCtx, std::size_t hartId);
+    Result Initialize(SharedState* pSharedCtx, Word hartId);
 public:
     /** Read the instruction currently at PC. */
     Result FetchInstAtPc(Instruction* pOut);
@@ -179,7 +179,7 @@ private:
 
     PrivilageLevel m_CurPrivLevel;
 
-    std::size_t m_HartId;
+    Word m_HartId;
 
     /** Cycle & retired inst count. */
     DWord m_CycleCount;

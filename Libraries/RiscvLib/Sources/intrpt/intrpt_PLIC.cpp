@@ -14,17 +14,17 @@ namespace {
 [[maybe_unused]] constexpr auto MinTargetCount = 0;
 [[maybe_unused]] constexpr auto MaxTargetCount = 15872;
 
-[[maybe_unused]] constexpr auto PriorityRegStart = 0x0 / sizeof(Word);
-[[maybe_unused]] constexpr auto PriorityRegEnd   = 0x1000 / sizeof(Word);
+[[maybe_unused]] constexpr Word PriorityRegStart = 0x0 / sizeof(Word);
+[[maybe_unused]] constexpr Word PriorityRegEnd   = 0x1000 / sizeof(Word);
 
-[[maybe_unused]] constexpr auto PendingRegStart = 0x1000 / sizeof(Word);
-[[maybe_unused]] constexpr auto PendingRegEnd   = 0x2000 / sizeof(Word);
+[[maybe_unused]] constexpr Word PendingRegStart = 0x1000 / sizeof(Word);
+[[maybe_unused]] constexpr Word PendingRegEnd   = 0x2000 / sizeof(Word);
 
-[[maybe_unused]] constexpr auto EnabledRegStart = 0x2000 / sizeof(Word);
-[[maybe_unused]] constexpr auto EnabledRegEnd   = 0x20000 / sizeof(Word);
+[[maybe_unused]] constexpr Word EnabledRegStart = 0x2000 / sizeof(Word);
+[[maybe_unused]] constexpr Word EnabledRegEnd   = 0x20000 / sizeof(Word);
 
-[[maybe_unused]] constexpr auto ContextRegStart = 0x200000 / sizeof(Word);
-[[maybe_unused]] constexpr auto ContextRegEnd   = AddrSpaceSize / sizeof(Word);
+[[maybe_unused]] constexpr Word ContextRegStart = 0x200000 / sizeof(Word);
+[[maybe_unused]] constexpr Word ContextRegEnd   = AddrSpaceSize / sizeof(Word);
 
 [[maybe_unused]] constexpr auto EnabledWordsPerContext = 1024 / 32;
 
