@@ -94,7 +94,7 @@ constexpr Result GetTranslationResult(Result res, Result accessFault, Result pag
     if(res.IsFailure()) {
         /* No PTE found & unprivilaged access are page faults. */
         if (ResultNoValidPteFound::Includes(res) ||
-            ResultCannotAccessMapFromPriv::Includes(res)) {
+            ResultPageFault::Includes(res)) {
             return pageFault;
         }
 
@@ -210,7 +210,7 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
     return (*m_pMemCtlr.*writeFunc)(in, addr);
 }
 
-Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
+Result MemoryManager::GetPteImpl(PTE* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
     /* Assert that outputs aren't null. */
     diag::AssertNotNull(pPte);
     diag::AssertNotNull(pPteAddr);
@@ -240,7 +240,7 @@ Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLeve
         /* Check if this is a leaf, return if it is. */
         if(pte.IsLeaf()) {
             *pLevelFound = curLevel;
-            *pPte = pteVal;
+            *pPte = pte;
             *pPteAddr = pteAddr;
             return ResultSuccess();
         }
@@ -255,41 +255,60 @@ Result MemoryManager::GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLeve
     return ResultNoValidPteFound();
 }
 
-Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TransChkFunc chkFunc) {
+Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TranslationReason reason) {
     Result res;
 
     /* Assert that output & check func aren't null. */
     diag::AssertNotNull(pAddrOut);
-    diag::AssertNotNull(chkFunc);
 
     /* Get PTE. */
-    NativeWord pteVal = 0;
+    PTE pte;
     Address pteAddr = 0;
     int levelFound = 0;
-    res = this->GetPteImpl(&pteVal, &pteAddr, &levelFound, addr);
+    res = this->GetPteImpl(&pte, &pteAddr, &levelFound, addr);
     if(res.IsFailure()) {
         return res;
     }
 
     /* If we're running in userspace, make sure User bit is set. */
-    PTE pte(pteVal);
     if(level == PrivilageLevel::User) {
         if(!pte.GetForUser()) {
-            return ResultCannotAccessMapFromPriv();
+            return ResultPageFault();
         }
     }
 
     /* If we're running as supervisor, make sure User bit is unset or SUM is enabled. */
     else if (level == PrivilageLevel::Supervisor) {
         if(pte.GetForUser() && !m_EnableSUM) {
-            return ResultCannotAccessMapFromPriv();
+            return ResultPageFault();
         }
     }
 
-    /* Run provided check function. */
-    res = chkFunc(this, &pte);
-    if(res.IsFailure()) {
-        return res;
+    /* Perform check(s) based on reason. */
+    switch(reason) {
+    case TranslationReason::Load: {
+        /* Make sure we can read from this page. */
+        if(!pte.GetReadable() && !(this->GetEnabledMXR() && pte.GetExecutable())) {
+            return ResultPageFault();
+        }
+    }
+    case TranslationReason::Store: {
+        /* Make sure we can write to this page. */
+        if(!pte.GetWriteable()) {
+            return ResultPageFault();
+        }
+
+        /* Set dirty bit. */
+        pte.SetDirty(true);
+    }
+    case TranslationReason::Fetch: {
+        /* Make sure we can fetch from this page. */
+        if(!pte.GetExecutable()) {
+            return ResultPageFault();
+        }
+    }
+    case TranslationReason::Any: break;
+    default: diag::UnexpectedDefault();
     }
 
     /* Set PTE accessed bit. */
@@ -317,71 +336,37 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
 }
 
 Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = [](MemoryManager* pManager, PTE* pPte) -> Result {
-        /* Make sure we can read this page. */
-        if(!pPte->GetReadable() && !pManager->GetEnabledMXR()) {
-            return ResultLoadPageFault();
-        }
-
-        return ResultSuccess();
-    };
-
     /* Assert that output isn't null. */
     diag::AssertNotNull(pOut);
 
     /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Load);
 
     return GetTranslationResult(res, ResultLoadAccessFault(), ResultLoadPageFault());
 }
 
 Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = []([[maybe_unused]] MemoryManager*, PTE* pPte) -> Result {
-        /* Make sure we can write this page. */
-        if(!pPte->GetWriteable()) {
-            return ResultStorePageFault();
-        }
-
-        /* Set dirty bit. */
-        pPte->SetDirty(true);
-
-        return ResultSuccess();
-    };
-
     /* Assert that output isn't null. */
     diag::AssertNotNull(pOut);
 
     /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Store);
 
     return GetTranslationResult(res, ResultStoreAccessFault(), ResultStorePageFault());
 }
 
 Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = []([[maybe_unused]] MemoryManager*, PTE* pPte) -> Result {
-        /* Make sure we can fetch from this page. */
-        if(!pPte->GetExecutable()) {
-            return ResultFetchPageFault();
-        }
-
-        return ResultSuccess();
-    };
-
     /* Assert that output isn't null. */
     diag::AssertNotNull(pOut);
 
     /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, chkFunc);
+    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Fetch);
 
     return GetTranslationResult(res, ResultFetchAccessFault(), ResultFetchPageFault());
 }
 
 Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
-    auto chkFunc = []([[maybe_unused]] MemoryManager*, [[maybe_unused]] PTE* pPte) -> Result {
-        return ResultSuccess();
-    };
-
-    return this->TranslateImpl(pOut, addr, level, chkFunc);
+    return this->TranslateImpl(pOut, addr, level, TranslationReason::Any);
 }
 
 Result MemoryManager::ReadByte(Byte* pOut, Address addr, PrivilageLevel level) {

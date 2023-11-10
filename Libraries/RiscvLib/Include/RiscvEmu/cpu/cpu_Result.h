@@ -25,7 +25,7 @@ class ResultFetchPageFault   : public result::ErrorBase<detail::ModuleId, 205> {
 /* Internal translation error. */
 class ResultInvalidTranslationMode  : public result::ErrorBase<detail::ModuleId, 210> {};
 class ResultNoValidPteFound         : public result::ErrorBase<detail::ModuleId, 211> {};
-class ResultCannotAccessMapFromPriv : public result::ErrorBase<detail::ModuleId, 212> {};
+class ResultPageFault               : public result::ErrorBase<detail::ModuleId, 212> {};
 
 /* CSR Access errors. */
 class ResultCsrIdInvalid       : public result::ErrorBase<detail::ModuleId, 300> {};

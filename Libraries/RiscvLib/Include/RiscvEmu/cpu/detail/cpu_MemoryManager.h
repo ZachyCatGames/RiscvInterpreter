@@ -62,19 +62,25 @@ private:
     template<typename T>
     Result MappedWriteImpl(auto readFunc, T in, Address addr);
 
-    Result GetPteImpl(NativeWord* pPte, Address* pPteAddr, int* pLevelFound, Address addr);
-
     class PTE;
 
-    using TransChkFunc = Result(*)(MemoryManager*,PTE*);
+    enum class TranslationReason {
+        Load,
+        Store,
+        Fetch,
+        Any
+    }; // enum class TranslationReason
 
-    Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TransChkFunc chkFunc);
+    Result GetPteImpl(PTE* pPte, Address* pPteAddr, int* pLevelFound, Address addr);
+
+    Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TranslationReason reason);
 
     Result TranslateForRead(Address* pOut, Address addr, PrivilageLevel level);
     Result TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level);
     Result TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level);
     Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
 private:
+
     mem::MemoryController* m_pMemCtlr;
     Address m_PTAddr;
 
