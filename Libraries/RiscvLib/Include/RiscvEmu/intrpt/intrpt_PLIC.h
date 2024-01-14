@@ -59,18 +59,17 @@ private:
     bool ReadContextRegImpl(Word* pOut, Word index) noexcept;
     bool WriteContextRegImpl(Word index, Word val) noexcept;
 private:
-    struct SourceImpl;
+    class Source;
+    struct QueueData;
 
     void CleanupQueue();
 
-    void AddSourceToQueue(SourceImpl* pSrc);
+    void AddSourceToQueue(Source* pSrc);
     Word ClaimTopRequest();
-    void NotifyCompletion(Word sourceId);
 
-    bool CanTargetTakeTopIRQ(Word targetId) const noexcept;
-
-    void NotifyTargetIRQAvailable(Word targetId);
     void NotifyAllTargetsIRQAvailable();
+
+    const QueueData& GetQueueTop() const;
 
     bool TargetIdValid(Word id) const noexcept;
     bool SourceIdValid(Word id) const noexcept;
@@ -94,64 +93,90 @@ private:
         PLIC* m_pParent;
     }; // class MmioInterface
 
-    class TargetBridgeImpl : public ITargetCtlrBridge {
-    public:
-        TargetBridgeImpl() noexcept;
-
-        virtual Result EnableInterrupts() override;
-
-        virtual Result DisableInterrupts() override;
-
-        virtual bool IsPendingInterruptAvailable() override;
-    private:
-        friend class PLIC;
-        void Initialize(PLIC* pParent, Word id) noexcept;
-    private:
-        PLIC* m_pParent;
-        Word m_Id;
-    }; // class TargetBridgeImpl
-
     enum class InterruptState {
         Waiting,
         Pending,
         AwaitCompletion
     }; // enum class InterruptState
 
-    struct SourceImpl : public ISource {
+    class Source : public ISource {
     public:
-        SourceImpl() noexcept;
+        Source() noexcept;
+
         void Initialize(PLIC* pParent) noexcept;
+
         void Finalize() noexcept;
 
         bool IsInitialized() const noexcept;
 
         Word GetId() const noexcept;
 
-        virtual Result SignalInterrupt() override;
+        Word ReadPriority() const noexcept;
+        void WritePriority(Word val) noexcept;
 
-        PLIC* pParent;
-        InterruptState state;
-        Word priority;
-        Word pendingCount;
-    }; // class SourceImpl
+        Word GetPendingCount() const noexcept;
+
+        InterruptState GetState() const noexcept;
+
+        void NotifyPending() noexcept;
+        void NotifyWaiting() noexcept;
+        Word NotifyClaimed() noexcept;
+        void NotifyComplete() noexcept;
+
+        virtual Result SignalInterrupt() override;
+    private:
+        PLIC* m_pParent;
+        InterruptState m_State;
+        Word m_Priority;
+        Word m_PendingCount;
+    }; // class Source
 
     struct QueueData {
-        QueueData(SourceImpl* p, Word prio) noexcept;
+        QueueData(Source* p, Word prio) noexcept;
 
         auto operator<=>(const QueueData& rhs) const noexcept;
         
-        SourceImpl* pSrc;
+        Source* pSrc;
         Word priority;
     }; // struct QueueData
 
-    struct TargetContext {
-        TargetContext() noexcept;
+    class Target : public detail::ITargetForCtrl {
+    public:
+        virtual bool HasPendingIRQ() override;
 
-        TargetPtrT pTarget = nullptr;
-        Word priorityThreshold;
-        TargetBridgeImpl bridge;
-        std::vector<Word> enableBits;
-    }; // struct TargetContextRegisters
+        virtual Result EnableInterrupts() override;
+
+        virtual Result DisableInterrupts() override;
+    public:
+        Target() noexcept;
+        Target(Target&&) = default;
+        Target(const Target&) = default;
+        virtual ~Target();
+
+        void Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id, Word pending);
+
+        void Finalize();
+
+        bool IsInitialized() const noexcept;
+
+        Word ReadEnableReg(Word index) const;
+        void WriteEnableReg(Word index, Word val);
+
+        Word ReadPrioThreshold() const noexcept;
+        void WritePrioThreshold(Word val) noexcept;
+
+        bool HasEnabledIRQ(Word src);
+
+        bool CanTakeTopIRQ();
+
+        Result NotifyAvailableIRQImpl();
+    private:
+        TargetPtrT m_pTarget;
+        std::vector<Word> m_EnableBits;
+        PLIC* m_pParent;
+        Word m_PrioThreshold;
+        Word m_Id;
+    }; // struct Target
 private:
     bool m_Claimed;
 
@@ -160,8 +185,8 @@ private:
 
     Word m_PendingCount;
 
-    std::vector<SourceImpl> m_Sources;
-    std::vector<TargetContext> m_Targets;
+    std::vector<Source> m_Sources;
+    std::vector<Target> m_Targets;
 
     std::vector<Word> m_PendingBits;
 

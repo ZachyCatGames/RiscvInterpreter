@@ -3,21 +3,17 @@
 namespace riscv {
 namespace intrpt {
 
-Result ITarget::InitializeForController(ITargetCtlrBridge* pCtlrBridge) {
-    m_pCtlrBridge = pCtlrBridge;
-    return ResultSuccess();
-}
+void ITarget::InitializeForController(detail::ITargetForCtrl* pCtlrBridge) { m_pCtlrBridge = pCtlrBridge; }
 
-Result ITarget::HandleIRQ() { return ResultSuccess(); }
+Result ITarget::NotifyAvailableIRQ() { return ResultSuccess(); }
 
-bool ITarget::IsPendingInterruptAvailable() {
-    /* Check if we've been notified of interrupt, if we have ask the interrupt controller
-     * if a request is still available, since asking the controller is relatively expensive. */
-    if(m_IRQNotified) {
-        m_IRQNotified = m_pCtlrBridge->IsPendingInterruptAvailable();
+bool ITarget::HasPendingIRQ() {
+    /* If we think we have an interrupt available, double check. */
+    if(m_PendingIRQ) {
+        m_PendingIRQ = m_pCtlrBridge->HasPendingIRQ();
     }
 
-    return m_IRQNotified;
+    return m_PendingIRQ;
 }
 
 Result ITarget::EnableInterrupts() {
@@ -28,12 +24,12 @@ Result ITarget::DisableInterrupts() {
     return m_pCtlrBridge->DisableInterrupts();
 }
 
-Result ITarget::NotifyIRQImpl() {
+Result ITarget::NotifyAvailableIRQImpl() {
     /* Set notified flag. */
-    m_IRQNotified = true;
+    m_PendingIRQ = true;
 
     /* Call IRQ handler function. */
-    return this->HandleIRQ();
+    return this->NotifyAvailableIRQ();
 }
 
 } // namespace intrpt

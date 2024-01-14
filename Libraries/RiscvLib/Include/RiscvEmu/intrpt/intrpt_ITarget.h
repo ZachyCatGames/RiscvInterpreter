@@ -1,6 +1,6 @@
 #pragma once
 #include <RiscvEmu/result.h>
-#include <RiscvEmu/intrpt/intrpt_ITargetCtlrBridge.h>
+#include <RiscvEmu/intrpt/detail/intrpt_ITargetForCtrl.h>
 
 namespace riscv {
 namespace intrpt {
@@ -19,19 +19,18 @@ public:
     virtual ~ITarget() noexcept = default;
 
     /**
-     * This may be implemented by the target and will be called in addition
-     * to setting the IRQ notified flag when an interrupt controller notifies us
-     * that an interrupt request is pending.
-     *
-     * Note: Targets should be careful to not claim a request in their handler while still acepting
-     * interrupts, as this may cause an infinite loop.
+     * This may be implemented by target devices and will be called whenever
+     * an interrupt the target has enabled is pending.
+     * 
+     * Note: Targets should not claim a request within this.
     */
-    virtual Result HandleIRQ();
+    virtual Result NotifyAvailableIRQ();
 
     /**
-     * Returns whether a pending interrupt is available for this target.
+     * This updates the internal pending flag and returns whether an interrupt is
+     * pending for this target.
     */
-    bool IsPendingInterruptAvailable();
+    bool HasPendingIRQ();
 
     /**
      * Notify the interrupt controller that the target won't be accepting
@@ -53,22 +52,26 @@ public:
     */
     Result DisableInterrupts();
 
+    bool HasEnabledIRQ(int src);
+private:
+    friend class detail::ITargetForCtrl;
+
     /**
      * Initialize the controller bridge.
      *
      * Should be only be called by a interrupt controller.
     */
-    Result InitializeForController(ITargetCtlrBridge* pCtlrBridge);
+    void InitializeForController(detail::ITargetForCtrl* pCtlrBridge);
 
     /**
      * Notifies the target that an interrupt request is available/pending.
      *
      * This should be only called by the interrupt controller.
     */
-    Result NotifyIRQImpl();
+    Result NotifyAvailableIRQImpl();
 private:
-    bool m_IRQNotified;
-    ITargetCtlrBridge* m_pCtlrBridge;
+    bool m_PendingIRQ;
+    detail::ITargetForCtrl* m_pCtlrBridge;
 }; // class ITarget
 
 } // namespace intrpt

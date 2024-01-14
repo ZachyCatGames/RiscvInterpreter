@@ -61,58 +61,160 @@ Result PLIC::MmioInterface::WriteWord(Word in, Address addr) {
     return ResultSuccess();
 }
 
-PLIC::TargetBridgeImpl::TargetBridgeImpl() noexcept :
-    m_pParent(nullptr), m_Id(0) {}
+PLIC::Target::Target() noexcept = default;
+PLIC::Target::~Target() = default;
 
-void PLIC::TargetBridgeImpl::Initialize(PLIC* pParent, Word id) noexcept {
+void PLIC::Target::Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id, Word pending) {
     diag::AssertNotNull(pParent);
+    diag::AssertNotNull(pTarget);
+    m_pTarget = std::move(pTarget);
+    m_EnableBits.resize(pending);
     m_pParent = pParent;
+    m_PrioThreshold = 0;
     m_Id = id;
 }
 
-Result PLIC::TargetBridgeImpl::EnableInterrupts() { return ResultSuccess(); }
-Result PLIC::TargetBridgeImpl::DisableInterrupts() { return ResultSuccess(); }
+void PLIC::Target::Finalize() { m_pTarget.reset(); }
 
-bool PLIC::TargetBridgeImpl::IsPendingInterruptAvailable() { return m_pParent->CanTargetTakeTopIRQ(m_Id); }
+bool PLIC::Target::IsInitialized() const noexcept { return m_pTarget != nullptr; }
 
-PLIC::SourceImpl::SourceImpl() noexcept :
-    pParent(nullptr), state(InterruptState::Waiting), priority(0), pendingCount(0) {}
+Word PLIC::Target::ReadEnableReg(Word index) const {
+    diag::Assert(m_Id < m_EnableBits.size());
+    return m_EnableBits[index];
+}
 
-void PLIC::SourceImpl::Initialize(PLIC* pParent) noexcept {
+void PLIC::Target::WriteEnableReg(Word index, Word val) {
+    diag::Assert(m_Id < m_EnableBits.size());
+    m_EnableBits[index] = val;
+}
+
+Word PLIC::Target::ReadPrioThreshold() const noexcept { return m_PrioThreshold; }
+void PLIC::Target::WritePrioThreshold(Word val) noexcept { m_PrioThreshold = val; }
+
+bool PLIC::Target::HasEnabledIRQ(Word src) {
+    auto reg = this->ReadEnableReg(src / sizeof(m_EnableBits[0]) * 8);
+    return util::ExtractBitfield(reg, src % 32, 1);
+}
+
+bool PLIC::Target::CanTakeTopIRQ() {
+    auto& top = m_pParent->GetQueueTop();
+
+    /* Return false if this target isn't initialized. */
+    if(!this->IsInitialized()) {
+        return false;
+    }
+
+    /* Return false if the source priority is too low for this target. */
+    if(top.priority < m_PrioThreshold) {
+        return false;
+    }
+
+    /* Return false if this target doesn't have this interrupt enabled. */
+    if(!this->HasEnabledIRQ(top.pSrc->GetId())) {
+        return false;
+    }
+
+    return true;
+}
+
+Result PLIC::Target::NotifyAvailableIRQImpl() {
+    /* Check if we can take the top IRQ. */
+    if(!this->CanTakeTopIRQ()) {
+        return ResultSuccess();
+    }
+
+    /* Notify target. */
+    return this->NotifyAvailableIRQ();
+}
+
+PLIC::Source::Source() noexcept :
+    m_pParent(nullptr), m_State(InterruptState::Waiting), m_Priority(0), m_PendingCount(0) {}
+
+void PLIC::Source::Initialize(PLIC* pParent) noexcept {
     diag::AssertNotNull(pParent);
-    this->pParent = pParent;
-    this->state = InterruptState::Waiting;
-    this->priority = 0;
-    this->pendingCount = 0;
+    m_pParent = pParent;
+    m_State = InterruptState::Waiting;
+    m_Priority = 0;
+    m_PendingCount = 0;
 }
 
-void PLIC::SourceImpl::Finalize() noexcept { this->pParent = nullptr; }
+void PLIC::Source::Finalize() noexcept { m_pParent = nullptr; }
 
-bool PLIC::SourceImpl::IsInitialized() const noexcept { return this->pParent != nullptr; }
+bool PLIC::Source::IsInitialized() const noexcept { return m_pParent != nullptr; }
 
-Word PLIC::SourceImpl::GetId() const noexcept {
-    return static_cast<Word>(this - this->pParent->m_Sources.data());
+Word PLIC::Source::ReadPriority() const noexcept { return m_Priority; }
+void PLIC::Source::WritePriority(Word val) noexcept { m_Priority = val; }
+
+PLIC::InterruptState PLIC::Source::GetState() const noexcept { return m_State; }
+
+void PLIC::Source::NotifyPending() noexcept { m_State = PLIC::InterruptState::Pending; }
+void PLIC::Source::NotifyWaiting() noexcept { m_State = PLIC::InterruptState::Waiting; }
+
+Word PLIC::Source::NotifyClaimed() noexcept {
+    /* Set our status to awaiting completion. */
+    m_State = PLIC::InterruptState::AwaitCompletion;
+
+    /* Decrement our pending count. */
+    m_PendingCount--;
+
+    /* Clear our pending bit if needed. */
+    auto id = this->GetId();
+    if(!m_PendingCount) {
+        m_pParent->SetPending(static_cast<int>(id), 0);
+    }
+
+    return id;
 }
 
-Result PLIC::SourceImpl::SignalInterrupt() {
+void PLIC::Source::NotifyComplete() noexcept {
+    /* Do nothing if we aren't initialized. */
+    if(this->IsInitialized()) {
+        return;
+    }
+
+    /* Also do nothing if we haven't been claimed. */
+    if(m_State != InterruptState::AwaitCompletion) {
+        return;
+    }
+
+    /* If we don't have any more pending interrupts, set our state to waiting. */
+    if (!m_PendingCount) {
+        m_State = PLIC::InterruptState::Waiting;
+        return;
+    }
+
+    /* If we do have more pending interrupts, set our state to pending and add ourself to the queue.. */
+    m_State = PLIC::InterruptState::Pending;
+    m_pParent->AddSourceToQueue(this);
+}
+
+Word PLIC::Source::GetId() const noexcept {
+    return static_cast<Word>(this - m_pParent->m_Sources.data());
+}
+
+Result PLIC::Source::SignalInterrupt() {
+    /* Set our pending bit if needed. */
+    auto id = this->GetId();
+    if(!m_PendingCount) {
+        m_pParent->SetPending(static_cast<int>(id), 1);
+    }
+
     /* Increment pending count. */
-    this->pendingCount++;
+    m_PendingCount++;
 
     /* If our pending count is 1 and status is waiting, add ourself to our parent's queue. */
-    if (this->pendingCount == 1 && this->state == InterruptState::Waiting) {
-        this->pParent->AddSourceToQueue(this);
+    if (m_PendingCount == 1 && m_State == InterruptState::Waiting) {
+        m_pParent->AddSourceToQueue(this);
+        m_State = PLIC::InterruptState::Pending;
     }
 
     return ResultSuccess();
 }
 
-PLIC::QueueData::QueueData(SourceImpl* p, Word prio) noexcept :
+PLIC::QueueData::QueueData(Source* p, Word prio) noexcept :
     pSrc(p), priority(prio) {}
 
 auto PLIC::QueueData::operator<=>(const QueueData& rhs) const noexcept { return this->priority <=> rhs.priority; }
-
-PLIC::TargetContext::TargetContext() noexcept :
-    pTarget(nullptr), priorityThreshold(0), bridge(), enableBits() {}
 
 Result PLIC::Initialize(int sourceCount, int targetCount) {
     /* Make sure source count is valid. */
@@ -152,20 +254,14 @@ Result PLIC::RegisterTarget(TargetPtrT pTarget, Word id) {
     this->AssertTargetIdValid(id);
     diag::AssertNotNull(pTarget);
 
-    auto pDest = &m_Targets[id];
+    auto& dst = m_Targets[id];
 
-    if(pDest->pTarget) {
+    if(dst.IsInitialized()) {
         return ResultPLICTargetAlreadyTaken();
     }
 
     /* Initialize target context. */
-    pDest->pTarget = std::move(pTarget);
-    pDest->priorityThreshold = 0;
-    pDest->enableBits.resize(m_PendingCount);
-    pDest->bridge.Initialize(this, id);
-
-    /* Initialize target. */
-    pTarget->InitializeForController(&pDest->bridge);
+    dst.Initialize(this, std::move(pTarget), id, m_PendingCount);
 
     return ResultSuccess();
 }
@@ -175,14 +271,14 @@ Result PLIC::RegisterSource(ISource** ppSrc, Word id) {
     this->AssertSourceIdValid(id);
     diag::AssertNotNull(ppSrc);
 
-    auto pSrc = &m_Sources[id];
+    auto src = m_Sources[id];
 
-    if(pSrc->IsInitialized()) {
+    if(src.IsInitialized()) {
         return ResultPLICSourceAlreadyTaken();
     }
 
-    pSrc->Initialize(this);
-    *ppSrc = pSrc;
+    src.Initialize(this);
+    *ppSrc = &src;
     return ResultSuccess();
 }
 
@@ -317,8 +413,7 @@ void PLIC::WriteEnabledReg(Word index, Word val) noexcept {
     /* Interrupt any targets that we just enabled. */
     Word changed = (val ^ cur) & val;
     if(changed) {
-        auto target = GetEnabledTarget(index);
-        this->NotifyTargetIRQAvailable(target);
+        m_Targets[GetEnabledTarget(index)].NotifyAvailableIRQImpl();
     }
 }
 
@@ -328,7 +423,7 @@ Word PLIC::ReadContextReg(Word index) {
 
     /* Handle reading from priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
-        return m_Targets[target].priorityThreshold;
+        return m_Targets[target].ReadPrioThreshold();
     }
 
     /* Return if reserved word. */
@@ -341,15 +436,15 @@ Word PLIC::ReadContextReg(Word index) {
 }
 
 void PLIC::WriteContextReg(Word index, Word val) {
-    auto target = GetContextTarget(index);
+    auto& target = m_Targets[GetContextTarget(index)];
     auto regId = GetContextRegId(index);
 
     /* Handle writing to priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
-        m_Targets[target].priorityThreshold = val;
+        target.WritePrioThreshold(val);
 
         /* Attempt to interrupt this target, as it may now be interruptable. */
-        this->NotifyTargetIRQAvailable(target);
+        target.NotifyAvailableIRQImpl();
     }
 
     /* Do nothing if this is a reserved word. */
@@ -358,7 +453,7 @@ void PLIC::WriteContextReg(Word index, Word val) {
     }
 
     /* Signal that we've finished handling the interrupt. */
-    this->NotifyCompletion(val);
+    m_Sources[val].NotifyComplete();
 }
 
 bool PLIC::ReadPriorityRegImpl(Word* pOut, Word index) const noexcept {
@@ -367,7 +462,7 @@ bool PLIC::ReadPriorityRegImpl(Word* pOut, Word index) const noexcept {
         return false;
     }
 
-    *pOut = m_Sources[index].priority;
+    *pOut = m_Sources[index].ReadPriority();
     return true;
 }
 
@@ -376,7 +471,7 @@ bool PLIC::WritePriorityRegImpl(Word index, Word val) noexcept {
         return false;
     }
     
-    m_Sources[index].priority = val;
+    m_Sources[index].WritePriority(val);
     return true;
 }
 
@@ -401,11 +496,11 @@ bool PLIC::ReadEnabledRegImpl(Word* pOut, Word index) const noexcept {
     auto target = GetEnabledTarget(index);
     auto source = GetEnabledSource(index);
 
-    if (target >= m_TargetCount || source >= m_SourceCount) {
+    if (!this->TargetIdValid(target) || !this->SourceIdValid(source)) {
         return false;
     }
 
-    *pOut = m_Targets[target].enableBits[source];
+    *pOut = m_Targets[target].ReadEnableReg(source);
     return true;
 }
 
@@ -413,34 +508,31 @@ bool PLIC::WriteEnabledRegImpl(Word index, Word val) noexcept {
     auto target = GetEnabledTarget(index);
     auto source = GetEnabledSource(index);
 
-    if (target >= m_TargetCount || source >= m_SourceCount) {
+    if (!this->TargetIdValid(target) || !this->SourceIdValid(source)) {
         return false;
     }
 
-    m_Targets[target].enableBits[source] = val;
+    m_Targets[target].WriteEnableReg(val, source);
     return true;
 }
 
 void PLIC::CleanupQueue() {
     /* Remove any entries with incorrect priority or non-pending status. */
     const auto* pTop = &m_Queue.top();
-    while ((pTop->priority != pTop->pSrc->priority ||
-        pTop->pSrc->state != InterruptState::Pending) &&
+    while ((pTop->priority != pTop->pSrc->ReadPriority() ||
+        pTop->pSrc->GetState() != InterruptState::Pending) &&
         !m_Queue.empty()) {
         m_Queue.pop();
         pTop = &m_Queue.top();
     }
 }
 
-void PLIC::AddSourceToQueue(SourceImpl* pSrc) {
+void PLIC::AddSourceToQueue(Source* pSrc) {
     /* Assert that source is not null. */
     diag::AssertNotNull(pSrc);
 
-    /* Set status to pending. */
-    pSrc->state = InterruptState::Pending;
-
     /* Add source to queue. */
-    m_Queue.emplace(pSrc, pSrc->priority);
+    m_Queue.emplace(pSrc, pSrc->ReadPriority());
 
     /* Notify targets if the queue was previously empty. */
     if(m_Queue.size() == 1) {
@@ -466,17 +558,8 @@ Word PLIC::ClaimTopRequest() {
     /* Remove from queue. */
     m_Queue.pop();
 
-    /* Decrement pending count. */
-    pTop->pendingCount--;
-
-    /* Indicate that this source is waiting to be handled. */
-    pTop->state = InterruptState::AwaitCompletion;
-
-    /* Calculate source id. */
-    auto id = pTop->GetId();
-
-    /* Clear pending bit. */
-    this->SetPending(static_cast<int>(id), false);
+    /* Notify source it's been claimed. */
+    auto id = pTop->NotifyClaimed();
 
     /* Notify targets if any other interrupts are available. */
     if(!m_Queue.empty()) {
@@ -484,61 +567,6 @@ Word PLIC::ClaimTopRequest() {
     }
 
     return id;
-}
-
-void PLIC::NotifyCompletion(Word sourceId) {
-    /* Get the source we're marking as completed. */
-    auto* pSrc = &m_Sources[sourceId];
-
-    /* Do nothing if this isn't an initialized source. */
-    if(pSrc->IsInitialized()) {
-        return;
-    }
-
-    /* Also do nothing if this isn't a source awaiting completion. */
-    if(pSrc->state != InterruptState::AwaitCompletion) {
-        return;
-    }
-
-    /* If this source doesn't have any additional pending interrupts, set status to waiting. */
-    if (!pSrc->pendingCount) {
-        pSrc->state = InterruptState::Waiting;
-        return;
-    }
-
-    /* If this source does have pending interrupts, add it back to the queue. */
-    this->AddSourceToQueue(pSrc);
-}
-
-bool PLIC::CanTargetTakeTopIRQ(Word targetId) const noexcept {
-    auto& top = m_Queue.top();
-    auto* pTargetCtx = &m_Targets[targetId];
-
-    /* Return false if this target isn't initialized. */
-    if(!pTargetCtx->pTarget) {
-        return false;
-    }
-
-    /* Return false if the source priority is too low for this target. */
-    if(top.priority < pTargetCtx->priorityThreshold) {
-        return false;
-    }
-
-    /* Return false if this target doesn't have this interrupt enabled. */
-    if(!this->GetEnabled(static_cast<int>(top.pSrc->GetId()), static_cast<int>(targetId))) {
-        return false;
-    }
-
-    return true;
-}
-
-void PLIC::NotifyTargetIRQAvailable(Word targetId) {
-    if(!this->CanTargetTakeTopIRQ(targetId)) {
-        return;
-    }
-
-    /* Interrupt target. */
-    m_Targets[targetId].pTarget->NotifyIRQImpl();
 }
 
 void PLIC::NotifyAllTargetsIRQAvailable() {
@@ -554,14 +582,14 @@ void PLIC::NotifyAllTargetsIRQAvailable() {
     m_Claimed = false;
 
     /* Interrupt all targets until one handles it. */
-    for(Word i = 0; i < m_Targets.size(); i++) {
-        /* If a context claimed the interrupt, no need to interrupt more targets. */
+    for(auto& target : m_Targets) {
+        /* Check if a target claimed the interrupt. */
         if(m_Claimed) {
             break;
         }
 
-        /* Attempt to interrupt the current target. */
-        this->NotifyTargetIRQAvailable(i);
+        /* Attempt to interrupt target. */
+        target.NotifyAvailableIRQImpl();
     }
 
     /* Clear claimed flag. */
@@ -578,6 +606,8 @@ void PLIC::AssertTargetIdValid(Word id, const std::source_location& location) co
 void PLIC::AssertSourceIdValid(Word id, const std::source_location& location) const noexcept {
     diag::Assert(this->SourceIdValid(id), diag::FormatString("Invalid Source ID (max = %u; provided = %u)\n", location), m_SourceCount - 1, id);
 }
+
+const PLIC::QueueData& PLIC::GetQueueTop() const { return m_Queue.top(); }
 
 } // namespace intrpt
 } // namespace riscv
