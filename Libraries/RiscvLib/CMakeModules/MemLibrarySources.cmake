@@ -1,16 +1,20 @@
-set(RISCV_MEM_LIBRARY_HEADERS
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem.h"
+set(_RV_MEM_HDR_DIR "${RISCVLIB_HEADER_DIR}/RiscvEmu/mem")
+set(_RV_MEM_SRC_DIR "${RISCVLIB_SOURCE_DIR}/mem")
 
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_IoRegion.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_MemRegion.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/detail/mem_RegionBase.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/mem_AlignedMmioDev.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/mem_IMmioDev.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/mem_MemoryController.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/mem_RegionInfo.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/mem/mem_Result.h"
+set(RISCV_MEM_LIBRARY_HEADERS
+    "${RISCVLIB_HEADER_DIR}/RiscvEmu/mem.h"
+
+    "${_RV_MEM_HDR_DIR}/mem_AlignedMmioDev.h"
+    "${_RV_MEM_HDR_DIR}/mem_IMmioDev.h"
+    "${_RV_MEM_HDR_DIR}/mem_MemoryController.h"
+    "${_RV_MEM_HDR_DIR}/mem_RegionInfo.h"
+    "${_RV_MEM_HDR_DIR}/mem_Result.h"
+
+    "${_RV_MEM_HDR_DIR}/detail/mem_IoRegion.h"
+    "${_RV_MEM_HDR_DIR}/detail/mem_MemRegion.h"
+    "${_RV_MEM_HDR_DIR}/detail/mem_RegionBase.h"
 )
 
 set(RISCV_MEM_LIBRARY_SOURCES
-    "${PROJECT_SOURCE_DIR}/Sources/mem/mem_MemoryController.cpp"
+    "${_RV_MEM_SRC_DIR}/mem_MemoryController.cpp"
 )

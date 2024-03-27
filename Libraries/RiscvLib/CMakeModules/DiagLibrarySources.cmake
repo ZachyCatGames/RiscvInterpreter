@@ -1,26 +1,28 @@
+set(_RV_DIAG_HDR_DIR "${RISCVLIB_HEADER_DIR}/RiscvEmu/diag")
+set(_RV_DIAG_SRC_DIR "${RISCVLIB_SOURCE_DIR}/diag")
+
 set(RISCV_DIAG_LIBRARY_HEADERS
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag.h"
+    "${RISCVLIB_HEADER_DIR}/RiscvEmu/diag.h"
 
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_Abort.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_Assert.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_DebugLog.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_FormatString.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/diag_Log.h"
+    "${_RV_DIAG_HDR_DIR}/diag_Abort.h"
+    "${_RV_DIAG_HDR_DIR}/diag_Assert.h"
+    "${_RV_DIAG_HDR_DIR}/diag_DebugLog.h"
+    "${_RV_DIAG_HDR_DIR}/diag_FormatString.h"
+    "${_RV_DIAG_HDR_DIR}/diag_Log.h"
 
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/detail/diag_AbortImpl.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/detail/diag_AssertImpl.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/detail/diag_DebugLogImpl.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/detail/diag_LogImpl.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/diag/detail/diag_PrintSourceLocation.h"
+    "${_RV_DIAG_HDR_DIR}/detail/diag_AbortImpl.h"
+    "${_RV_DIAG_HDR_DIR}/detail/diag_AssertImpl.h"
+    "${_RV_DIAG_HDR_DIR}/detail/diag_DebugLogImpl.h"
+    "${_RV_DIAG_HDR_DIR}/detail/diag_LogImpl.h"
+    "${_RV_DIAG_HDR_DIR}/detail/diag_PrintSourceLocation.h"
 )
 
 set(RISCV_DIAG_LIBRARY_SOURCES
-    "${PROJECT_SOURCE_DIR}/Sources/diag/diag_Abort.cpp"
+    "${_RV_DIAG_SRC_DIR}/diag_Abort.cpp"
 
-    "${PROJECT_SOURCE_DIR}/Sources/diag/detail/diag_AbortImpl.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/diag/detail/diag_AssertImpl.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/diag/detail/diag_DebugLogImpl.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/diag/detail/diag_LogImpl.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/diag/detail/diag_PrintSourceLocation.cpp"
+    "${_RV_DIAG_SRC_DIR}/detail/diag_AbortImpl.cpp"
+    "${_RV_DIAG_SRC_DIR}/detail/diag_AssertImpl.cpp"
+    "${_RV_DIAG_SRC_DIR}/detail/diag_DebugLogImpl.cpp"
+    "${_RV_DIAG_SRC_DIR}/detail/diag_LogImpl.cpp"
+    "${_RV_DIAG_SRC_DIR}/detail/diag_PrintSourceLocation.cpp"
 )
-

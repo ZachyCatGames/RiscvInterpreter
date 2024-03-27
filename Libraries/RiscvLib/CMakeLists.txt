@@ -31,6 +31,10 @@ endif()
 # Add our module directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 
+# Export our header and source directories.
+set(RISCVLIB_HEADER_DIR "${PROJECT_SOURCE_DIR}/Include")
+set(RISCVLIB_SOURCE_DIR "${PROJECT_SOURCE_DIR}/Sources")
+
 # Include library modules.
 include(CpuLibrarySources)
 include(DiagLibrarySources)

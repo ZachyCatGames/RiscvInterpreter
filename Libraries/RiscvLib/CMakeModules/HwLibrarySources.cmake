@@ -1,9 +1,11 @@
+set(_RV_HW_HDR_DIR "${RISCVLIB_HEADER_DIR}/RiscvEmu/hw")
+set(_RV_HW_SRC_DIR "${RISCVLIB_SOURCE_DIR}/hw")
+
 set(RISCV_HW_LIBRARY_HEADERS
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/hw/hw_IDevice.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/hw/hw_Scheduler.h"
+    "${_RV_HW_HDR_DIR}/hw_IDevice.h"
+    "${_RV_HW_HDR_DIR}/hw_Scheduler.h"
 )
 
 set(RISCV_HW_LIBRARY_SOURCES
-    "${PROJECT_SOURCE_DIR}/Sources/hw/hw_Scheduler.cpp"
+    "${_RV_HW_SRC_DIR}/hw_Scheduler.cpp"
 )
-

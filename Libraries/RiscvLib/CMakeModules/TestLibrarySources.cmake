@@ -1,5 +1,8 @@
+set(_RV_TEST_HDR_DIR "${RISCVLIB_HEADER_DIR}/RiscvEmu/test")
+#set(_RV_TEST_SRC_DIR "${RISCVLIB_SOURCE_DIR}/test")
+
 set(RISCV_TEST_LIBRARY_HEADERS
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/test/test_Result.h"
+    "${_RV_TEST_HDR_DIR}/test_Result.h"
 )
 
 set(RISCV_TEST_LIBRARY_SOURCES

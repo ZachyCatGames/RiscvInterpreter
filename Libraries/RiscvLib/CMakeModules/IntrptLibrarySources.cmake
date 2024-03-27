@@ -1,18 +1,18 @@
+set(_RV_INTRPT_HDR_DIR "${RISCVLIB_HEADER_DIR}/RiscvEmu/intrpt")
+set(_RV_INTRPT_SRC_DIR "${RISCVLIB_SOURCE_DIR}/intrpt")
+
 set(RISCV_INTRPT_LIBRARY_HEADERS
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt.h"
+    "${RISCVLIB_HEADER_DIR}/RiscvEmu/intrpt.h"
 
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt/intrpt_ISource.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt/intrpt_ITarget.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt/intrpt_PLIC.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt/intrpt_Result.h"
-    "${PROJECT_SOURCE_DIR}/Include/RiscvEmu/intrpt/detail/intrpt_ITargetForCtrl.h"
-
+    "${_RV_INTRPT_HDR_DIR}/intrpt_ISource.h"
+    "${_RV_INTRPT_HDR_DIR}/intrpt_ITarget.h"
+    "${_RV_INTRPT_HDR_DIR}/intrpt_PLIC.h"
+    "${_RV_INTRPT_HDR_DIR}/intrpt_Result.h"
+    "${_RV_INTRPT_HDR_DIR}/detail/intrpt_ITargetForCtrl.h"
 )
 
 set(RISCV_INTRPT_LIBRARY_SOURCES
-    "${PROJECT_SOURCE_DIR}/Sources/intrpt/intrpt_ITarget.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/intrpt/intrpt_PLIC.cpp"
-    "${PROJECT_SOURCE_DIR}/Sources/intrpt/detail/intrpt_ITargetForCtrl.cpp"
-
+    "${_RV_INTRPT_SRC_DIR}/intrpt_ITarget.cpp"
+    "${_RV_INTRPT_SRC_DIR}/intrpt_PLIC.cpp"
+    "${_RV_INTRPT_SRC_DIR}/detail/intrpt_ITargetForCtrl.cpp"
 )
-
