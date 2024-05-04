@@ -1,15 +1,18 @@
 #include <RiscvEmu/mem/mem_MemoryController.h>
+#include <RiscvEmu/mem/mem_MCClient.h>
 #include <RiscvEmu/mem/mem_MmioTemplateAdapter.h>
 #include <span>
 
 namespace riscv {
 namespace mem {
 
-MemoryController::MemoryController() : m_Clients() {}
+MemoryController::MemoryController() = default;
 
 Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t count) {
     return this->Initialize(std::span<const RegionInfo>(pRegions, count));
 }
+
+MCClient MemoryController::GetClient() { return MCClient(this); }
 
 Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
     /* Find the IO region we'll be placing this device in. */
@@ -28,6 +31,31 @@ Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
 
     /* Add the new device. */
     pRegion->GetDevList().emplace_back(addr, len, pDev);
+
+    return ResultSuccess();
+}
+
+Result MemoryController::AddRegionImpl(const RegionInfo* pRegion) {
+    /* Check if this new regions conflicts with any currently existing regions. */
+    if (m_MemRegion.Includes(pRegion->GetStart()) ||
+        m_MemRegion.Includes(pRegion->GetEnd() - 1) ||
+        this->FindIoRegion(pRegion->GetStart()) != nullptr ||
+        this->FindIoRegion(pRegion->GetEnd() - 1) != nullptr) {
+        return ResultRegionAlreadyExists();
+    }
+
+    /* Add new mem region if the current region is a mem region. */
+    if(pRegion->GetType() == RegionType::Memory) {
+        /* Setup the new MemRegion. */
+        m_MemRegion.Initialize(*pRegion);
+    }
+    else if(pRegion->GetType() == RegionType::IO) {
+        /* Setup the new IoRegion. */
+        m_IoRegions.emplace_back(*pRegion);
+    }
+    else {
+        return ResultInvalidRegionType();
+    }
 
     return ResultSuccess();
 }
@@ -57,7 +85,7 @@ Result MemoryController::LoadImpl(WordType* pOut, Address addr) {
     Unsigned tmp;
 
     /* Read value as unsigned. */
-    Result res = this->Load<Unsigned>(&tmp, addr);
+    Result res = this->LoadImpl(&tmp, addr);
     if(res.IsFailure()) {
         return res;
     }
@@ -110,7 +138,7 @@ Result MemoryController::StoreImpl(WordType in, Address addr) {
         std::scoped_lock lock(m_Reservations);
 
         /* Invalidate reservation on addr. */
-        this->InvalidateReservation(addr):
+        this->InvalidateReservation(addr);
 
         /* Perform store. */
         return MmioTemplateAdapter(pDev->GetDevice()).Store(in, addr - pDev->GetStart());
@@ -146,35 +174,35 @@ template Result MemoryController::StoreImpl<float>(float, Address);
 template Result MemoryController::StoreImpl<double>(double, Address);
 
 template<typename WordType>
-Result MemoryController::LoadReserve(int client, WordType* pOut, Address addr) {
+Result MemoryController::LoadReserve(MCClient* pClient, WordType* pOut, Address addr) {
     /* Acquire lock on reservation info. */
     std::scoped_lock lock(m_ReserveMutex);
 
     /* Add a reservation. */
-    this->AddReservation(client, addr);
+    this->AddReservation(pClient, addr);
 
     /* Perform the load. */
     return this->LoadImpl(pOut, addr);
 }
 
-template Result MemoryController::LoadReserve<Byte>(int, Byte*, Address);
-template Result MemoryController::LoadReserve<HWord>(int, HWord*, Address);
-template Result MemoryController::LoadReserve<Word>(int, Word*, Address);
-template Result MemoryController::LoadReserve<DWord>(int, DWord*, Address);
-template Result MemoryController::LoadReserve<ByteS>(int, ByteS*, Address);
-template Result MemoryController::LoadReserve<HWordS>(int, HWordS*, Address);
-template Result MemoryController::LoadReserve<WordS>(int, WordS*, Address);
-template Result MemoryController::LoadReserve<DWordS>(int, DWordS*, Address);
-template Result MemoryController::LoadReserve<float>(int, float*, Address);
-template Result MemoryController::LoadReserve<double>(int, double*, Address);
+template Result MemoryController::LoadReserve<Byte>(MCClient*, Byte*, Address);
+template Result MemoryController::LoadReserve<HWord>(MCClient*, HWord*, Address);
+template Result MemoryController::LoadReserve<Word>(MCClient*, Word*, Address);
+template Result MemoryController::LoadReserve<DWord>(MCClient*, DWord*, Address);
+template Result MemoryController::LoadReserve<ByteS>(MCClient*, ByteS*, Address);
+template Result MemoryController::LoadReserve<HWordS>(MCClient*, HWordS*, Address);
+template Result MemoryController::LoadReserve<WordS>(MCClient*, WordS*, Address);
+template Result MemoryController::LoadReserve<DWordS>(MCClient*, DWordS*, Address);
+template Result MemoryController::LoadReserve<float>(MCClient*, float*, Address);
+template Result MemoryController::LoadReserve<double>(MCClient*, double*, Address);
 
 template<typename WordType>
-Result MemoryController::StoreConditional(int client, WordType* pInOut, Address addr) {
+Result MemoryController::StoreConditional(MCClient* pClient, WordType* pInOut, Address addr) {
     /* Acquire lock on reservation info. */
     std::scoped_lock lock(m_ReserveMutex);
 
     /* Check if we still have our reservation. */
-    if(!this->HasReservation(client, addr)) {
+    if(!this->HasReservation(pClient, addr)) {
         /* Clean pInOut then return. */
         *pInOut = 1;
         return ResultSuccess();
@@ -191,43 +219,18 @@ Result MemoryController::StoreConditional(int client, WordType* pInOut, Address 
     return this->StoreImpl(tmp, addr);
 }
 
-template Result MemoryController::StoreConditional<Byte>(int, Byte*, Address);
-template Result MemoryController::StoreConditional<HWord>(int, HWord*, Address);
-template Result MemoryController::StoreConditional<Word>(int, Word*, Address);
-template Result MemoryController::StoreConditional<DWord>(int, DWord*, Address);
-template Result MemoryController::StoreConditional<ByteS>(int, ByteS*, Address);
-template Result MemoryController::StoreConditional<HWordS>(int, HWordS*, Address);
-template Result MemoryController::StoreConditional<WordS>(int, WordS*, Address);
-template Result MemoryController::StoreConditional<DWordS>(int, DWordS*, Address);
-template Result MemoryController::StoreConditional<float>(int, float*, Address);
-template Result MemoryController::StoreConditional<double>(int, double*, Address);
+template Result MemoryController::StoreConditional<Byte>(MCClient*, Byte*, Address);
+template Result MemoryController::StoreConditional<HWord>(MCClient*, HWord*, Address);
+template Result MemoryController::StoreConditional<Word>(MCClient*, Word*, Address);
+template Result MemoryController::StoreConditional<DWord>(MCClient*, DWord*, Address);
+template Result MemoryController::StoreConditional<ByteS>(MCClient*, ByteS*, Address);
+template Result MemoryController::StoreConditional<HWordS>(MCClient*, HWordS*, Address);
+template Result MemoryController::StoreConditional<WordS>(MCClient*, WordS*, Address);
+template Result MemoryController::StoreConditional<DWordS>(MCClient*, DWordS*, Address);
+template Result MemoryController::StoreConditional<float>(MCClient*, float*, Address);
+template Result MemoryController::StoreConditional<double>(MCClient*, double*, Address);
 
-Result MemoryController::AddRegionImpl(const RegionInfo* pRegion) {
-    /* Check if this new regions conflicts with any currently existing regions. */
-    if (m_MemRegion.Includes(pRegion->GetStart()) ||
-        m_MemRegion.Includes(pRegion->GetEnd() - 1) ||
-        this->FindIoRegion(pRegion->GetStart()) != nullptr ||
-        this->FindIoRegion(pRegion->GetEnd() - 1) != nullptr) {
-        return ResultRegionAlreadyExists();
-    }
-
-    /* Add new mem region if the current region is a mem region. */
-    if(pRegion->GetType() == RegionType::Memory) {
-        /* Setup the new MemRegion. */
-        m_MemRegion.Initialize(*pRegion);
-    }
-    else if(pRegion->GetType() == RegionType::IO) {
-        /* Setup the new IoRegion. */
-        m_IoRegions.emplace_back(*pRegion);
-    }
-    else {
-        return ResultInvalidRegionType();
-    }
-
-    return ResultSuccess();
-}
-
-bool MemoryController::HasReservation(int client, Address addr) {
+bool MemoryController::HasReservation(MCClient* pClient, Address addr) {
     /* Do nothing if reservations list is emtpy. */
     if(!m_Reservations.empty()) {
         return false;
@@ -238,7 +241,7 @@ bool MemoryController::HasReservation(int client, Address addr) {
 
     /* Check all active reservation entries. */
     for(const auto& reservation : m_Reservations) {
-        if(reservation.client == client && reservation.addr == addr) {
+        if(reservation.pClient == pClient && reservation.addr == addr) {
             return true;
         }
     }
@@ -246,14 +249,17 @@ bool MemoryController::HasReservation(int client, Address addr) {
     return false;
 }
 
-void MemoryController::AddReservation(int client, Address addr) {
+void MemoryController::AddReservation(MCClient* pClient, Address addr) {
     /* If we already have a reservation, clear it. */
     if(!m_Reservations.empty()) {
-        m_Reservations.erase(std::find_if(m_Reservations.begin(), m_Reservations.end(), [client](const auto& it) { return it.client == client; }));
+        m_Reservations.erase(std::find_if(m_Reservations.begin(), m_Reservations.end(), [pClient](const auto& it) { return it.pClient == pClient; }));
     }
 
+    /* Cut off lower bits. */
+    addr >>= ReserveGranularity;
+
     /* Add reservation. */
-    m_Reservations.emplace_back(client, addr);
+    m_Reservations.emplace_back(pClient, addr);
 }
 
 void MemoryController::InvalidateReservation(Address addr) {
@@ -261,6 +267,9 @@ void MemoryController::InvalidateReservation(Address addr) {
     if(m_Reservations.empty()) {
         return;
     }
+
+    /* Cut off lower bits. */
+    addr >>= ReserveGranularity;
 
     /* Find and erase all resevations on this address. */
     for(auto it = m_Reservations.begin(); it != m_Reservations.end(); it++) {

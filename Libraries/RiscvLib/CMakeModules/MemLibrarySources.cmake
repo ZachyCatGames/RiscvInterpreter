@@ -17,7 +17,6 @@ set(RISCV_MEM_LIBRARY_HEADERS
 )
 
 set(RISCV_MEM_LIBRARY_SOURCES
-    "${_RV_MEM_SRC_DIR}/mem_MCClient.cpp"
     "${_RV_MEM_SRC_DIR}/mem_MemoryController.cpp"
     "${_RV_MEM_SRC_DIR}/mem_MemoryDevice.cpp"
 

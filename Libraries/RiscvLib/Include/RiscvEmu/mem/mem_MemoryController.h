@@ -1,7 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/mem/mem_IMmioDev.h>
-#include <RiscvEmu/mem/mem_MCClient.h>
 #include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_Result.h>
 #include <RiscvEmu/mem/detail/mem_MemRegion.h>
@@ -12,6 +11,8 @@
 
 namespace riscv {
 namespace mem {
+
+class MCClient;
 
 /**
  * This represents a Memory Controller/MMIO Controller device.
@@ -57,112 +58,15 @@ public:
 
     Result Initialize(const RegionInfo* pRegions, std::size_t count);
 
+    /**
+     * Create a Memory Controller Client object.
+     * 
+     * @return MCClient object.
+    */
+    MCClient GetClient();
+
     /** Add an MMIO device. */
     Result AddMmioDev(IMmioDev* dev, Address addr);
-
-    /**
-     * @brief Perform a load from memory.
-     * 
-     * This loads a WordType from memory.
-     * 
-     * WordType can be any of the following: 
-     * Byte, HWord, Word, DWord, ByteS, HWordS, WordS, DWordS, float, or double.
-     * 
-     * Depending on the device being written to, addr may or may not be required to 
-     * be aligned to some boundry.
-     * 
-     * This operation is not atomic.
-     * 
-     * @param pOut Location to store the loaded word.
-     * @param addr Byte address of word to load.
-     * @return Result code.
-    */
-    template<typename WordType>
-    Result Load(WordType* pOut, Address addr) { return this->LoadImpl(pOut, addr); }
-
-    /**
-     * @brief Perform a store to memory.
-     * 
-     * This stores a WordType to memory.
-     * 
-     * WordType can be any of the following:
-     * Byte, HWord, Word, DWord, ByteS, HWordS, WordS, DWordS, float, or double.
-     * 
-     * Depending on the device being written to, addr may or may not be required to 
-     * be aligned to some boundry.
-     * 
-     * This operation is atomic.
-     * 
-     * @param in   Word to store to memory.
-     * @param addr Byte address to store word at.
-     * @return Result code.
-    */
-    template<typename WordType>
-    Result Store(WordType in, Address addr) { return this->StoreImpl(in, addr); }
-
-    /**
-     * @brief Perform a load from memory and register a reservation.
-     * 
-     * This loads a WordType from memory.
-     * 
-     * WordType can be any of the following: 
-     * Byte, HWord, Word, DWord, ByteS, HWordS, WordS, DWordS, float, or double.
-     * 
-     * After performing the load a reservation entry for addr will be created.
-     * 
-     * The provided address must be aligned to sizeof(WordType).
-     * 
-     * This operation is atomic.
-     * 
-     * @param client    Client ID to register a reservation for.
-     * @param pOut      Location to store loaded word.
-     * @param addr      Byte address of word to load and add a registration for.
-     * @return Result code.
-    */
-    template<typename WordType>
-    Result LoadReserve(int client, WordType* pOut, Address addr);
-
-    /**
-     * @brief Perform a conditional store based on reservation entries.
-     * 
-     * This stores a WordType to memory only if the specified client has a reservation 
-     * for the provided address. If the store succeeds the provided word is overwritten
-     * with 0, otherwise it is overwritten with 1.
-     * 
-     * WordType can be any of the following: 
-     * Byte, HWord, Word, DWord, ByteS, HWordS, WordS, DWordS, float, or double.
-     * 
-     * The provided address must be aligned to sizeof(WordType).
-     * 
-     * This operation is atomic.
-     * 
-     * @param client    Client ID to check reservation for.
-     * @param pInOut    Location containing the word to be written.
-     * @param addr      Byte address to store word at.
-     * @return Result code.
-    */
-    template<typename WordType>
-    Result StoreConditional(int client, WordType* pInOut, Address addr);
-private:
-    friend class MemoryClient;
-
-    static constexpr auto MaxClientCount = 16; // TODO: Control with macro
-
-    struct ReserveEntry {
-        Address addr;
-        int client;
-    }; // struct ReserveEntry
-
-    /* Number of least significant bits to cut off. */
-    static constexpr auto ReserveGranularity = 3; // align to 8 bytes.
-
-    std::mutex m_ReserveMutex;
-    std::vector<ReserveEntry> m_Reservations;
-
-    MCClient m_Clients[MaxClientCount];
-
-    detail::MemRegion m_MemRegion;
-    std::vector<detail::IoRegion> m_IoRegions;
 private:
     Result AddRegionImpl(const RegionInfo* pRegion);
 
@@ -184,8 +88,14 @@ private:
     template<std::floating_point WordType>
     Result StoreImpl(WordType in, Address addr);
 
-    bool HasReservation(int client, Address addr);
-    void AddReservation(int client, Address addr);
+    template<typename WordType>
+    Result LoadReserve(MCClient* pClient, WordType* pOut, Address addr);
+
+    template<typename WordType>
+    Result StoreConditional(MCClient* pClient, WordType* pInOut, Address addr);
+
+    bool HasReservation(MCClient* pClient, Address addr);
+    void AddReservation(MCClient* pClient, Address addr);
     void InvalidateReservation(Address addr);
 
     template<typename T>
@@ -193,6 +103,26 @@ private:
 
     detail::IoRegion* FindIoRegion(Address addr);
     detail::IoDev* FindIoDevice(Address addr, NativeWord len);
+private:
+    friend class MemoryClient;
+
+    static constexpr auto MaxClientCount = 16; // TODO: Control with macro
+
+    struct ReserveEntry {
+        Address addr;
+        MCClient* pClient;
+    }; // struct ReserveEntry
+
+    /* Number of least significant bits to cut off. */
+    static constexpr auto ReserveGranularity = 3; // align to 8 bytes.
+
+    std::mutex m_ReserveMutex;
+    std::vector<ReserveEntry> m_Reservations;
+
+    int m_UsedClients;
+
+    detail::MemRegion m_MemRegion;
+    std::vector<detail::IoRegion> m_IoRegions;
 }; // class MemoryController
 
 } // namespace mem
