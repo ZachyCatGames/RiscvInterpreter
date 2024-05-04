@@ -99,7 +99,7 @@ private:
     std::size_t m_SharedAccessCount;
     std::unique_ptr<SharedAccessEntry[]> m_SharedEntries;
 
-    std::atomic<std::size_t> m_ExclAccessCount;
+    std::size_t m_ExclAccessCount;
     std::unique_ptr<ExclAccessEntry[]> m_ExclEntries;
 }; // class MemoryMonitor
 
