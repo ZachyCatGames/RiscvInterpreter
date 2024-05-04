@@ -104,7 +104,7 @@ private:
     detail::IoRegion* FindIoRegion(Address addr);
     detail::IoDev* FindIoDevice(Address addr, NativeWord len);
 private:
-    friend class MemoryClient;
+    friend class MCClient;
 
     static constexpr auto MaxClientCount = 16; // TODO: Control with macro
 

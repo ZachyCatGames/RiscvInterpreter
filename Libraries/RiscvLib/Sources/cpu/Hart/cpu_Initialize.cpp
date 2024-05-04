@@ -4,7 +4,7 @@
 namespace riscv {
 namespace cpu {
 
-Result Hart::Initialize(SharedState* pSharedCtx, Word hartId) {
+Result Hart::Initialize(SharedState* pSharedCtx, mem::MCClient&& mcClient, Word hartId) {
     /* Assert shared context isn't null. */
     diag::AssertNotNull(pSharedCtx);
 
@@ -15,10 +15,7 @@ Result Hart::Initialize(SharedState* pSharedCtx, Word hartId) {
     m_pSharedCtx = pSharedCtx;
 
     /* Initialize memory manager. */
-    m_MemMgr.Initialize(m_pSharedCtx->GetMemController());
-
-    /* Initialize memory monitor context. */
-    m_MemMonitorCtx = m_pSharedCtx->GetMemMonitor()->GetContext(m_HartId);
+    m_MemMgr.Initialize(std::move(mcClient));
 
     return ResultSuccess();
 }

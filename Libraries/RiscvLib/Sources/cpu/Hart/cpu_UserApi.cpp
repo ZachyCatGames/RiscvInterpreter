@@ -46,37 +46,5 @@ Result Hart::ReadWriteCSR(CsrId id, NativeWord* pOut, NativeWord in) {
     return this->ReadWriteCSRImpl(id, pOut, in, makeValFunc);
 }
 
-Result Hart::MappedReadByte(Byte* pOut, Address addr) {
-    return m_MemMgr.MappedReadByte(pOut, addr);
-}
-
-Result Hart::MappedReadHWord(HWord* pOut, Address addr) {
-    return m_MemMgr.MappedReadHWord(pOut, addr);
-}
-
-Result Hart::MappedReadWord(Word* pOut, Address addr) {
-    return m_MemMgr.MappedReadWord(pOut, addr);
-}
-
-Result Hart::MappedReadDWord(DWord* pOut, Address addr) {
-    return m_MemMgr.MappedReadDWord(pOut, addr);
-}
-
-Result Hart::MappedWriteByte(Byte in, Address addr) {
-    return m_MemMgr.MappedWriteByte(in, addr);
-}
-
-Result Hart::MappedWriteHWord(HWord in, Address addr) {
-    return m_MemMgr.MappedWriteHWord(in, addr);
-}
-
-Result Hart::MappedWriteWord(Word in, Address addr) {
-    return m_MemMgr.MappedWriteWord(in, addr);
-}
-
-Result Hart::MappedWriteDWord(DWord in, Address addr) {
-    return m_MemMgr.MappedWriteDWord(in, addr);
-}
-
 } // namespace cpu
 } // namespace riscv

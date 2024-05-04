@@ -9,13 +9,10 @@ void Hart::SharedState::Initialize(Word hartCount, mem::MemoryController* pMemCt
     diag::AssertNotNull(pMemCtlr);
 
     m_HartCount = hartCount;
-    m_pMemCtlr = pMemCtlr;
 
     /* Init memory monitor. */
     m_MemMonitor.Initialize(hartCount);
 }
-
-mem::MemoryController* Hart::SharedState::GetMemController() noexcept { return m_pMemCtlr; }
 
 detail::MemoryMonitor* Hart::SharedState::GetMemMonitor() noexcept { return &m_MemMonitor; }
 

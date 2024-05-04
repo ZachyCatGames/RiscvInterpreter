@@ -9,7 +9,7 @@
 #include <RiscvEmu/cpu/detail/cpu_ClkTime.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
-#include <RiscvEmu/mem/mem_MemoryController.h>
+#include <RiscvEmu/mem/mem_MCClient.h>
 #include <cassert>
 
 namespace riscv {
@@ -21,17 +21,14 @@ public:
     public:
         void Initialize(Word hartCount, mem::MemoryController* pMemCtlr) noexcept;
 
-        mem::MemoryController* GetMemController() noexcept;
-
         detail::MemoryMonitor* GetMemMonitor() noexcept;
     private:
         Word m_HartCount;
-        mem::MemoryController* m_pMemCtlr;
         detail::MemoryMonitor m_MemMonitor;
     }; // SharedState
 public:
     /** Initialize the Hart. */
-    Result Initialize(SharedState* pSharedCtx, Word hartId);
+    Result Initialize(SharedState* pSharedCtx, mem::MCClient&& mcClient, Word hartId);
 public:
     /** Read the instruction currently at PC. */
     Result FetchInstAtPc(Instruction* pOut);
@@ -69,29 +66,11 @@ public:
     /** Read and write a control/status register. */
     Result ReadWriteCSR(CsrId id, NativeWord* pOut, NativeWord in);
 
-    /** Read mapped Byte with highest privilage. */
-    Result MappedReadByte(Byte* pOut, Address addr);
+    template<typename WordType>
+    Result MemMappedLoadForDebug(WordType* pOut, Address addr) { return m_MemMgr.MappedLoadForDebug(pOut, addr); }
 
-    /** Read mapped HWord with highest privilage. */
-    Result MappedReadHWord(HWord* pOut, Address addr);
-
-    /** Read mapped Word with highest privilage. */
-    Result MappedReadWord(Word* pOut, Address addr);
-
-    /** Read mapped DWord with highest privilage. */
-    Result MappedReadDWord(DWord* pOut, Address addr);
-
-    /** Write mapped Byte with highest privilage. */
-    Result MappedWriteByte(Byte in, Address addr);
-
-    /** Write mapped HWord with highest privilage. */
-    Result MappedWriteHWord(HWord in, Address addr);
-
-    /** Write mapped Word with highest privilage. */
-    Result MappedWriteWord(Word in, Address addr);
-
-    /** Write mapped DWord with highest privilage. */
-    Result MappedWriteDWord(DWord in, Address addr);
+    template<typename WordType>
+    Result MemMappedStoreForDebug(WordType in, Address addr) { return m_MemMgr.MappedStoreForDebug(in, addr); }
 
     Result Reset();
 private:
@@ -110,14 +89,11 @@ private:
         return ResultSuccess();
     }
 private:
-    Result MemReadByte(Byte* pOut, Address addr);
-    Result MemReadHWord(HWord* pOut, Address addr);
-    Result MemReadWord(Word* pOut, Address addr);
-    Result MemReadDWord(DWord* pOut, Address addr);
-    Result MemWriteByte(Byte in, Address addr);
-    Result MemWriteHWord(HWord in, Address addr);
-    Result MemWriteWord(Word in, Address addr);
-    Result MemWriteDWord(DWord in, Address addr);
+    template<typename WordType>
+    Result MemLoad(WordType* pOut, Address addr) { return m_MemMgr.Load(pOut, addr, m_CurPrivLevel); }
+
+    template<typename WordType>
+    Result MemStore(WordType in, Address addr) { return m_MemMgr.Store(in, addr, m_CurPrivLevel); }
 
     Result FetchInstruction(Instruction* pOut, Address addr);
 private:
