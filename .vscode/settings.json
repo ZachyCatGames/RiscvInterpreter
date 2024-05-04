@@ -88,6 +88,9 @@
         "locale": "cpp",
         "ranges": "cpp",
         "source_location": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "stdfloat": "cpp",
+        "execution": "cpp",
+        "set": "cpp"
     }
 }

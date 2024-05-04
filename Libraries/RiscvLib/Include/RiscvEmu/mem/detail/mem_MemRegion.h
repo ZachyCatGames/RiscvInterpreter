@@ -9,26 +9,19 @@ namespace riscv {
 namespace mem {
 namespace detail {
 
-class MemRegion : public RegionBase, private MemoryDeviceImpl<std::unique_ptr<Byte[]>> {
+class MemRegion : public RegionBase {
 public:
-    MemRegion() noexcept = default;
-    constexpr MemRegion(const RegionBase& info) :
-        RegionBase(info),
-        MemoryDeviceImpl(std::make_unique<Byte[]>(info.GetLength())) {}
+    MemRegion() noexcept;
 
-    constexpr void Initialize(const RegionBase& info) {
-        RegionBase::Initialize(info);
-        MemoryDeviceImpl::Initialize(std::make_unique<Byte[]>(info.GetLength()));
-    }
+    void Initialize(const RegionBase& info);
 
-    constexpr Result ReadByte  (Byte* pOut, Address addr)  { return this->ReadByteImpl(pOut, addr); }
-    constexpr Result ReadHWord (HWord* pOut, Address addr) { return this->ReadHWordImpl(pOut, addr); }
-    constexpr Result ReadWord  (Word* pOut, Address addr)  { return this->ReadWordImpl(pOut, addr); }
-    constexpr Result ReadDWord (DWord* pOut, Address addr) { return this->ReadDWordImpl(pOut, addr); }
-    constexpr Result WriteByte (Byte in, Address addr)     { return this->WriteByteImpl(in, addr); }
-    constexpr Result WriteHWord(HWord in, Address addr)    { return this->WriteHWordImpl(in, addr); }
-    constexpr Result WriteWord (Word in, Address addr)     { return this->WriteWordImpl(in, addr); }
-    constexpr Result WriteDWord(DWord in, Address addr)    { return this->WriteDWordImpl(in, addr); }
+    template<typename WordType>
+    Result Load(WordType* pOut, Address addr) { return m_Dev.LoadImpl<WordType>(pOut, addr); }
+
+    template<typename WordType>
+    Result Store(WordType in, Address addr) { return m_Dev.StoreImpl<WordType>(in, addr); }
+private:
+    MemoryDeviceImpl m_Dev;
 }; // class MemRegion
 
 } // namespace detail

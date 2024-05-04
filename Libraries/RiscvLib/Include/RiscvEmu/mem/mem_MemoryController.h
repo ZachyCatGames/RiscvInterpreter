@@ -1,10 +1,12 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/mem/mem_IMmioDev.h>
+#include <RiscvEmu/mem/mem_MemoryClient.h>
 #include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_Result.h>
 #include <RiscvEmu/mem/detail/mem_MemRegion.h>
 #include <RiscvEmu/mem/detail/mem_IoRegion.h>
+#include <array>
 #include <vector>
 
 namespace riscv {
@@ -24,6 +26,11 @@ namespace mem {
 */
 class MemoryController {
 public:
+    /** Default constructor, initializes with empty state. */
+    MemoryController() = default;
+
+    /** Initializer contructor -- Calls ::Initialize. */
+    MemoryController(const RegionInfo* pRegions, std::size_t regionCount);
 
     /**
      * Initializes the Memory Controller's regions.
@@ -31,49 +38,70 @@ public:
      * Note: Only a single Memory region may exist, if multiple entries are present the last will be used.
      * If multiple memory regions are needed, add a mem::Ram IO device.
      * 
-     * @param[in] pRegions  Regions to add.
-     * @param[in] regionCount  Number of entries in pRegions.
+     * @param[in] regions  Regions to add.
      * @return ResultRegionAlreadyExists() if a region in pRegions overlaps with a prexisting region.
      * @return ResultInvalidRegionType() if the type field in an entry is invalid.
      * @return ResultSuccess() otherwise.
     */
-    Result Initialize(const RegionInfo* pRegions, std::size_t regionCount);
+    template<typename T>
+    requires std::same_as<typename T::value_type, RegionInfo>
+    Result Initialize(const T& regions) {
+        Result res;
+        for(const auto& region : regions) {
+            res = this->AddRegionImpl(&region);
+            if(res.IsFailure()) {
+                break;
+            }
+        }
+
+        return ResultSuccess();
+    }
+
+    Result Initialize(const RegionInfo* pRegions, std::size_t count);
 
     /** Add an MMIO device. */
     Result AddMmioDev(IMmioDev* dev, Address addr);
 
-    Result ReadByte(Byte* pOut, Address addr);
+    template<typename WordType>
+    Result Load(WordType* pOut, Address addr) { return this->LoadImpl(pOut, addr); }
 
-    Result ReadHWord(HWord* pOut, Address addr);
-
-    Result ReadWord(Word* pOut, Address addr);
-
-    Result ReadDWord(DWord* pOut, Address addr);
-
-    Result ReadNativeWord(NativeWord* pOut, Address addr);
-
-    Result WriteByte(Byte in, Address addr);
-
-    Result WriteHWord(HWord in, Address addr);
-
-    Result WriteWord(Word in, Address addr);
-
-    Result WriteDWord(DWord in, Address addr);
-
-    Result WriteNativeWord(NativeWord in, Address addr);
+    template<typename WordType>
+    Result Store(WordType in, Address addr) { return this->StoreImpl(in, addr); }
 private:
+    friend class MemoryClient;
+
+    static constexpr auto MaxClientCount = 16; // TODO: Control with macro
+
+    std::array<MemoryClient, MaxClientCount> m_Clients();
     detail::MemRegion m_MemRegion;
     std::vector<detail::IoRegion> m_IoRegions;
 private:
-    template<auto MemRead, auto IoRead, typename T>
-    Result ReadWriteImpl(T pOut, Address addr);
+    Result AddRegionImpl(const RegionInfo* pRegion);
+
+    template<std::unsigned_integral WordType>
+    Result LoadImpl(WordType* pOut, Address addr);
+
+    template<std::signed_integral WordType>
+    Result LoadImpl(WordType* pOut, Address addr);
+
+    template<std::floating_point WordType>
+    Result LoadImpl(WordType* pOut, Address addr);
+
+    template<std::unsigned_integral WordType>
+    Result StoreImpl(WordType in, Address addr);
+
+    template<std::signed_integral WordType>
+    Result StoreImpl(WordType in, Address addr);
+
+    template<std::floating_point WordType>
+    Result StoreImpl(WordType in, Address addr);
 
     template<typename T>
     T* FindRegionImpl(std::vector<T>& regionList, Address addr);
 
     detail::IoRegion* FindIoRegion(Address addr);
     detail::IoDev* FindIoDevice(Address addr, NativeWord len);
-};
+}; // class MemoryController
 
 } // namespace mem
 } // namespace riscv

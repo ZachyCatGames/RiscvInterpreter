@@ -22,29 +22,15 @@ public:
     /** Retrieve the size of a device's address space. */
     virtual NativeWord GetMappedSize() = 0;
 
-    /** Read a single byte. */
-    virtual Result ReadByte(Byte* pOut, Address addr) = 0;
+    virtual Result LoadByte(Byte* pOut, Address addr);
+    virtual Result LoadHWord(HWord* pOut, Address addr);
+    virtual Result LoadWord(Word* pOut, Address addr);
+    virtual Result LoadDWord(DWord* pOut, Address addr);
 
-    /** Read a single half word. */
-    virtual Result ReadHWord(HWord* pOut, Address addr) = 0;
-
-    /** Read a single word. */
-    virtual Result ReadWord(Word* pOut, Address addr) = 0;
-
-    /** Read a single double word. */
-    virtual Result ReadDWord(DWord* pOut, Address addr) = 0;
-
-    /* Write a single byte. */
-    virtual Result WriteByte(Byte in, Address addr) = 0;
-
-    /** Write a single half word. */
-    virtual Result WriteHWord(HWord in, Address addr) = 0;
-
-    /** Write a single word. */
-    virtual Result WriteWord(Word in, Address addr) = 0;
-
-    /** Write a single double word. */
-    virtual Result WriteDWord(DWord in, Address addr) = 0;
+    virtual Result StoreByte(Byte in, Address addr);
+    virtual Result StoreHWord(HWord in, Address addr);
+    virtual Result StoreWord(Word in, Address addr);
+    virtual Result StoreDWord(DWord in, Address addr);
 }; // class IMmioDev
 
 } // namespace mem

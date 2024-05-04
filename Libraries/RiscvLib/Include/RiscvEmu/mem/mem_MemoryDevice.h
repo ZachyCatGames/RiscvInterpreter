@@ -10,30 +10,31 @@ namespace mem {
 /**
  * This is IO device which provides additional read/write volatile memory.
 */
-class MemoryDevice : public IMmioDev, private detail::MemoryDeviceImpl<std::unique_ptr<Byte[]>> {
+class MemoryDevice : public IMmioDev {
 public:
     /**
      * Construct a MemoryDevice object with a given size.
      * 
      * @param[in] length  Amount of memory to allocate & provide.
     */
-    constexpr MemoryDevice(NativeWord length) :
-        MemoryDeviceImpl(std::make_unique<Byte[]>(length)),
+    MemoryDevice(NativeWord length) :
+        m_Dev(length),
         m_Length(length) {}
 
-    constexpr virtual NativeWord GetMappedSize() override { return m_Length; }
+    virtual NativeWord GetMappedSize() override { return m_Length; }
 
-    constexpr virtual Result ReadByte  (Byte* pOut, Address addr)  override { return this->ReadByteImpl(pOut, addr); }
-    constexpr virtual Result ReadHWord (HWord* pOut, Address addr) override { return this->ReadHWordImpl(pOut, addr); }
-    constexpr virtual Result ReadWord  (Word* pOut, Address addr)  override { return this->ReadWordImpl(pOut, addr); }
-    constexpr virtual Result ReadDWord (DWord* pOut, Address addr) override { return this->ReadDWordImpl(pOut, addr); }
-    constexpr virtual Result WriteByte (Byte in, Address addr)     override { return this->WriteByteImpl(in, addr); }
-    constexpr virtual Result WriteHWord(HWord in, Address addr)    override { return this->WriteHWordImpl(in, addr); }
-    constexpr virtual Result WriteWord (Word in, Address addr)     override { return this->WriteWordImpl(in, addr); }
-    constexpr virtual Result WriteDWord(DWord in, Address addr)    override { return this->WriteDWordImpl(in, addr); }
+    virtual Result LoadByte  (Byte* pOut, Address addr)  override { return m_Dev.LoadImpl<Byte>(pOut, addr); }
+    virtual Result LoadHWord (HWord* pOut, Address addr) override { return m_Dev.LoadImpl<HWord>(pOut, addr); }
+    virtual Result LoadWord  (Word* pOut, Address addr)  override { return m_Dev.LoadImpl<Word>(pOut, addr); }
+    virtual Result LoadDWord (DWord* pOut, Address addr) override { return m_Dev.LoadImpl<DWord>(pOut, addr); }
+    virtual Result StoreByte (Byte in, Address addr)     override { return m_Dev.StoreImpl<Byte>(in, addr); }
+    virtual Result StoreHWord(HWord in, Address addr)    override { return m_Dev.StoreImpl<HWord>(in, addr); }
+    virtual Result StoreWord (Word in, Address addr)     override { return m_Dev.StoreImpl<Word>(in, addr); }
+    virtual Result StoreDWord(DWord in, Address addr)    override { return m_Dev.StoreImpl<DWord>(in, addr); }
 private:
+    detail::MemoryDeviceImpl m_Dev;
     NativeWord m_Length;
-};
+}; // class MemoryDevice
 
 } // namespace mem
 } // namespace riscv

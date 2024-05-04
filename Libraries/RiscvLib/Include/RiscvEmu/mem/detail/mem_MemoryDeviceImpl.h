@@ -3,150 +3,31 @@
 #include <RiscvEmu/riscv_Types.h>
 #include <bit>
 #include <utility>
+#include <memory>
 
 namespace riscv {
 namespace mem {
 namespace detail {
 
-template<typename T>
 class MemoryDeviceImpl {
 public:
+    using PtrType = std::unique_ptr<Byte[]>;
+
     constexpr MemoryDeviceImpl() noexcept = default;
 
-    constexpr MemoryDeviceImpl(T&& pMem) :
-        m_pMem(std::forward<T>(pMem)) {}
+    MemoryDeviceImpl(PtrType&& pMem);
+    MemoryDeviceImpl(NativeWord size);
 
-    constexpr void Initialize(T&& pMem) {
-        m_pMem = std::forward<T>(pMem);
-    }
+    Result Initialize(PtrType&& pMem);
+    Result Initialize(NativeWord size);
 
-    constexpr Result ReadByteImpl(Byte* pOut, Address addr) {
-        *pOut = m_pMem[addr];
-        return ResultSuccess();
-    }
+    template<typename WordType>
+    Result LoadImpl(WordType* pOut, Address addr);
 
-    constexpr Result ReadHWordImpl(HWord* pOut, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher.*/
-            *pOut = static_cast<HWord>(m_pMem[addr + 0] << 0) |
-                    static_cast<HWord>(m_pMem[addr + 1] << 8);
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower*/
-            *pOut = static_cast<HWord>(m_pMem[addr + 0] << 8) |
-                    static_cast<HWord>(m_pMem[addr + 1] << 0);
-        }
-        return ResultSuccess();
-    }
-
-    constexpr Result ReadWordImpl(Word* pOut, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher.*/
-            *pOut = static_cast<Word>(m_pMem[addr + 0] <<  0) |
-                    static_cast<Word>(m_pMem[addr + 1] <<  8) |
-                    static_cast<Word>(m_pMem[addr + 2] << 16) |
-                    static_cast<Word>(m_pMem[addr + 3] << 24);
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower*/
-            *pOut = static_cast<Word>(m_pMem[addr + 0] << 24) |
-                    static_cast<Word>(m_pMem[addr + 1] << 16) |
-                    static_cast<Word>(m_pMem[addr + 2] <<  8) |
-                    static_cast<Word>(m_pMem[addr + 3] <<  0);
-        }
-        return ResultSuccess();
-    }
-
-    constexpr Result ReadDWordImpl(DWord* pOut, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher.*/
-            *pOut = static_cast<DWord>(m_pMem[addr + 0]) <<  0 |
-                    static_cast<DWord>(m_pMem[addr + 1]) <<  8 |
-                    static_cast<DWord>(m_pMem[addr + 2]) << 16 |
-                    static_cast<DWord>(m_pMem[addr + 3]) << 24 |
-                    static_cast<DWord>(m_pMem[addr + 4]) << 32 |
-                    static_cast<DWord>(m_pMem[addr + 5]) << 40 |
-                    static_cast<DWord>(m_pMem[addr + 6]) << 48 |
-                    static_cast<DWord>(m_pMem[addr + 7]) << 56;
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower*/
-            *pOut = static_cast<DWord>(m_pMem[addr + 0]) << 56 |
-                    static_cast<DWord>(m_pMem[addr + 1]) << 48 |
-                    static_cast<DWord>(m_pMem[addr + 2]) << 40 |
-                    static_cast<DWord>(m_pMem[addr + 3]) << 32 |
-                    static_cast<DWord>(m_pMem[addr + 4]) << 24 |
-                    static_cast<DWord>(m_pMem[addr + 5]) << 16 |
-                    static_cast<DWord>(m_pMem[addr + 6]) <<  8 |
-                    static_cast<DWord>(m_pMem[addr + 7]) <<  0;
-        }
-        return ResultSuccess();
-    }
-
-    constexpr Result WriteByteImpl(Byte in, Address addr) {
-        m_pMem[addr] = in;
-        return ResultSuccess();
-    }
-
-    constexpr Result WriteHWordImpl(HWord in, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >> 0u & 0xFFu);
-            m_pMem[addr + 1] = static_cast<Byte>(in >> 8u & 0xFFu);
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >> 8 & 0xFF);
-            m_pMem[addr + 1] = static_cast<Byte>(in >> 0 & 0xFF);
-        }
-        return ResultSuccess();
-    }
-
-    constexpr Result WriteWordImpl(Word in, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >>  0 & 0xFF);
-            m_pMem[addr + 1] = static_cast<Byte>(in >>  8 & 0xFF);
-            m_pMem[addr + 2] = static_cast<Byte>(in >> 16 & 0xFF);
-            m_pMem[addr + 3] = static_cast<Byte>(in >> 24 & 0xFF);
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >> 24 & 0xFF);
-            m_pMem[addr + 1] = static_cast<Byte>(in >> 16 & 0xFF);
-            m_pMem[addr + 2] = static_cast<Byte>(in >>  8 & 0xFF);
-            m_pMem[addr + 3] = static_cast<Byte>(in >>  0 & 0xFF);
-        }
-        return ResultSuccess();
-    }
-
-    constexpr Result WriteDWordImpl(DWord in, Address addr) {
-        if constexpr(std::endian::native == std::endian::little) {
-            /* On little endian we go from lower to higher. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >>  0 & 0xFF);
-            m_pMem[addr + 1] = static_cast<Byte>(in >>  8 & 0xFF);
-            m_pMem[addr + 2] = static_cast<Byte>(in >> 16 & 0xFF);
-            m_pMem[addr + 3] = static_cast<Byte>(in >> 24 & 0xFF);
-            m_pMem[addr + 4] = static_cast<Byte>(in >> 32 & 0xFF);
-            m_pMem[addr + 5] = static_cast<Byte>(in >> 40 & 0xFF);
-            m_pMem[addr + 6] = static_cast<Byte>(in >> 48 & 0xFF);
-            m_pMem[addr + 7] = static_cast<Byte>(in >> 56 & 0xFF);
-        }
-        else /* if constexpr(std::endian::native == std::endian::big) */ {
-            /* On big endian we go from higher to lower. */
-            m_pMem[addr + 0] = static_cast<Byte>(in >> 56 & 0xFF);
-            m_pMem[addr + 1] = static_cast<Byte>(in >> 48 & 0xFF);
-            m_pMem[addr + 2] = static_cast<Byte>(in >> 40 & 0xFF);
-            m_pMem[addr + 3] = static_cast<Byte>(in >> 32 & 0xFF);
-            m_pMem[addr + 4] = static_cast<Byte>(in >> 24 & 0xFF);
-            m_pMem[addr + 5] = static_cast<Byte>(in >> 16 & 0xFF);
-            m_pMem[addr + 6] = static_cast<Byte>(in >>  8 & 0xFF);
-            m_pMem[addr + 7] = static_cast<Byte>(in >>  0 & 0xFF);
-        }
-        return ResultSuccess();
-    }
+    template<typename WordType>
+    Result StoreImpl(WordType in, Address addr);
 private:
-    T m_pMem;
+    PtrType m_pMem;
 }; // class MemoryDeviceImpl
 
 } // namespace detail

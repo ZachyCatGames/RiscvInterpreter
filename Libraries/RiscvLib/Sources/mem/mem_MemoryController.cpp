@@ -1,35 +1,12 @@
 #include <RiscvEmu/mem/mem_MemoryController.h>
+#include <RiscvEmu/mem/mem_MmioTemplateAdapter.h>
+#include <span>
 
 namespace riscv {
 namespace mem {
 
-Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t regionCount) {
-    for(std::size_t i = 0; i < regionCount; i++) {
-        const auto& curRegion = pRegions[i];
-
-        /* Check if this new regions conflicts with any currently existing regions. */
-        if (m_MemRegion.Includes(curRegion.GetStart()) ||
-            m_MemRegion.Includes(curRegion.GetEnd() - 1) ||
-            this->FindIoRegion(curRegion.GetStart()) != nullptr ||
-            this->FindIoRegion(curRegion.GetEnd() - 1) != nullptr) {
-            return ResultRegionAlreadyExists();
-        }
-
-        /* Add new mem region if the current region is a mem region. */
-        if(curRegion.GetType() == RegionType::Memory) {
-            /* Setup the new MemRegion. */
-            m_MemRegion.Initialize(curRegion);
-        }
-        else if(curRegion.GetType() == RegionType::IO) {
-            /* Setup the new IoRegion. */
-            m_IoRegions.emplace_back(curRegion);
-        }
-        else {
-            return ResultInvalidRegionType();
-        }
-    }
-
-    return ResultSuccess();
+Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t count) {
+    return this->Initialize(std::span<const RegionInfo>(pRegions, count));
 }
 
 Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
@@ -53,74 +30,125 @@ Result MemoryController::AddMmioDev(IMmioDev* pDev, Address addr) {
     return ResultSuccess();
 }
 
-Result MemoryController::ReadByte(Byte* pOut, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadByte, &IMmioDev::ReadByte>(pOut, addr);
-}
-
-Result MemoryController::ReadHWord(HWord* pOut, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadHWord, &IMmioDev::ReadHWord>(pOut, addr);
-}
-
-Result MemoryController::ReadWord(Word* pOut, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadWord, &IMmioDev::ReadWord>(pOut, addr);
-}
-
-Result MemoryController::ReadDWord(DWord* pOut, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::ReadDWord, &IMmioDev::ReadDWord>(pOut, addr);
-}
-
-Result MemoryController::ReadNativeWord(NativeWord* pOut, Address addr) {
-    Result res;
-    if constexpr (cfg::cpu::EnableIsaRV64I) {
-        DWord val = 0;
-        res = this->ReadDWord(&val, addr);
-        *pOut = static_cast<NativeWord>(val);
-    }
-    else {
-        Word val = 0;
-        res = this->ReadWord(&val, addr);
-        *pOut = static_cast<NativeWord>(val);
-    }
-    return res;
-}
-
-Result MemoryController::WriteByte(Byte in, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteByte, &IMmioDev::WriteByte>(in, addr);
-}
-
-Result MemoryController::WriteHWord(HWord in, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteHWord, &IMmioDev::WriteHWord>(in, addr);
-}
-
-Result MemoryController::WriteWord(Word in, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteWord, &IMmioDev::WriteWord>(in, addr);
-}
-
-Result MemoryController::WriteDWord(DWord in, Address addr) {
-    return this->ReadWriteImpl<&decltype(m_MemRegion)::WriteDWord, &IMmioDev::WriteDWord>(in, addr);
-}
-
-Result MemoryController::WriteNativeWord(NativeWord in, Address addr) {
-    if constexpr (cfg::cpu::EnableIsaRV64I) {
-        return this->WriteDWord(static_cast<NativeWord>(in), addr);
-    }
-    else {
-        return this->WriteWord(static_cast<NativeWord>(in), addr);
-    }
-}
-
-template<auto MemRead, auto IoRead, typename T>
-Result MemoryController::ReadWriteImpl(T pOut, Address addr) {
+template<std::unsigned_integral WordType>
+Result MemoryController::LoadImpl(WordType* pOut, Address addr) {
     /* First let's check if this address is in main memory. */
     if(m_MemRegion.Includes(addr)) {
-        return (m_MemRegion.*MemRead)(pOut, addr - m_MemRegion.GetStart());
+        return m_MemRegion.Load<WordType>(pOut, addr - m_MemRegion.GetStart());
     }
-    /* Next if that fails let's try reading/writing from/to an IO device. */
-    detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(std::remove_pointer_t<T>));
+    /* Next, if that fails let's try reading/writing from/to an IO device. */
+    detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(std::remove_pointer_t<WordType>));
     if(pDev) {
-        return (*pDev->GetDevice().*IoRead)(pOut, addr - pDev->GetStart());
+        return MmioTemplateAdapter(pDev->GetDevice()).Load(pOut, addr - pDev->GetStart());
     }
     return ResultReadAccessFault();
+}
+
+template Result MemoryController::LoadImpl<Byte>(Byte*, Address);
+template Result MemoryController::LoadImpl<HWord>(HWord*, Address);
+template Result MemoryController::LoadImpl<Word>(Word*, Address);
+template Result MemoryController::LoadImpl<DWord>(DWord*, Address);
+
+template<std::signed_integral WordType>
+Result MemoryController::LoadImpl(WordType* pOut, Address addr) {
+    using Unsigned = std::make_unsigned_t<WordType>;
+    Unsigned tmp;
+
+    /* Read value as unsigned. */
+    Result res = this->Load<Unsigned>(&tmp, addr);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Convert value to signed. */
+    *pOut = static_cast<WordType>(tmp);
+
+    return ResultSuccess();
+}
+
+template Result MemoryController::LoadImpl<ByteS>(ByteS*, Address);
+template Result MemoryController::LoadImpl<HWordS>(HWordS*, Address);
+template Result MemoryController::LoadImpl<WordS>(WordS*, Address);
+template Result MemoryController::LoadImpl<DWordS>(DWordS*, Address);
+
+template<std::floating_point WordType>
+Result MemoryController::LoadImpl(WordType* pOut, Address addr) {
+    using TmpType = std::conditional_t<std::is_same_v<WordType, float>, Word, DWord>;
+
+    /* Read word. */
+    TmpType tmp;
+    Result res = this->LoadImpl<TmpType>(&tmp, addr);
+
+    /* Bitcast value to float/double. */
+    *pOut = std::bit_cast<WordType>(tmp);
+
+    return ResultSuccess();
+}
+
+template Result MemoryController::LoadImpl<float>(float*, Address);
+template Result MemoryController::LoadImpl<double>(double*, Address);
+
+template<std::unsigned_integral WordType>
+Result MemoryController::StoreImpl(WordType in, Address addr) {
+    /* First let's check if this address is in main memory. */
+    if(m_MemRegion.Includes(addr)) {
+        return m_MemRegion.Store<WordType>(in, addr - m_MemRegion.GetStart());
+    }
+    /* Next, if that fails let's try reading/writing from/to an IO device. */
+    detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(WordType));
+    if(pDev) {
+        return MmioTemplateAdapter(pDev->GetDevice()).Store(in, addr - pDev->GetStart());
+    }
+    return ResultWriteAccessFault();
+}
+
+template Result MemoryController::StoreImpl<Byte>(Byte, Address);
+template Result MemoryController::StoreImpl<HWord>(HWord, Address);
+template Result MemoryController::StoreImpl<Word>(Word, Address);
+template Result MemoryController::StoreImpl<DWord>(DWord, Address);
+
+template<std::signed_integral WordType>
+Result MemoryController::StoreImpl(WordType in, Address addr) {
+    /* Convert value to unsigned value and store it. */
+    using Unsigned = std::make_unsigned_t<WordType>;
+    return this->StoreImpl(static_cast<Unsigned>(in), addr);
+}
+
+template Result MemoryController::StoreImpl<ByteS>(ByteS, Address);
+template Result MemoryController::StoreImpl<HWordS>(HWordS, Address);
+template Result MemoryController::StoreImpl<WordS>(WordS, Address);
+template Result MemoryController::StoreImpl<DWordS>(DWordS, Address);
+
+template<std::floating_point WordType>
+Result MemoryController::StoreImpl(WordType in, Address addr) {
+    /* Convert value to word type then store it. */
+    using TmpType = std::conditional_t<std::is_same_v<WordType, float>, Word, DWord>;
+    return this->StoreImpl(std::bit_cast<TmpType>(in), addr);
+}
+
+Result MemoryController::AddRegionImpl(const RegionInfo* pRegion) {
+    /* Check if this new regions conflicts with any currently existing regions. */
+    if (m_MemRegion.Includes(pRegion->GetStart()) ||
+        m_MemRegion.Includes(pRegion->GetEnd() - 1) ||
+        this->FindIoRegion(pRegion->GetStart()) != nullptr ||
+        this->FindIoRegion(pRegion->GetEnd() - 1) != nullptr) {
+        return ResultRegionAlreadyExists();
+    }
+
+    /* Add new mem region if the current region is a mem region. */
+    if(pRegion->GetType() == RegionType::Memory) {
+        /* Setup the new MemRegion. */
+        m_MemRegion.Initialize(*pRegion);
+    }
+    else if(pRegion->GetType() == RegionType::IO) {
+        /* Setup the new IoRegion. */
+        m_IoRegions.emplace_back(*pRegion);
+    }
+    else {
+        return ResultInvalidRegionType();
+    }
+
+    return ResultSuccess();
 }
 
 template<typename T>
