@@ -46,8 +46,8 @@ public:
 private:
     class PTE;
 
-    enum class TranslationReason {
-        Load,
+    enum class TranslationReason : int {
+        Load = 0,
         Store,
         Fetch,
         Any
@@ -57,10 +57,9 @@ private:
 
     Result TranslateImpl(Address* pAddrOut, Address addr, PrivilageLevel level, TranslationReason reason);
 
-    Result TranslateForRead(Address* pOut, Address addr, PrivilageLevel level);
-    Result TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level);
-    Result TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level);
-    Result TranslateForAny(Address* pOut, Address addr, PrivilageLevel level);
+    Result GetTranslationResult(Result res, TranslationReason);
+
+    Result Translate(Address* pAddrOut, Address addr, PrivilageLevel level, TranslationReason reason);
 private:
     mem::MCClient m_McClient;
     mem::MemoryController* m_pMemCtlr;

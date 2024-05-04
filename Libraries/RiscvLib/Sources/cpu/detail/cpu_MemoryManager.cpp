@@ -90,20 +90,20 @@ constexpr NativeWord GetPTOffset(Address vaddr, int level) {
     return (vaddr >> (VPNPartSize * level + 12)) & (cfg::cpu::EnableIsaRV64I ? 0x1F : 0x3F);
 }
 
-constexpr Result GetTranslationResult(Result res, Result accessFault, Result pageFault) {
-    if(res.IsFailure()) {
-        /* No PTE found & unprivilaged access are page faults. */
-        if (ResultNoValidPteFound::Includes(res) ||
-            ResultPageFault::Includes(res)) {
-            return pageFault;
-        }
+static constexpr Result g_PageFaultResults[] = {
+    ResultLoadPageFault(),
+    ResultStorePageFault(),
+    ResultFetchPageFault(),
+    ResultLoadAccessFault(), // for type any
+};
 
-        /* Anything else is a access fault. */
-        return accessFault;
-    }
+static constexpr Result g_AccessFaultResults[] = {
+    ResultLoadAccessFault(),
+    ResultStoreAccessFault(),
+    ResultFetchAccessFault(),
+    ResultLoadAccessFault(), // for type any.
+};
 
-    return ResultSuccess();
-}
 
 constexpr bool TranslationModeValid(AddrTransMode mode) {
     if constexpr(cfg::cpu::EnableIsaRV64I) {
@@ -175,7 +175,7 @@ Result MemoryManager::Load(WordType* pOut, Address addr, PrivilageLevel level) {
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateForRead(&addr, addr, level);
+        res = this->Translate(&addr, addr, level, TranslationReason::Load);
         if(res.IsFailure()) {
             return res;
         }
@@ -204,7 +204,7 @@ Result MemoryManager::Store(WordType in, Address addr, PrivilageLevel level) {
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateForWrite(&addr, addr, level);
+        res = this->Translate(&addr, addr, level, TranslationReason::Store);
         if(res.IsFailure()) {
             return res;
         }
@@ -234,7 +234,7 @@ Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) 
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateForFetch(&addr, addr, level);
+        res = this->Translate(&addr, addr, level, TranslationReason::Fetch);
         if(res.IsFailure()) {
             return res;
         }
@@ -251,7 +251,7 @@ Result MemoryManager::MappedLoadForDebug(WordType* pOut, Address addr) {
     diag::AssertNotNull(pOut);
 
     /* Translate address without permission checks. */
-    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
+    Result res = this->Translate(&addr, addr, PrivilageLevel::Machine, TranslationReason::Any);
     if(res.IsFailure()) {
         return res;
     }
@@ -274,7 +274,7 @@ template Result MemoryManager::MappedLoadForDebug<double>(double* pOut, Address 
 template<typename WordType>
 Result MemoryManager::MappedStoreForDebug(WordType in, Address addr) {
     /* Translate address without permission checks. */
-    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
+    Result res = this->Translate(&addr, addr, PrivilageLevel::Machine, TranslationReason::Any);
     if(res.IsFailure()) {
         return res;
     }
@@ -293,7 +293,6 @@ template Result MemoryManager::MappedStoreForDebug<WordS>(WordS pOut, Address ad
 template Result MemoryManager::MappedStoreForDebug<DWordS>(DWordS pOut, Address addr);
 template Result MemoryManager::MappedStoreForDebug<float>(float pOut, Address addr);
 template Result MemoryManager::MappedStoreForDebug<double>(double pOut, Address addr);
-
 
 Result MemoryManager::GetPteImpl(PTE* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
     /* Assert that outputs aren't null. */
@@ -420,38 +419,30 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
     return ResultSuccess();
 }
 
-Result MemoryManager::TranslateForRead(Address* pOut, Address addr, PrivilageLevel level) {
+Result MemoryManager::GetTranslationResult(Result res, TranslationReason reason) {
+    if(res.IsFailure()) {
+        /* No PTE found & unprivilaged access are page faults. */
+        if (ResultNoValidPteFound::Includes(res) ||
+            ResultPageFault::Includes(res)) {
+            return g_PageFaultResults[static_cast<int>(reason)];
+        }
+
+        /* Anything else is a access fault. */
+        return g_AccessFaultResults[static_cast<int>(reason)];
+    }
+
+    return ResultSuccess();
+}
+
+Result MemoryManager::Translate(Address* pOut, Address addr, PrivilageLevel level, TranslationReason reason) {
     /* Assert that output isn't null. */
     diag::AssertNotNull(pOut);
 
     /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Load);
+    Result res = this->TranslateImpl(pOut, addr, level, reason);
 
-    return GetTranslationResult(res, ResultLoadAccessFault(), ResultLoadPageFault());
-}
-
-Result MemoryManager::TranslateForWrite(Address* pOut, Address addr, PrivilageLevel level) {
-    /* Assert that output isn't null. */
-    diag::AssertNotNull(pOut);
-
-    /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Store);
-
-    return GetTranslationResult(res, ResultStoreAccessFault(), ResultStorePageFault());
-}
-
-Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLevel level) {
-    /* Assert that output isn't null. */
-    diag::AssertNotNull(pOut);
-
-    /* Translate address. */
-    Result res = this->TranslateImpl(pOut, addr, level, TranslationReason::Fetch);
-
-    return GetTranslationResult(res, ResultFetchAccessFault(), ResultFetchPageFault());
-}
-
-Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
-    return this->TranslateImpl(pOut, addr, level, TranslationReason::Any);
+    /* Get proper result. */
+    return GetTranslationResult(res, reason);
 }
 
 } // namespace detail
