@@ -94,11 +94,25 @@ template<std::unsigned_integral WordType>
 Result MemoryController::StoreImpl(WordType in, Address addr) {
     /* First let's check if this address is in main memory. */
     if(m_MemRegion.Includes(addr)) {
+        /* Acquire lock on reservation info. */
+        std::scoped_lock lock(m_Reservations);
+
+        /* Invalidate reservation on addr. */
+        this->InvalidateReservation(addr);
+
+        /* Perform store. */
         return m_MemRegion.Store<WordType>(in, addr - m_MemRegion.GetStart());
     }
     /* Next, if that fails let's try reading/writing from/to an IO device. */
     detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(WordType));
     if(pDev) {
+        /* Acquire lock on reservation info. */
+        std::scoped_lock lock(m_Reservations);
+
+        /* Invalidate reservation on addr. */
+        this->InvalidateReservation(addr):
+
+        /* Perform store. */
         return MmioTemplateAdapter(pDev->GetDevice()).Store(in, addr - pDev->GetStart());
     }
     return ResultWriteAccessFault();
