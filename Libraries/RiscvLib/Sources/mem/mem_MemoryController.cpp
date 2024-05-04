@@ -123,7 +123,7 @@ Result MemoryController::StoreImpl(WordType in, Address addr) {
     /* First let's check if this address is in main memory. */
     if(m_MemRegion.Includes(addr)) {
         /* Acquire lock on reservation info. */
-        std::scoped_lock lock(m_Reservations);
+        std::scoped_lock lock(m_ReserveMutex);
 
         /* Invalidate reservation on addr. */
         this->InvalidateReservation(addr);
@@ -135,7 +135,7 @@ Result MemoryController::StoreImpl(WordType in, Address addr) {
     detail::IoDev* pDev = this->FindIoDevice(addr, sizeof(WordType));
     if(pDev) {
         /* Acquire lock on reservation info. */
-        std::scoped_lock lock(m_Reservations);
+        std::scoped_lock lock(m_ReserveMutex);
 
         /* Invalidate reservation on addr. */
         this->InvalidateReservation(addr);
@@ -259,7 +259,7 @@ void MemoryController::AddReservation(MCClient* pClient, Address addr) {
     addr >>= ReserveGranularity;
 
     /* Add reservation. */
-    m_Reservations.emplace_back(pClient, addr);
+    m_Reservations.push_back(ReserveEntry{addr, pClient});
 }
 
 void MemoryController::InvalidateReservation(Address addr) {
