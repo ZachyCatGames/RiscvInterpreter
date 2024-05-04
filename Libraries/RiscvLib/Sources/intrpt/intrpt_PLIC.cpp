@@ -44,19 +44,19 @@ constexpr Word GetContextRegId (Word val) noexcept { return val % ContextSize; }
 NativeWord PLIC::MmioInterface::GetMappedSize() { return AddrSpaceSize; }
 
 /* TODO: What do we want to do here? */
-Result PLIC::MmioInterface::ReadByte([[maybe_unused]] Byte*, [[maybe_unused]] Address) { return ResultSuccess(); }
-Result PLIC::MmioInterface::ReadHWord([[maybe_unused]] HWord*, [[maybe_unused]] Address) { return ResultSuccess(); }
-Result PLIC::MmioInterface::ReadDWord([[maybe_unused]] DWord*, [[maybe_unused]] Address) { return ResultSuccess(); }
-Result PLIC::MmioInterface::WriteByte([[maybe_unused]] Byte, [[maybe_unused]] Address) { return ResultSuccess(); }
-Result PLIC::MmioInterface::WriteHWord([[maybe_unused]] HWord, [[maybe_unused]] Address) { return ResultSuccess(); }
-Result PLIC::MmioInterface::WriteDWord([[maybe_unused]] DWord, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::LoadByte([[maybe_unused]] Byte*, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::LoadHWord([[maybe_unused]] HWord*, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::LoadDWord([[maybe_unused]] DWord*, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::StoreByte([[maybe_unused]] Byte, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::StoreHWord([[maybe_unused]] HWord, [[maybe_unused]] Address) { return ResultSuccess(); }
+Result PLIC::MmioInterface::StoreDWord([[maybe_unused]] DWord, [[maybe_unused]] Address) { return ResultSuccess(); }
 
-Result PLIC::MmioInterface::ReadWord(Word* pOut, Address addr) {
+Result PLIC::MmioInterface::LoadWord(Word* pOut, Address addr) {
     *pOut = m_pParent->ReadRegister(static_cast<Word>(addr));
     return ResultSuccess();
 }
 
-Result PLIC::MmioInterface::WriteWord(Word in, Address addr) {
+Result PLIC::MmioInterface::StoreWord(Word in, Address addr) {
     m_pParent->WriteRegister(static_cast<Word>(addr), in);
     return ResultSuccess();
 }

@@ -81,14 +81,14 @@ private:
     public:
         virtual NativeWord GetMappedSize() override;
 
-        virtual Result ReadByte(Byte* pOut, Address addr) override;
-        virtual Result ReadHWord(HWord* pOut, Address addr) override;
-        virtual Result ReadWord(Word* pOut, Address addr) override;
-        virtual Result ReadDWord(DWord* pOut, Address addr) override;
-        virtual Result WriteByte(Byte in, Address addr) override;
-        virtual Result WriteHWord(HWord in, Address addr) override;
-        virtual Result WriteWord(Word in, Address addr) override;
-        virtual Result WriteDWord(DWord in, Address addr) override;
+        virtual Result LoadByte(Byte* pOut, Address addr) override;
+        virtual Result LoadHWord(HWord* pOut, Address addr) override;
+        virtual Result LoadWord(Word* pOut, Address addr) override;
+        virtual Result LoadDWord(DWord* pOut, Address addr) override;
+        virtual Result StoreByte(Byte in, Address addr) override;
+        virtual Result StoreHWord(HWord in, Address addr) override;
+        virtual Result StoreWord(Word in, Address addr) override;
+        virtual Result StoreDWord(DWord in, Address addr) override;
     private:
         PLIC* m_pParent;
     }; // class MmioInterface
