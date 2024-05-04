@@ -1,5 +1,6 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
+#include <RiscvEmu/diag.h>
 #include <RiscvEmu/result.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
 
@@ -8,6 +9,9 @@ namespace mem {
 
 class MCClient {
 public:
+    /** Default constructor. */
+    MCClient() : m_pCtlr(nullptr) {}
+
     /** Move constructor. */
     MCClient(MCClient&&) = default;
 
@@ -32,7 +36,10 @@ public:
      * @return Result code.
     */
     template<typename WordType>
-    Result Load(WordType* pOut, Address addr) { return m_pCtlr->LoadImpl(pOut, addr); }
+    Result Load(WordType* pOut, Address addr) {
+        diag::AssertNotNull(m_pCtlr);
+        return m_pCtlr->LoadImpl(pOut, addr);
+    }
 
     /**
      * @brief Perform a store to memory.
@@ -52,7 +59,10 @@ public:
      * @return Result code.
     */
     template<typename WordType>
-    Result Store(WordType in, Address addr) { return m_pCtlr->StoreImpl(in, addr); }
+    Result Store(WordType in, Address addr) {
+        diag::AssertNotNull(m_pCtlr);
+        return m_pCtlr->StoreImpl(in, addr);
+    }
 
     /**
      * @brief Perform a load from memory and register a reservation.
@@ -73,7 +83,10 @@ public:
      * @return Result code.
     */
     template<typename WordType>
-    Result LoadReserve(WordType* pOut, Address addr) { m_pCtlr->LoadReserve(this, pOut, addr); }
+    Result LoadReserve(WordType* pOut, Address addr) {
+        diag::AssertNotNull(m_pCtlr);
+        m_pCtlr->LoadReserve(this, pOut, addr);
+    }
 
     /**
      * @brief Perform a conditional store based on reservation entries.
@@ -94,11 +107,13 @@ public:
      * @return Result code.
     */
     template<typename WordType>
-    Result StoreConditional(WordType* pInOut, Address addr) { return m_pCtlr->StoreConditional(this, pInOut, addr); }
+    Result StoreConditional(WordType* pInOut, Address addr) {
+        diag::AssertNotNull(m_pCtlr);
+        return m_pCtlr->StoreConditional(this, pInOut, addr);
+    }
 private:
-    MCClient();
     MCClient(const MCClient&) = delete;
-    MCClient(MemoryController* pCtlr);
+    MCClient(MemoryController* pCtlr) : m_pCtlr(pCtlr) {}
 private:
     friend class MemoryController;
     MemoryController* m_pCtlr;
