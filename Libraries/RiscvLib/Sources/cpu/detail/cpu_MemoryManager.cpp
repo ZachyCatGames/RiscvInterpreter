@@ -375,6 +375,7 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
         if(!pte.GetReadable() && !(this->GetEnabledMXR() && pte.GetExecutable())) {
             return ResultPageFault();
         }
+        break;
     }
     case TranslationReason::Store: {
         /* Make sure we can write to this page. */
@@ -384,12 +385,14 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
 
         /* Set dirty bit. */
         pte.SetDirty(true);
+        break;
     }
     case TranslationReason::Fetch: {
         /* Make sure we can fetch from this page. */
         if(!pte.GetExecutable()) {
             return ResultPageFault();
         }
+        break;
     }
     case TranslationReason::Any: break;
     default: diag::UnexpectedDefault();
