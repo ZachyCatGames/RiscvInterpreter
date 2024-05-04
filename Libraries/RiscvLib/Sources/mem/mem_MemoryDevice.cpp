@@ -3,7 +3,6 @@
 namespace riscv {
 namespace mem {
 
-Result MemoryDevice::LoadByte(Byte* pOut, Address addr)  { return m_Dev.LoadImpl<Byte>(pOut, addr); }
 Result MemoryDevice::LoadByte  (Byte* pOut, Address addr) { return m_Dev.LoadImpl<Byte>(pOut, addr); }
 Result MemoryDevice::LoadHWord (HWord* pOut, Address addr) { return m_Dev.LoadImpl<HWord>(pOut, addr); }
 Result MemoryDevice::LoadWord  (Word* pOut, Address addr) { return m_Dev.LoadImpl<Word>(pOut, addr); }
