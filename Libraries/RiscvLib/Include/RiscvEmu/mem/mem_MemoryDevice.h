@@ -23,14 +23,15 @@ public:
 
     virtual NativeWord GetMappedSize() override { return m_Length; }
 
-    virtual Result LoadByte  (Byte* pOut, Address addr)  override { return m_Dev.LoadImpl<Byte>(pOut, addr); }
-    virtual Result LoadHWord (HWord* pOut, Address addr) override { return m_Dev.LoadImpl<HWord>(pOut, addr); }
-    virtual Result LoadWord  (Word* pOut, Address addr)  override { return m_Dev.LoadImpl<Word>(pOut, addr); }
-    virtual Result LoadDWord (DWord* pOut, Address addr) override { return m_Dev.LoadImpl<DWord>(pOut, addr); }
-    virtual Result StoreByte (Byte in, Address addr)     override { return m_Dev.StoreImpl<Byte>(in, addr); }
-    virtual Result StoreHWord(HWord in, Address addr)    override { return m_Dev.StoreImpl<HWord>(in, addr); }
-    virtual Result StoreWord (Word in, Address addr)     override { return m_Dev.StoreImpl<Word>(in, addr); }
-    virtual Result StoreDWord(DWord in, Address addr)    override { return m_Dev.StoreImpl<DWord>(in, addr); }
+    virtual Result LoadByte(Byte* pOut, Address addr) override;
+    virtual Result LoadHWord(HWord* pOut, Address addr) override;
+    virtual Result LoadWord(Word* pOut, Address addr) override;
+    virtual Result LoadDWord(DWord* pOut, Address addr) override;
+
+    virtual Result StoreByte(Byte in, Address addr) override;
+    virtual Result StoreHWord(HWord in, Address addr) override;
+    virtual Result StoreWord(Word in, Address addr) override;
+    virtual Result StoreDWord(DWord in, Address addr) override;
 private:
     detail::MemoryDeviceImpl m_Dev;
     NativeWord m_Length;

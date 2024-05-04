@@ -19,6 +19,7 @@ set(RISCV_MEM_LIBRARY_HEADERS
 set(RISCV_MEM_LIBRARY_SOURCES
     "${_RV_MEM_SRC_DIR}/mem_MemoryClient.cpp"
     "${_RV_MEM_SRC_DIR}/mem_MemoryController.cpp"
+    "${_RV_MEM_SRC_DIR}/mem_MemoryDevice.cpp"
 
     "${_RV_MEM_SRC_DIR}/detail/mem_MemoryDeviceImpl.cpp"
     "${_RV_MEM_SRC_DIR}/detail/mem_MemRegion.cpp"
