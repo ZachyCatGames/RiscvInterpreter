@@ -119,8 +119,6 @@ private:
     std::mutex m_ReserveMutex;
     std::vector<ReserveEntry> m_Reservations;
 
-    int m_UsedClients;
-
     detail::MemRegion m_MemRegion;
     std::vector<detail::IoRegion> m_IoRegions;
 }; // class MemoryController
