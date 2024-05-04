@@ -1,7 +1,7 @@
 #include <RiscvEmuTest/test_Common.h>
 #include <RiscvEmu/cpu/cpu_EncodeInstruction.h>
 #include <RiscvEmu/cpu/cpu_Hart.h>
-#include <RiscvEmu/cpu/decoder/cpu_InstructionFormat.h>
+#include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <limits>
 
 namespace riscv {
@@ -26,10 +26,10 @@ constexpr int TestFieldOpcode() noexcept {
 }
 
 constexpr int TestFieldRd() noexcept {
-    for(Word i = 0; i < cpu::InstMaxRegister; i++) {
+    for(int i = 0; i < cpu::InstMaxRegister; i++) {
         /* Encode instruction with all fields max'd */
         auto inst = cpu::UTypeInstruction(cpu::EncodeUTypeInstruction(cpu::Opcode::Max, 
-                                                                      static_cast<int>(i), 
+                                                                      i, 
                                                                       std::numeric_limits<Word>::max()));
 
         /* Test that rd is what we expect. */
