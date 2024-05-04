@@ -11,6 +11,9 @@ public:
     /** Move constructor. */
     MCClient(MCClient&&) = default;
 
+    /** Move assignment operator. */
+    MCClient& operator=(MCClient&&) = default;
+
     /**
      * @brief Perform a load from memory.
      * 
