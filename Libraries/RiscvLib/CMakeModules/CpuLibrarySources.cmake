@@ -15,7 +15,6 @@ set(RISCV_CPU_LIBRARY_HEADERS
     "${_RV_CPU_HDR_DIR}/detail/cpu_DecoderImpl.h"
     "${_RV_CPU_HDR_DIR}/detail/cpu_IntegerMultiply.h"
     "${_RV_CPU_HDR_DIR}/detail/cpu_MemoryManager.h"
-    "${_RV_CPU_HDR_DIR}/detail/cpu_MemoryMonitor.h"
 )
 
 set(RISCV_CPU_LIBRARY_SOURCES
@@ -25,7 +24,6 @@ set(RISCV_CPU_LIBRARY_SOURCES
     "${_RV_CPU_SRC_DIR}/detail/cpu_IntegerMultiply.cpp"
     "${_RV_CPU_SRC_DIR}/detail/cpu_IntegerMultiplyImpl-arch.amd64.S"
     "${_RV_CPU_SRC_DIR}/detail/cpu_MemoryManager.cpp"
-    "${_RV_CPU_SRC_DIR}/detail/cpu_MemoryMonitor.cpp"
 
     "${_RV_CPU_SRC_DIR}/Hart/cpu_CsrReadWrite.cpp"
     "${_RV_CPU_SRC_DIR}/Hart/cpu_Initialize.cpp"

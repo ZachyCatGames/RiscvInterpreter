@@ -4,17 +4,9 @@
 namespace riscv {
 namespace cpu {
 
-void Hart::SharedState::Initialize(Word hartCount, mem::MemoryController* pMemCtlr) noexcept {
-    /* Assert memory controller isn't null. */
-    diag::AssertNotNull(pMemCtlr);
-
+void Hart::SharedState::Initialize(Word hartCount) noexcept {
     m_HartCount = hartCount;
-
-    /* Init memory monitor. */
-    m_MemMonitor.Initialize(hartCount);
 }
-
-detail::MemoryMonitor* Hart::SharedState::GetMemMonitor() noexcept { return &m_MemMonitor; }
 
 } // namespace cpu
 } // namespace riscv

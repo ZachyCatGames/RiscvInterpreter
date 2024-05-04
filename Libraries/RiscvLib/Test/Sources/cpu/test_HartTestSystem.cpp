@@ -11,7 +11,7 @@ Result HartTestSystem::Initialize() {
     auto hartClient = m_MemCtlr.GetClient();
 
     /* Initialize the Hart. */
-    m_HartSharedState.Initialize(1, &m_MemCtlr);
+    m_HartSharedState.Initialize(1);
     Result res = m_Hart.Initialize(&m_HartSharedState, std::move(hartClient), 0);
     if(res.IsFailure()) {
         return res;

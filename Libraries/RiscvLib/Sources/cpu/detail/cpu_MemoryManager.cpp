@@ -9,8 +9,6 @@ namespace detail {
 
 namespace {
 
-using MemCtlrT = mem::MemoryController;
-
 class PTEBase {
 public:
     constexpr PTEBase() noexcept : m_Value(0) {}

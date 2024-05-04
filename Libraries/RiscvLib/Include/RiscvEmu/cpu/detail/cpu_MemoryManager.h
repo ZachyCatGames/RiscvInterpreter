@@ -1,6 +1,5 @@
 #pragma once
 #include <RiscvEmu/cpu/cpu_Types.h>
-#include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
 #include <RiscvEmu/mem/mem_MCClient.h>
 
 namespace riscv {

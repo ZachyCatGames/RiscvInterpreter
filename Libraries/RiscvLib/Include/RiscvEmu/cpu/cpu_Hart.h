@@ -8,7 +8,6 @@
 #include <RiscvEmu/cpu/cpu_InstructionFormat.h>
 #include <RiscvEmu/cpu/detail/cpu_ClkTime.h>
 #include <RiscvEmu/cpu/detail/cpu_MemoryManager.h>
-#include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
 #include <RiscvEmu/mem/mem_MCClient.h>
 #include <cassert>
 
@@ -19,12 +18,9 @@ class Hart {
 public:
     class SharedState {
     public:
-        void Initialize(Word hartCount, mem::MemoryController* pMemCtlr) noexcept;
-
-        detail::MemoryMonitor* GetMemMonitor() noexcept;
+        void Initialize(Word hartCount) noexcept;
     private:
         Word m_HartCount;
-        detail::MemoryMonitor m_MemMonitor;
     }; // SharedState
 public:
     /** Initialize the Hart. */
@@ -179,9 +175,6 @@ private:
 
     /* Memory manager. */
     detail::MemoryManager m_MemMgr;
-
-    /* Memory monitor context for this hart. */
-    detail::MemoryMonitor::Context m_MemMonitorCtx;
 
     SharedState* m_pSharedCtx;
 }; // class Hart

@@ -2,7 +2,6 @@
 #include <RiscvEmu/hw/hw_Scheduler.h>
 #include <RiscvEmu/mem/mem_MemoryDevice.h>
 #include <RiscvEmu/cpu/detail/cpu_IntegerMultiply.h>
-#include <RiscvEmu/cpu/detail/cpu_MemoryMonitor.h>
 #include <RiscvEmu/diag.h>
 #include <iostream>
 
