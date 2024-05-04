@@ -128,9 +128,8 @@ constexpr bool TranslationModeValid(AddrTransMode mode) {
 
 class MemoryManager::PTE : public std::conditional_t<cfg::cpu::EnableIsaRV64I, PTEFor64, PTEFor32> {};
 
-Result MemoryManager::Initialize(mem::MemoryController* pMemCtlr) {
-    diag::AssertNotNull(pMemCtlr);
-    m_pMemCtlr = pMemCtlr;
+Result MemoryManager::Initialize(mem::MCClient&& client) {
+    m_McClient = std::move(client);
     m_Mode = AddrTransMode::Bare;
     return ResultSuccess();
 }
@@ -167,13 +166,12 @@ void MemoryManager::SetEnabledSUM(bool val) noexcept { m_EnableSUM = val; }
 bool MemoryManager::GetEnabledMXR() const noexcept { return m_EnableMXR; }
 void MemoryManager::SetEnabledMXR(bool val) noexcept { m_EnableMXR = val; }
 
-template<typename T>
-Result MemoryManager::ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLevel level) {
+template<typename WordType>
+Result MemoryManager::Load(WordType* pOut, Address addr, PrivilageLevel level) {
     Result res;
 
-    /* Assert that output and read func aren't null. */
+    /* Assert that output isn't null. */
     diag::AssertNotNull(pOut);
-    diag::AssertNotNull(readFunc);
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
@@ -186,15 +184,23 @@ Result MemoryManager::ReadImpl(auto readFunc, T* pOut, Address addr, PrivilageLe
     /* TODO: PMP: Perform PMP check. */
 
     /* Perform an unmapped read. */
-    return (*m_pMemCtlr.*readFunc)(pOut, addr);
+    return m_McClient.Load<WordType>(pOut, addr);
 }
 
-template<typename T>
-Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLevel level) {
-    Result res;
+template Result MemoryManager::Load<Byte>(Byte* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<HWord>(HWord* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<Word>(Word* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<DWord>(DWord* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<ByteS>(ByteS* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<HWordS>(HWordS* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<WordS>(WordS* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<DWordS>(DWordS* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<float>(float* pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Load<double>(double* pOut, Address addr, PrivilageLevel level);
 
-    /* Assert that write func isn't null. */
-    diag::AssertNotNull(writeFunc);
+template<typename WordType>
+Result MemoryManager::Store(WordType in, Address addr, PrivilageLevel level) {
+    Result res;
 
     /* Translate address if in non-machine mode and translation is enabled. */
     if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
@@ -206,9 +212,88 @@ Result MemoryManager::WriteImpl(auto writeFunc, T in, Address addr, PrivilageLev
 
     /* TODO: PMP: Perform PMP check. */
 
-    /* Perform unmapped write. */
-    return (*m_pMemCtlr.*writeFunc)(in, addr);
+    /* Perform unmapped store. */
+    return m_McClient.Store(in, addr);
 }
+
+template Result MemoryManager::Store<Byte>(Byte pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<HWord>(HWord pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<Word>(Word pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<DWord>(DWord pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<ByteS>(ByteS pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<HWordS>(HWordS pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<WordS>(WordS pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<DWordS>(DWordS pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<float>(float pOut, Address addr, PrivilageLevel level);
+template Result MemoryManager::Store<double>(double pOut, Address addr, PrivilageLevel level);
+
+Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) {
+    Result res;
+
+    diag::AssertNotNull(pOut);
+
+    /* Translate address if in non-machine mode and translation is enabled. */
+    if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
+        res = this->TranslateForFetch(&addr, addr, level);
+        if(res.IsFailure()) {
+            return res;
+        }
+    }
+
+    /* TODO: PMP: Perform PMP Check. */
+
+    /* Perform unmapped load. */
+    return m_McClient.Load<Word>(pOut, addr);
+}
+
+template<typename WordType>
+Result MemoryManager::MappedLoadForDebug(WordType* pOut, Address addr) {
+    diag::AssertNotNull(pOut);
+
+    /* Translate address without permission checks. */
+    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Perform unmapped read. */
+    return m_McClient.Load(pOut, addr);
+}
+
+template Result MemoryManager::MappedLoadForDebug<Byte>(Byte* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<HWord>(HWord* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<Word>(Word* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<DWord>(DWord* pOut, Address);
+template Result MemoryManager::MappedLoadForDebug<ByteS>(ByteS* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<HWordS>(HWordS* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<WordS>(WordS* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<DWordS>(DWordS* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<float>(float* pOut, Address addr);
+template Result MemoryManager::MappedLoadForDebug<double>(double* pOut, Address addr);
+
+template<typename WordType>
+Result MemoryManager::MappedStoreForDebug(WordType in, Address addr) {
+    /* Translate address without permission checks. */
+    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
+    if(res.IsFailure()) {
+        return res;
+    }
+
+    /* Perform unmapped write. */
+    return m_McClient.Store(in, addr);
+}
+
+template Result MemoryManager::MappedStoreForDebug<Byte>(Byte pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<HWord>(HWord pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<Word>(Word pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<DWord>(DWord pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<ByteS>(ByteS pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<HWordS>(HWordS pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<WordS>(WordS pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<DWordS>(DWordS pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<float>(float pOut, Address addr);
+template Result MemoryManager::MappedStoreForDebug<double>(double pOut, Address addr);
+
 
 Result MemoryManager::GetPteImpl(PTE* pPte, Address* pPteAddr, int* pLevelFound, Address addr) {
     /* Assert that outputs aren't null. */
@@ -226,7 +311,7 @@ Result MemoryManager::GetPteImpl(PTE* pPte, Address* pPteAddr, int* pLevelFound,
         auto pteAddr = curPT + offset * sizeof(NativeWord);
 
         /* Read PTE. */
-        res = m_pMemCtlr->ReadNativeWord(&pteVal, pteAddr);
+        res = m_McClient.Load(&pteVal, pteAddr);
         if(res.IsFailure()) {
             return res;
         }
@@ -315,7 +400,7 @@ Result MemoryManager::TranslateImpl(Address* pAddrOut, Address addr, PrivilageLe
     pte.SetAccessed(true);
 
     /* Write PTE back. */
-    res = m_pMemCtlr->WriteNativeWord(pte.GetValue(), pteAddr);
+    res = m_McClient.Store<NativeWord>(pte.GetValue(), pteAddr);
     if(res.IsFailure()) {
         return res;
     }
@@ -367,118 +452,6 @@ Result MemoryManager::TranslateForFetch(Address* pOut, Address addr, PrivilageLe
 
 Result MemoryManager::TranslateForAny(Address* pOut, Address addr, PrivilageLevel level) {
     return this->TranslateImpl(pOut, addr, level, TranslationReason::Any);
-}
-
-Result MemoryManager::ReadByte(Byte* pOut, Address addr, PrivilageLevel level) {
-    return this->ReadImpl(&MemCtlrT::ReadByte, pOut, addr, level);
-}
-
-Result MemoryManager::ReadHWord(HWord* pOut, Address addr, PrivilageLevel level) {
-    return this->ReadImpl(&MemCtlrT::ReadHWord, pOut, addr, level);
-}
-
-Result MemoryManager::ReadWord(Word* pOut, Address addr, PrivilageLevel level) {
-    return this->ReadImpl(&MemCtlrT::ReadWord, pOut, addr, level);
-}
-
-Result MemoryManager::ReadDWord(DWord* pOut, Address addr, PrivilageLevel level) {
-    return this->ReadImpl(&MemCtlrT::ReadDWord, pOut, addr, level);
-}
-
-Result MemoryManager::WriteByte(Byte in, Address addr, PrivilageLevel level) {
-    return this->WriteImpl(&MemCtlrT::WriteByte, in, addr, level);
-}
-
-Result MemoryManager::WriteHWord(HWord in, Address addr, PrivilageLevel level) {
-    return this->WriteImpl(&MemCtlrT::WriteHWord, in, addr, level);
-}
-
-Result MemoryManager::WriteWord(Word in, Address addr, PrivilageLevel level) {
-    return this->WriteImpl(&MemCtlrT::WriteWord, in, addr, level);
-}
-
-Result MemoryManager::WriteDWord(DWord in, Address addr, PrivilageLevel level) {
-    return this->WriteImpl(&MemCtlrT::WriteDWord, in, addr, level);
-}
-
-Result MemoryManager::InstFetch(Word* pOut, Address addr, PrivilageLevel level) {
-    Result res;
-
-    diag::AssertNotNull(pOut);
-
-    /* Translate address if in non-machine mode and translation is enabled. */
-    if(level != PrivilageLevel::Machine && m_Mode != AddrTransMode::Bare) {
-        res = this->TranslateForFetch(&addr, addr, level);
-        if(res.IsFailure()) {
-            return res;
-        }
-    }
-
-    /* TODO: PMP: Perform PMP Check. */
-
-    /* Perform unmapped fetch. */
-    return m_pMemCtlr->ReadWord(pOut, addr);
-}
-
-template<typename T>
-Result MemoryManager::MappedReadImpl(auto readFunc, T* pOut, Address addr) {
-    diag::AssertNotNull(readFunc);
-    diag::AssertNotNull(pOut);
-
-    /* Translate address without permission checks. */
-    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
-    if(res.IsFailure()) {
-        return res;
-    }
-
-    /* Perform unmapped read. */
-    return (*m_pMemCtlr.*readFunc)(pOut, addr);
-}
-
-template<typename T>
-Result MemoryManager::MappedWriteImpl(auto writeFunc, T in, Address addr) {
-    diag::AssertNotNull(writeFunc);
-
-    /* Translate address without permission checks. */
-    Result res = this->TranslateForAny(&addr, addr, PrivilageLevel::Machine);
-    if(res.IsFailure()) {
-        return res;
-    }
-
-    /* Perform unmapped write. */
-    return (*m_pMemCtlr.*writeFunc)(in, addr);
-}
-
-Result MemoryManager::MappedReadByte(Byte* pOut, Address addr) {
-    return this->MappedReadImpl(&MemCtlrT::ReadByte, pOut, addr);
-}
-
-Result MemoryManager::MappedReadHWord(HWord* pOut, Address addr) {
-    return this->MappedReadImpl(&MemCtlrT::ReadHWord, pOut, addr);
-}
-
-Result MemoryManager::MappedReadWord(Word* pOut, Address addr) {
-    return this->MappedReadImpl(&MemCtlrT::ReadWord, pOut, addr);
-}
-
-Result MemoryManager::MappedReadDWord(DWord* pOut, Address addr) {
-    return this->MappedReadImpl(&MemCtlrT::ReadDWord, pOut, addr);
-}
-
-Result MemoryManager::MappedWriteByte(Byte in, Address addr) {
-    return this->MappedWriteImpl(&MemCtlrT::WriteByte, in, addr);
-}
-
-Result MemoryManager::MappedWriteHWord(HWord in, Address addr) {
-    return this->MappedWriteImpl(&MemCtlrT::WriteHWord, in, addr);
-}
-
-Result MemoryManager::MappedWriteWord(Word in, Address addr) {
-    return this->MappedWriteImpl(&MemCtlrT::WriteWord, in, addr);
-}
-
-Result MemoryManager::MappedWriteDWord(DWord in, Address addr) {
-    return this->MappedWriteImpl(&MemCtlrT::WriteDWord, in, addr);
 }
 
 } // namespace detail
