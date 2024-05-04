@@ -5,6 +5,8 @@
 namespace riscv {
 namespace mem {
 
+MemoryController::MemoryController() : m_Clients() {}
+
 Result MemoryController::Initialize(const RegionInfo* pRegions, std::size_t count) {
     return this->Initialize(std::span<const RegionInfo>(pRegions, count));
 }
@@ -126,6 +128,66 @@ Result MemoryController::StoreImpl(WordType in, Address addr) {
     return this->StoreImpl(std::bit_cast<TmpType>(in), addr);
 }
 
+template Result MemoryController::StoreImpl<float>(float, Address);
+template Result MemoryController::StoreImpl<double>(double, Address);
+
+template<typename WordType>
+Result MemoryController::LoadReserve(int client, WordType* pOut, Address addr) {
+    /* Acquire lock on reservation info. */
+    std::scoped_lock lock(m_ReserveMutex);
+
+    /* Add a reservation. */
+    this->AddReservation(client, addr);
+
+    /* Perform the load. */
+    return this->LoadImpl(pOut, addr);
+}
+
+template Result MemoryController::LoadReserve<Byte>(int, Byte*, Address);
+template Result MemoryController::LoadReserve<HWord>(int, HWord*, Address);
+template Result MemoryController::LoadReserve<Word>(int, Word*, Address);
+template Result MemoryController::LoadReserve<DWord>(int, DWord*, Address);
+template Result MemoryController::LoadReserve<ByteS>(int, ByteS*, Address);
+template Result MemoryController::LoadReserve<HWordS>(int, HWordS*, Address);
+template Result MemoryController::LoadReserve<WordS>(int, WordS*, Address);
+template Result MemoryController::LoadReserve<DWordS>(int, DWordS*, Address);
+template Result MemoryController::LoadReserve<float>(int, float*, Address);
+template Result MemoryController::LoadReserve<double>(int, double*, Address);
+
+template<typename WordType>
+Result MemoryController::StoreConditional(int client, WordType* pInOut, Address addr) {
+    /* Acquire lock on reservation info. */
+    std::scoped_lock lock(m_ReserveMutex);
+
+    /* Check if we still have our reservation. */
+    if(!this->HasReservation(client, addr)) {
+        /* Clean pInOut then return. */
+        *pInOut = 1;
+        return ResultSuccess();
+    }
+
+    /* Invalidate any reservations on this address. */
+    this->InvalidateReservation(addr);
+
+    /* Save pInOut and clear it. */
+    auto tmp = *pInOut;
+    *pInOut = 0;
+
+    /* Perform store. */
+    return this->StoreImpl(tmp, addr);
+}
+
+template Result MemoryController::StoreConditional<Byte>(int, Byte*, Address);
+template Result MemoryController::StoreConditional<HWord>(int, HWord*, Address);
+template Result MemoryController::StoreConditional<Word>(int, Word*, Address);
+template Result MemoryController::StoreConditional<DWord>(int, DWord*, Address);
+template Result MemoryController::StoreConditional<ByteS>(int, ByteS*, Address);
+template Result MemoryController::StoreConditional<HWordS>(int, HWordS*, Address);
+template Result MemoryController::StoreConditional<WordS>(int, WordS*, Address);
+template Result MemoryController::StoreConditional<DWordS>(int, DWordS*, Address);
+template Result MemoryController::StoreConditional<float>(int, float*, Address);
+template Result MemoryController::StoreConditional<double>(int, double*, Address);
+
 Result MemoryController::AddRegionImpl(const RegionInfo* pRegion) {
     /* Check if this new regions conflicts with any currently existing regions. */
     if (m_MemRegion.Includes(pRegion->GetStart()) ||
@@ -149,6 +211,49 @@ Result MemoryController::AddRegionImpl(const RegionInfo* pRegion) {
     }
 
     return ResultSuccess();
+}
+
+bool MemoryController::HasReservation(int client, Address addr) {
+    /* Do nothing if reservations list is emtpy. */
+    if(!m_Reservations.empty()) {
+        return false;
+    }
+
+    /* Cut off lower bits. */
+    addr >>= ReserveGranularity;
+
+    /* Check all active reservation entries. */
+    for(const auto& reservation : m_Reservations) {
+        if(reservation.client == client && reservation.addr == addr) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void MemoryController::AddReservation(int client, Address addr) {
+    /* If we already have a reservation, clear it. */
+    if(!m_Reservations.empty()) {
+        m_Reservations.erase(std::find_if(m_Reservations.begin(), m_Reservations.end(), [client](const auto& it) { return it.client == client; }));
+    }
+
+    /* Add reservation. */
+    m_Reservations.emplace_back(client, addr);
+}
+
+void MemoryController::InvalidateReservation(Address addr) {
+    /* Do nothing if reservations list is emtpy. */
+    if(m_Reservations.empty()) {
+        return;
+    }
+
+    /* Find and erase all resevations on this address. */
+    for(auto it = m_Reservations.begin(); it != m_Reservations.end(); it++) {
+        if(it->addr == addr) {
+            it = m_Reservations.erase(it);
+        }
+    }
 }
 
 template<typename T>

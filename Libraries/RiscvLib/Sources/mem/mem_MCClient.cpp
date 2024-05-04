@@ -1,4 +1,4 @@
-#include <RiscvEmu/mem/mem_MemoryClient.h>
+#include <RiscvEmu/mem/mem_MCClient.h>
 
 namespace riscv {
 namespace mem {

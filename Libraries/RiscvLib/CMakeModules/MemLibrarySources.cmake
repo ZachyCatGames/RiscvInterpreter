@@ -6,7 +6,7 @@ set(RISCV_MEM_LIBRARY_HEADERS
 
     "${_RV_MEM_HDR_DIR}/mem_AlignedMmioDev.h"
     "${_RV_MEM_HDR_DIR}/mem_IMmioDev.h"
-    "${_RV_MEM_HDR_DIR}/mem_MemoryClient.h"
+    "${_RV_MEM_HDR_DIR}/mem_MCClient.h"
     "${_RV_MEM_HDR_DIR}/mem_MemoryController.h"
     "${_RV_MEM_HDR_DIR}/mem_RegionInfo.h"
     "${_RV_MEM_HDR_DIR}/mem_Result.h"
@@ -17,7 +17,7 @@ set(RISCV_MEM_LIBRARY_HEADERS
 )
 
 set(RISCV_MEM_LIBRARY_SOURCES
-    "${_RV_MEM_SRC_DIR}/mem_MemoryClient.cpp"
+    "${_RV_MEM_SRC_DIR}/mem_MCClient.cpp"
     "${_RV_MEM_SRC_DIR}/mem_MemoryController.cpp"
     "${_RV_MEM_SRC_DIR}/mem_MemoryDevice.cpp"
 

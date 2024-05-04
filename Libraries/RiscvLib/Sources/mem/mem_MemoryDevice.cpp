@@ -1,4 +1,4 @@
-#include <RiscvEmu/mem/mem_MemoryDevice.cpp>
+#include <RiscvEmu/mem/mem_MemoryDevice.h>
 
 namespace riscv {
 namespace mem {

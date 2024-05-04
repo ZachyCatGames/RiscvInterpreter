@@ -1,12 +1,13 @@
 #pragma once
 #include <RiscvEmu/riscv_Types.h>
 #include <RiscvEmu/mem/mem_IMmioDev.h>
-#include <RiscvEmu/mem/mem_MemoryClient.h>
+#include <RiscvEmu/mem/mem_MCClient.h>
 #include <RiscvEmu/mem/mem_RegionInfo.h>
 #include <RiscvEmu/mem/mem_Result.h>
 #include <RiscvEmu/mem/detail/mem_MemRegion.h>
 #include <RiscvEmu/mem/detail/mem_IoRegion.h>
 #include <array>
+#include <mutex>
 #include <vector>
 
 namespace riscv {
@@ -27,10 +28,7 @@ namespace mem {
 class MemoryController {
 public:
     /** Default constructor, initializes with empty state. */
-    MemoryController() = default;
-
-    /** Initializer contructor -- Calls ::Initialize. */
-    MemoryController(const RegionInfo* pRegions, std::size_t regionCount);
+    MemoryController();
 
     /**
      * Initializes the Memory Controller's regions.
@@ -67,12 +65,30 @@ public:
 
     template<typename WordType>
     Result Store(WordType in, Address addr) { return this->StoreImpl(in, addr); }
+
+    template<typename WordType>
+    Result LoadReserve(int client, WordType* pOut, Address addr);
+
+    template<typename WordType>
+    Result StoreConditional(int client, WordType* pInOut, Address addr);
 private:
     friend class MemoryClient;
 
     static constexpr auto MaxClientCount = 16; // TODO: Control with macro
 
-    std::array<MemoryClient, MaxClientCount> m_Clients();
+    struct ReserveEntry {
+        Address addr;
+        int client;
+    }; // struct ReserveEntry
+
+    /* Number of least significant bits to cut off. */
+    static constexpr auto ReserveGranularity = 3; // align to 8 bytes.
+
+    std::mutex m_ReserveMutex;
+    std::vector<ReserveEntry> m_Reservations;
+
+    MCClient m_Clients[MaxClientCount];
+
     detail::MemRegion m_MemRegion;
     std::vector<detail::IoRegion> m_IoRegions;
 private:
@@ -95,6 +111,10 @@ private:
 
     template<std::floating_point WordType>
     Result StoreImpl(WordType in, Address addr);
+
+    bool HasReservation(int client, Address addr);
+    void AddReservation(int client, Address addr);
+    void InvalidateReservation(Address addr);
 
     template<typename T>
     T* FindRegionImpl(std::vector<T>& regionList, Address addr);

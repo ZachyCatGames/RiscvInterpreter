@@ -7,7 +7,7 @@ namespace mem {
 
 class MemoryController;
 
-class MemoryClient {
+class MCClient {
 public:
     Result RequestWeakReservation(Address addr);
 
@@ -17,12 +17,12 @@ public:
     template<typename WordType>
     Result Store(WordType in, Address addr);
 private:
-    MemoryClient();
-    MemoryClient(MemoryController* pCtlr, int deviceId);
+    MCClient();
+    MCClient(MemoryController* pCtlr, int deviceId);
 private:
     friend class MemoryController;
     MemoryController* m_pCtlr;
-}; // class MemoryClient
+}; // class MCClient
 
 } // namespace mem
 } // namespace riscv
