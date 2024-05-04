@@ -37,25 +37,17 @@ public:
     void ClearGPRs() noexcept;
 
     /* Access physical memory. */
-    Result MemReadByte(Byte* pOut, Address addr)   { return m_MemCtlr.ReadByte(pOut, addr); }
-    Result MemReadHWord(HWord* pOut, Address addr) { return m_MemCtlr.ReadHWord(pOut, addr); }
-    Result MemReadWord(Word* pOut, Address addr)   { return m_MemCtlr.ReadWord(pOut, addr); }
-    Result MemReadDWord(DWord* pOut, Address addr) { return m_MemCtlr.ReadDWord(pOut, addr); }
-    Result MemWriteByte(Byte in, Address addr)     { return m_MemCtlr.WriteByte(in, addr); }
-    Result MemWriteHWord(HWord in, Address addr)   { return m_MemCtlr.WriteHWord(in, addr); }
-    Result MemWriteWord(Word in, Address addr)     { return m_MemCtlr.WriteWord(in, addr); }
-    Result MemWriteDWord(DWord in, Address addr)   { return m_MemCtlr.WriteDWord(in, addr); }
+    template<typename WordType>
+    Result MemLoad(WordType* pOut, Address addr) { return m_McClient.Load(pOut, addr); }
+    template<typename WordType>
+    Result MemStore(WordType in, Address addr) { return m_McClient.Store(in, addr); }
 
     /* Access memory as the hart. */
     /* TODO: Properly implement to bypass memory restrictions. */
-    Result HartReadByte(Byte* pOut, Address addr)   { return m_Hart.MappedReadByte(pOut, addr); }
-    Result HartReadHWord(HWord* pOut, Address addr) { return m_Hart.MappedReadHWord(pOut, addr); }
-    Result HartReadWord(Word* pOut, Address addr)   { return m_Hart.MappedReadWord(pOut, addr); }
-    Result HartReadDWord(DWord* pOut, Address addr) { return m_Hart.MappedReadDWord(pOut, addr); }
-    Result HartWriteByte(Byte in, Address addr)     { return m_Hart.MappedWriteByte(in, addr); }
-    Result HartWriteHWord(HWord in, Address addr)   { return m_Hart.MappedWriteHWord(in, addr); }
-    Result HartWriteWord(Word in, Address addr)     { return m_Hart.MappedWriteWord(in, addr); }
-    Result HartWriteDWord(DWord in, Address addr)   { return m_Hart.MappedWriteDWord(in, addr); }
+    template<typename WordType>
+    Result MemMappedLoad(WordType* pOut, Address addr) { return m_Hart.MemMappedLoadForDebug(pOut, addr); }
+    template<typename WordType>
+    Result MemMappedStore(WordType in, Address addr) { return m_Hart.MemMappedStoreForDebug(in, addr); }
 
     Result ClearMem();
 
@@ -65,6 +57,7 @@ private:
     cpu::Hart::SharedState m_HartSharedState;
     cpu::Hart m_Hart;
     mem::MemoryController m_MemCtlr;
+    mem::MCClient m_McClient;
 }; // class HartTestSystem
 
 } // namespace test

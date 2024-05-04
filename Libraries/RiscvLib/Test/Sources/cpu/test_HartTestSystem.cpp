@@ -4,9 +4,15 @@ namespace riscv {
 namespace test {
 
 Result HartTestSystem::Initialize() {
+    /* Get our own MC client. */
+    m_McClient = m_MemCtlr.GetClient();
+
+    /* Get a MC client for the Hart. */
+    auto hartClient = m_MemCtlr.GetClient();
+
     /* Initialize the Hart. */
     m_HartSharedState.Initialize(1, &m_MemCtlr);
-    Result res = m_Hart.Initialize(&m_HartSharedState, 0);
+    Result res = m_Hart.Initialize(&m_HartSharedState, std::move(hartClient), 0);
     if(res.IsFailure()) {
         return res;
     }
@@ -44,7 +50,7 @@ Result HartTestSystem::ClearMem() {
     /* Write zero to entirety of ram. */
     Address curAddr = MemoryAddress;
     while(curAddr < MemoryAddress + MemorySize) {
-        Result res = this->MemWriteDWord(0, curAddr);
+        Result res = this->MemStore<DWord>(0, curAddr);
         if(res.IsFailure()) {
             return res;
         }

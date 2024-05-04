@@ -18,7 +18,7 @@ private:
     friend class HartSingleInstTestBase<TestInstLOAD>;
     Result Initialize(HartTestSystem* pSys) const {
         /* Write our memVal to memory. */
-        Result res = pSys->MemWriteDWord(static_cast<DWord>(std::get<1>(m_MemVal)), std::get<0>(m_MemVal));
+        Result res = pSys->MemStore(static_cast<DWord>(std::get<1>(m_MemVal)), std::get<0>(m_MemVal));
         if(res.IsFailure()) {
             return res;
         }

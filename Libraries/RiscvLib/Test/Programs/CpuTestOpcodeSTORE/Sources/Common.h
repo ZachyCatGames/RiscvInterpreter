@@ -28,7 +28,7 @@ private:
     Result Check(HartTestSystem* pSys) const{
         /* Read memory. */
         DWord out = 0;
-        Result res = pSys->MemReadDWord(&out, std::get<0>(m_ExpectedMemVal));
+        Result res = pSys->MemLoad(&out, std::get<0>(m_ExpectedMemVal));
         if(res.IsFailure()) {
             return res;
         }
