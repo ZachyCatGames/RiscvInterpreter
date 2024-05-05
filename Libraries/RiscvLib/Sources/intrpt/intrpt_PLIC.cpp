@@ -33,12 +33,6 @@ namespace {
 [[maybe_unused]] constexpr auto ContextPriorityThresholdReg = 0;
 [[maybe_unused]] constexpr auto ContextClaimReg = 1;
 
-constexpr Word GetEnabledTarget(Word val) noexcept { return val / EnabledWordsPerContext; }
-constexpr Word GetEnabledSource(Word val) noexcept { return val % EnabledWordsPerContext; }
-
-constexpr Word GetContextTarget(Word val) noexcept { return val / ContextRegWordCount; }
-constexpr Word GetContextRegId (Word val) noexcept { return val % ContextSize; }
-
 } // namespace
 
 NativeWord PLIC::MmioInterface::GetMappedSize() { return AddrSpaceSize; }
@@ -52,13 +46,11 @@ Result PLIC::MmioInterface::StoreHWord([[maybe_unused]] HWord, [[maybe_unused]] 
 Result PLIC::MmioInterface::StoreDWord([[maybe_unused]] DWord, [[maybe_unused]] Address) { return ResultSuccess(); }
 
 Result PLIC::MmioInterface::LoadWord(Word* pOut, Address addr) {
-    *pOut = m_pParent->ReadRegister(static_cast<Word>(addr));
-    return ResultSuccess();
+    return m_pParent->ReadRegister(pOut, static_cast<Word>(addr / 4));
 }
 
 Result PLIC::MmioInterface::StoreWord(Word in, Address addr) {
-    m_pParent->WriteRegister(static_cast<Word>(addr), in);
-    return ResultSuccess();
+    return m_pParent->WriteRegister(static_cast<Word>(addr / 4), in);
 }
 
 PLIC::Target::Target() noexcept = default;
@@ -159,7 +151,7 @@ Word PLIC::Source::NotifyClaimed() noexcept {
     /* Clear our pending bit if needed. */
     auto id = this->GetId();
     if(!m_PendingCount) {
-        m_pParent->SetPending(static_cast<int>(id), 0);
+        m_pParent->SetPending(id, false);
     }
 
     return id;
@@ -195,7 +187,7 @@ Result PLIC::Source::SignalInterrupt() {
     /* Set our pending bit if needed. */
     auto id = this->GetId();
     if(!m_PendingCount) {
-        m_pParent->SetPending(static_cast<int>(id), 1);
+        m_pParent->SetPending(id, 1);
     }
 
     /* Increment pending count. */
@@ -255,162 +247,193 @@ Result PLIC::RegisterSource(ISource** ppSrc, Word id) {
     return ResultSuccess();
 }
 
-Word PLIC::GetPriority(int source) const noexcept {
-    Word val = 0;
+Word PLIC::GetPriority(std::size_t source) const noexcept {
     this->AssertSourceIdValid(static_cast<Word>(source));
-    this->ReadPriorityRegImpl(&val, static_cast<Word>(source));
-    return val;
+    return m_Sources[source].ReadPriority();
 }
 
-void PLIC::SetPriority(int source, Word val) noexcept {
+void PLIC::SetPriority(std::size_t source, Word val) noexcept {
     this->AssertSourceIdValid(static_cast<Word>(source));
-    this->WritePriorityRegImpl(static_cast<Word>(source), val);
+    m_Sources[source].WritePriority(val);
 }
 
-bool PLIC::GetPending(int source) const noexcept {
+bool PLIC::GetPending(std::size_t source) const noexcept {
     this->AssertSourceIdValid(static_cast<Word>(source));
-    return util::ExtractBitArray(m_PendingBits.data(), source);
+    return util::ExtractBitArray(m_PendingBits.data(), static_cast<int>(source));
 }
 
-void PLIC::SetPending(int source, bool val) noexcept {
+void PLIC::SetPending(std::size_t source, bool val) noexcept {
     this->AssertSourceIdValid(static_cast<Word>(source));
-    util::AssignBitArray(m_PendingBits.data(), source, val);
+    util::AssignBitArray(m_PendingBits.data(), static_cast<int>(source), val);
 }
 
-bool PLIC::GetEnabled(int source, int target) const noexcept {
+bool PLIC::GetEnabled(std::size_t source, std::size_t target) const noexcept {
     /* Code using this should know better. */
     this->AssertTargetIdValid(static_cast<Word>(target));
     this->AssertSourceIdValid(static_cast<Word>(source));
 
     /* Read enabled register. */
-    Word reg = 0;
-    this->ReadEnabledRegImpl(&reg, static_cast<Word>(target * EnabledWordsPerContext + source));
+    auto reg = m_Targets[target].ReadEnableReg(static_cast<Word>(source));
 
     /* Extract bit. */
-    return util::ExtractBitfield(reg, static_cast<Word>(source) % WordBitLen, 1);
+    return util::ExtractBitfield(reg, static_cast<Word>(source) % m_PendingBitsPerWord, 1);
 }
 
-void PLIC::SetEnabled(int source, int target, bool enable) noexcept {
+void PLIC::SetEnabled(std::size_t source, std::size_t target, bool enable) noexcept {
     /* Code using this should know better. */
     this->AssertTargetIdValid(static_cast<Word>(target));
     this->AssertSourceIdValid(static_cast<Word>(source));
 
     /* Read enabled register. */
-    auto regId = static_cast<Word>(target * EnabledWordsPerContext + source);
-    Word reg = 0;
-    if (!this->ReadEnabledRegImpl(&reg, regId)) {
-        return;
-    }
+    auto regId = static_cast<Word>(source) / m_PendingBitsPerWord;
+    Word reg = m_Targets[target].ReadEnableReg(regId);
 
     /* Write bit. */
-    reg = util::AssignBitfield(reg, static_cast<Word>(source) % WordBitLen, 1, static_cast<Word>(enable));
+    reg = util::AssignBitfield(reg, static_cast<Word>(source) % m_PendingBitsPerWord, 1, static_cast<Word>(enable));
 
     /* Write register back. */
-    this->WriteEnabledReg(regId, reg);
+    m_Targets[target].WriteEnableReg(regId, reg);
 }
 
-Word PLIC::ReadRegister(Word index) {
+Result PLIC::ReadRegister(Word* pOut, Word index) {
     if (index >= ContextRegStart) {
-        return this->ReadContextReg(index - ContextRegStart);
+        return this->ReadContextReg(pOut, index - ContextRegStart);
     }
     else if (index >= EnabledRegStart) {
-        return this->ReadEnabledReg(index - EnabledRegStart);
+        return this->ReadEnabledReg(pOut, index - EnabledRegStart);
     }
     else if (index >= PendingRegStart) {
-        return this->ReadPendingReg(index - PendingRegStart);
+        return this->ReadPendingReg(pOut, index - PendingRegStart);
     }
     else /* if (index >= PriorityRegStart) */ {
-        return this->ReadPriorityReg(index - PriorityRegStart);
+        return this->ReadPriorityReg(pOut, index - PriorityRegStart);
     }
 }
 
-void PLIC::WriteRegister(Word index, Word val) {
+Result PLIC::WriteRegister(Word index, Word val) {
     if (index >= ContextRegStart) {
-        this->WriteContextReg(index - ContextRegStart, val);
+        return this->WriteContextReg(index - ContextRegStart, val);
     }
     else if (index >= EnabledRegStart) {
-        this->WriteEnabledReg(index - EnabledRegStart, val);
+        return this->WriteEnabledReg(index - EnabledRegStart, val);
     }
     else if (index >= PendingRegStart) {
         /* Writing to pending does nothing. */
-        return;
+        return ResultSuccess();
     }
     else /* if (index >= PriorityRegStart) */ {
-        this->WriteRegister(index - PriorityRegStart, val);
+        return this->WriteRegister(index - PriorityRegStart, val);
     }
 }
 
-Word PLIC::ReadPriorityReg(Word index) const noexcept {
-    Word val = 0;
-    this->ReadPriorityRegImpl(&val, index);
-    return val;
+Result PLIC::ReadPriorityReg(Word* pOut, Word index) const noexcept {
+    /* If index > SourceCount, trigger a access fault. */
+    if(index >= m_SourceCount) {
+        return mem::ResultLoadAccessFault();
+    }
+
+    /* Load priority value. */
+    *pOut = m_Sources[index].ReadPriority();
+
+    return ResultSuccess();
 }
 
-void PLIC::WritePriorityReg(Word index, Word val) noexcept {
-    /* noop if priority is the same or index is bad. */
-    Word reg = 0;
-    if (!this->ReadPriorityRegImpl(&reg, index) || val == reg) {
-        return;
+Result PLIC::WritePriorityReg(Word index, Word val) noexcept {
+    /* If index > SourceCount, trigger a access fault. */
+    if(index >= m_SourceCount) {
+        return mem::ResultStoreAccessFault();
+    }
+
+    /* No-op if priority is the same. */
+    if(m_Sources[index].ReadPriority() == val) {
+        return ResultSuccess();
     }
 
     /* Write priority for the appropriate source. */
-    this->WritePriorityRegImpl(index, val);
+    m_Sources[index].WritePriority(val);
 
     /* Readd to queue. */
     this->AddSourceToQueue(m_Sources.data() + index);
 
     /* Attempt to interrupt all target. */
     this->NotifyAllTargetsIRQAvailable();
+
+    return ResultSuccess();
 }
 
-Word PLIC::ReadPendingReg(Word index) const noexcept {
-    Word val = 0;
-    this->ReadPendingRegImpl(&val, index);
-    return val;
+Result PLIC::ReadPendingReg(Word* pOut, Word index) const noexcept {
+    /* If index is greater than the number of pending works, trigger an access fault. */
+    if(index >= m_PendingWordCount) {
+        return mem::ResultLoadAccessFault();
+    }
+
+    /* Perform load. */
+    *pOut = m_PendingBits[index];
+    
+    return ResultSuccess();
 }
 
-Word PLIC::ReadEnabledReg(Word index) const noexcept {
-    Word val = 0;
-    this->ReadEnabledRegImpl(&val, index);
-    return val;
+Result PLIC::ReadEnabledReg(Word* pOut, Word index) const noexcept {
+    /* Compute target and source indecies. */
+    auto target = index / m_MaxSourceCount;
+    auto wordidx = index % m_MaxSourceCount;
+
+    /* If either target is greater than the target count or wordidx is greater than pending word count, trigger an access fault. */
+    if(target >= m_TargetCount || wordidx >= m_PendingWordCount) {
+        return mem::ResultLoadAccessFault();
+    }
+
+    /* Load enabled register. */
+    *pOut = m_Targets[target].ReadEnableReg(wordidx);
+
+    return ResultSuccess();
 }
 
-void PLIC::WriteEnabledReg(Word index, Word val) noexcept {
-    /* Read current value. */
+Result PLIC::WriteEnabledReg(Word index, Word val) noexcept {
+    /* Try to load current value. */
     Word cur = 0;
-    this->ReadEnabledRegImpl(&cur, index);
+    Result res = this->ReadEnabledReg(&cur, index);
+    if(res.IsFailure()) {
+        return mem::ResultStoreAccessFault();
+    }
 
-    /* Write new value. */
-    this->WriteEnabledRegImpl(index, val);
+    /* Store new value. */
+    auto wordIdx = index % m_MaxSourceCount;
+    m_Targets[index].WriteEnableReg(wordIdx, cur);
 
     /* Interrupt any targets that we just enabled. */
     Word changed = (val ^ cur) & val;
     if(changed) {
-        m_Targets[GetEnabledTarget(index)].NotifyAvailableIRQImpl();
+        m_Targets[wordIdx].NotifyAvailableIRQImpl();
     }
+
+    return ResultSuccess();
 }
 
-Word PLIC::ReadContextReg(Word index) {
-    auto target = GetContextTarget(index);
-    auto regId = GetContextRegId(index);
+Result PLIC::ReadContextReg(Word* pOut, Word index) {
+    auto target = this->GetContextTarget(index);
+    auto regId = this->GetContextRegId(index);
 
     /* Handle reading from priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
-        return m_Targets[target].ReadPrioThreshold();
+        *pOut = m_Targets[target].ReadPrioThreshold();
     }
 
     /* Return if reserved word. */
     if (regId != ContextClaimReg) {
-        return 0;
+        *pOut = 0u;
+        return ResultSuccess();
     }
 
     /* Claim top request. */
-    return this->ClaimTopRequest();
+    *pOut = this->ClaimTopRequest();
+
+    return ResultSuccess();
 }
 
-void PLIC::WriteContextReg(Word index, Word val) {
-    auto& target = m_Targets[GetContextTarget(index)];
-    auto regId = GetContextRegId(index);
+Result PLIC::WriteContextReg(Word index, Word val) {
+    auto& target = m_Targets[this->GetContextTarget(index)];
+    auto regId = this->GetContextRegId(index);
 
     /* Handle writing to priority threshold. */
     if (regId == ContextPriorityThresholdReg) {
@@ -422,71 +445,13 @@ void PLIC::WriteContextReg(Word index, Word val) {
 
     /* Do nothing if this is a reserved word. */
     if (regId != ContextClaimReg) {
-        return;
+        return ResultSuccess();
     }
 
-    /* Signal that we've finished handling the interrupt. */
+    /* We're writing the claim reg, signal that we've finished handling the interrupt. */
     m_Sources[val].NotifyComplete();
-}
 
-bool PLIC::ReadPriorityRegImpl(Word* pOut, Word index) const noexcept {
-    /* Make sure index is valid. */
-    if (index >= m_Sources.size()) {
-        return false;
-    }
-
-    *pOut = m_Sources[index].ReadPriority();
-    return true;
-}
-
-bool PLIC::WritePriorityRegImpl(Word index, Word val) noexcept {
-    if (index >= m_Sources.size()) {
-        return false;
-    }
-    
-    m_Sources[index].WritePriority(val);
-    return true;
-}
-
-bool PLIC::ReadPendingRegImpl(Word* pOut, Word index) const noexcept {
-    if (index >= m_PendingBits.size()) {
-        return false;
-    }
-
-    *pOut = m_PendingBits[index];
-    return true;
-}
-bool PLIC::WritePendingRegImpl(Word index, Word val) noexcept {
-    if (index >= m_PendingBits.size()) {
-        return false;
-    }
-
-    m_PendingBits[index] = val;
-    return true;
-}
-
-bool PLIC::ReadEnabledRegImpl(Word* pOut, Word index) const noexcept {
-    auto target = GetEnabledTarget(index);
-    auto source = GetEnabledSource(index);
-
-    if (!this->TargetIdValid(target) || !this->SourceIdValid(source)) {
-        return false;
-    }
-
-    *pOut = m_Targets[target].ReadEnableReg(source);
-    return true;
-}
-
-bool PLIC::WriteEnabledRegImpl(Word index, Word val) noexcept {
-    auto target = GetEnabledTarget(index);
-    auto source = GetEnabledSource(index);
-
-    if (!this->TargetIdValid(target) || !this->SourceIdValid(source)) {
-        return false;
-    }
-
-    m_Targets[target].WriteEnableReg(val, source);
-    return true;
+    return ResultSuccess();
 }
 
 void PLIC::CleanupQueue() {

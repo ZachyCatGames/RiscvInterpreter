@@ -25,40 +25,28 @@ public:
     Result RegisterTarget(TargetPtrT pTarget, Word id);
     Result RegisterSource(ISource** ppSrc, Word id);
 
-    Word GetPriority(int source) const noexcept;
-    void SetPriority(int source, Word val) noexcept;
+    Word GetPriority(std::size_t source) const noexcept;
+    void SetPriority(std::size_t source, Word val) noexcept;
 
-    bool GetPending(int source) const noexcept;
-    void SetPending(int source, bool val) noexcept;
+    bool GetPending(std::size_t source) const noexcept;
+    void SetPending(std::size_t source, bool val) noexcept;
 
-    bool GetEnabled(int source, int target) const noexcept;
-    void SetEnabled(int source, int target, bool val) noexcept;
+    bool GetEnabled(std::size_t source, std::size_t target) const noexcept;
+    void SetEnabled(std::size_t source, std::size_t target, bool val) noexcept;
 private:
-    Word ReadRegister(Word index);
-    void WriteRegister(Word index, Word val);
+    Result ReadRegister(Word* pOut, Word index);
+    Result WriteRegister(Word index, Word val);
 
-    Word ReadPriorityReg(Word index) const noexcept;
-    void WritePriorityReg(Word index, Word val) noexcept;
+    Result ReadPriorityReg(Word* pOut, Word index) const noexcept;
+    Result WritePriorityReg(Word index, Word val) noexcept;
 
-    Word ReadPendingReg(Word index) const noexcept;
+    Result ReadPendingReg(Word* pOut, Word index) const noexcept;
 
-    Word ReadContextReg(Word index);
-    void WriteContextReg(Word index, Word val);
+    Result ReadContextReg(Word* pOut, Word index);
+    Result WriteContextReg(Word index, Word val);
 
-    Word ReadEnabledReg(Word index) const noexcept;
-    void WriteEnabledReg(Word index, Word val) noexcept;
-
-    bool ReadPriorityRegImpl(Word* pOut, Word index) const noexcept;
-    bool WritePriorityRegImpl(Word index, Word val) noexcept;
-
-    bool ReadPendingRegImpl(Word* pOut, Word index) const noexcept;
-    bool WritePendingRegImpl(Word index, Word val) noexcept;
-
-    bool ReadEnabledRegImpl(Word* pOut, Word index) const noexcept;
-    bool WriteEnabledRegImpl(Word index, Word val) noexcept;
-
-    bool ReadContextRegImpl(Word* pOut, Word index) noexcept;
-    bool WriteContextRegImpl(Word index, Word val) noexcept;
+    Result ReadEnabledReg(Word* pOut, Word index) const noexcept;
+    Result WriteEnabledReg(Word index, Word val) noexcept;
 private:
     class Source;
     struct QueueData;
@@ -77,12 +65,27 @@ private:
 
     void AssertTargetIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
     void AssertSourceIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
+
+    static constexpr Word GetEnabledTarget(Word index) noexcept { return index / m_PendingWordCount; }
+    static constexpr Word GetEnabledSource(Word index) noexcept { return index % m_PendingWordCount; }
+
+    static constexpr Word GetContextTarget(Word index) noexcept { return index / m_ContextWordCount; }
+    static constexpr Word GetContextRegId (Word index) noexcept { return index % m_ContextSize; }
 private:
+    static constexpr auto m_MaxSourceCount = 1024;
+    static constexpr auto m_MaxTargetCount = 15872;
+
     /* TODO: Config. */
     static constexpr auto m_SourceCount = 128;
     static constexpr auto m_TargetCount = 128;
+    static_assert(m_SourceCount <= m_MaxSourceCount);
+    static_assert(m_TargetCount <= m_MaxTargetCount);
 
     static constexpr auto m_PendingWordCount = (m_SourceCount + 31u) / 32u;
+    static constexpr auto m_PendingBitsPerWord = 32u;
+
+    static constexpr auto m_ContextSize = 0x1000;
+    static constexpr auto m_ContextWordCount = m_ContextSize / sizeof(Word);
 private:
     class MmioInterface : public mem::IMmioDev {
     public:
