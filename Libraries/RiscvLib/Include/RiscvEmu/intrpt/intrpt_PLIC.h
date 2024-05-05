@@ -19,8 +19,8 @@ public:
 public:
     Result Initialize();
 
-    Word GetTargetCount() const noexcept;
-    Word GetSourceCount() const noexcept;
+    constexpr Word GetTargetCount() const noexcept { return m_TargetCount; }
+    constexpr Word GetSourceCount() const noexcept { return m_SourceCount; }
 
     Result RegisterTarget(TargetPtrT pTarget, Word id);
     Result RegisterSource(ISource** ppSrc, Word id);

@@ -222,9 +222,6 @@ Result PLIC::Initialize() {
     return ResultSuccess();
 }
 
-Word PLIC::GetTargetCount() const noexcept { return m_TargetCount; }
-Word PLIC::GetSourceCount() const noexcept { return m_SourceCount; }
-
 Result PLIC::RegisterTarget(TargetPtrT pTarget, Word id) {
     /* Assert that id is valid and we've been given a valid target. */
     this->AssertTargetIdValid(id);
