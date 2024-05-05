@@ -24,9 +24,9 @@ class ResultDeviceAlreadyExists : public result::ErrorBase<detail::ModuleId, 6> 
 
 class ResultDeviceDoesNotExist : public result::ErrorBase<detail::ModuleId, 7> {};
 
-class ResultReadAccessFault : public result::ErrorBase<detail::ModuleId, 8> {};
+class ResultLoadAccessFault : public result::ErrorBase<detail::ModuleId, 8> {};
 
-class ResultWriteAccessFault : public result::ErrorBase<detail::ModuleId, 9> {};
+class ResultStoreAccessFault : public result::ErrorBase<detail::ModuleId, 9> {};
 
 } // namespace mem
 } // namespace riscv

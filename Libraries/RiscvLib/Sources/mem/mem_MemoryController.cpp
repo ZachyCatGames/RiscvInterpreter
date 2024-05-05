@@ -71,7 +71,7 @@ Result MemoryController::LoadImpl(WordType* pOut, Address addr) {
     if(pDev) {
         return MmioTemplateAdapter(pDev->GetDevice()).Load(pOut, addr - pDev->GetStart());
     }
-    return ResultReadAccessFault();
+    return ResultLoadAccessFault();
 }
 
 template Result MemoryController::LoadImpl<Byte>(Byte*, Address);
@@ -143,7 +143,7 @@ Result MemoryController::StoreImpl(WordType in, Address addr) {
         /* Perform store. */
         return MmioTemplateAdapter(pDev->GetDevice()).Store(in, addr - pDev->GetStart());
     }
-    return ResultWriteAccessFault();
+    return ResultStoreAccessFault();
 }
 
 template Result MemoryController::StoreImpl<Byte>(Byte, Address);
