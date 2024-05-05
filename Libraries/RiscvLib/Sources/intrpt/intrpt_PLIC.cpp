@@ -64,11 +64,10 @@ Result PLIC::MmioInterface::StoreWord(Word in, Address addr) {
 PLIC::Target::Target() noexcept = default;
 PLIC::Target::~Target() = default;
 
-void PLIC::Target::Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id, Word pending) {
+void PLIC::Target::Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id) {
     diag::AssertNotNull(pParent);
     diag::AssertNotNull(pTarget);
     m_pTarget = std::move(pTarget);
-    m_EnableBits.resize(pending);
     m_pParent = pParent;
     m_PrioThreshold = 0;
     m_Id = id;
@@ -216,32 +215,9 @@ PLIC::QueueData::QueueData(Source* p, Word prio) noexcept :
 
 auto PLIC::QueueData::operator<=>(const QueueData& rhs) const noexcept { return this->priority <=> rhs.priority; }
 
-Result PLIC::Initialize(int sourceCount, int targetCount) {
-    /* Make sure source count is valid. */
-    if (sourceCount >= MaxSourceCount || sourceCount < MinSourceCount) {
-        return ResultPLICInvalidSourceCount();
-    }
-
-    /* Make sure target count is valid. */
-    if (targetCount >= MaxTargetCount || targetCount < MinTargetCount) {
-        return ResultPLICInvalidTargetCount();
-    }
-
+Result PLIC::Initialize() {
     /* Clear claimed flag. */
     m_Claimed = false;
-
-    /* Copy source/target values. */
-    m_SourceCount = static_cast<Word>(sourceCount);
-    m_TargetCount = static_cast<Word>(targetCount);
-
-    /* Calculate how many words we'll need for pending bits. */
-    m_PendingCount = (m_SourceCount + 31u) / 32u;
-
-    /* Init source and target vectors. */
-    m_Sources.resize(m_SourceCount);
-    m_Targets.resize(m_TargetCount);
-
-    m_PendingBits.resize(m_PendingCount);
 
     return ResultSuccess();
 }
@@ -261,7 +237,7 @@ Result PLIC::RegisterTarget(TargetPtrT pTarget, Word id) {
     }
 
     /* Initialize target context. */
-    dst.Initialize(this, std::move(pTarget), id, m_PendingCount);
+    dst.Initialize(this, std::move(pTarget), id);
 
     return ResultSuccess();
 }

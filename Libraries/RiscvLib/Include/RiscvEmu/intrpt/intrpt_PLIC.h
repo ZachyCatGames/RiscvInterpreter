@@ -4,6 +4,7 @@
 #include <RiscvEmu/intrpt/intrpt_ITarget.h>
 #include <RiscvEmu/mem/mem_AlignedMmioDev.h>
 #include <RiscvEmu/mem/mem_MemoryController.h>
+#include <array>
 #include <queue>
 #include <source_location>
 #include <vector>
@@ -16,7 +17,7 @@ class PLIC {
 public:
     using TargetPtrT = std::shared_ptr<ITarget>;
 public:
-    Result Initialize(int sourceCount, int targetCount);
+    Result Initialize();
 
     Word GetTargetCount() const noexcept;
     Word GetSourceCount() const noexcept;
@@ -77,6 +78,12 @@ private:
     void AssertTargetIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
     void AssertSourceIdValid(Word id, const std::source_location& location = std::source_location::current()) const noexcept;
 private:
+    /* TODO: Config. */
+    static constexpr auto m_SourceCount = 128;
+    static constexpr auto m_TargetCount = 128;
+
+    static constexpr auto m_PendingWordCount = (m_SourceCount + 31u) / 32u;
+private:
     class MmioInterface : public mem::IMmioDev {
     public:
         virtual NativeWord GetMappedSize() override;
@@ -131,15 +138,6 @@ private:
         Word m_PendingCount;
     }; // class Source
 
-    struct QueueData {
-        QueueData(Source* p, Word prio) noexcept;
-
-        auto operator<=>(const QueueData& rhs) const noexcept;
-        
-        Source* pSrc;
-        Word priority;
-    }; // struct QueueData
-
     class Target : public detail::ITargetForCtrl {
     public:
         virtual bool HasPendingIRQ() override;
@@ -153,7 +151,7 @@ private:
         Target(const Target&) = default;
         virtual ~Target();
 
-        void Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id, Word pending);
+        void Initialize(PLIC* pParent, TargetPtrT&& pTarget, Word id);
 
         void Finalize();
 
@@ -172,23 +170,26 @@ private:
         Result NotifyAvailableIRQImpl();
     private:
         TargetPtrT m_pTarget;
-        std::vector<Word> m_EnableBits;
+        std::array<Word, PLIC::m_PendingWordCount> m_EnableBits;
         PLIC* m_pParent;
         Word m_PrioThreshold;
         Word m_Id;
-    }; // struct Target
+    }; // class Target
+
+    struct QueueData {
+        QueueData(Source* p, Word prio) noexcept;
+
+        auto operator<=>(const QueueData& rhs) const noexcept;
+        
+        Source* pSrc;
+        Word priority;
+    }; // struct QueueData
 private:
     bool m_Claimed;
 
-    Word m_SourceCount;
-    Word m_TargetCount;
-
-    Word m_PendingCount;
-
-    std::vector<Source> m_Sources;
-    std::vector<Target> m_Targets;
-
-    std::vector<Word> m_PendingBits;
+    std::array<Source, m_SourceCount> m_Sources;
+    std::array<Target, m_TargetCount> m_Targets;
+    std::array<Word, m_PendingWordCount> m_PendingBits;
 
     std::priority_queue<QueueData> m_Queue;
 
