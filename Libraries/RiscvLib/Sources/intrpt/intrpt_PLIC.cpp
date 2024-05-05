@@ -271,7 +271,7 @@ Result PLIC::RegisterSource(ISource** ppSrc, Word id) {
     this->AssertSourceIdValid(id);
     diag::AssertNotNull(ppSrc);
 
-    auto src = m_Sources[id];
+    auto& src = m_Sources[id];
 
     if(src.IsInitialized()) {
         return ResultPLICSourceAlreadyTaken();
